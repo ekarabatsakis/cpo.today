@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-05T07:52:42Z",
+ "generated": "2026-09-05T07:55:18Z",
  "countries": [
   {
    "code": "FR",
@@ -28,6 +28,20 @@
    "dynamic_ts": "2026-09-05T07:46:48Z",
    "locations": 4180,
    "evses": 9825
+  },
+  {
+   "code": "LT",
+   "name": "Lithuania",
+   "path": "lt",
+   "source": "VIALIETUVA",
+   "source_name": "Via Lietuva - national EV charging data service",
+   "source_url": "https://ev.vialietuva.lt/en/data-provision",
+   "refresh_minutes": 10,
+   "live": true,
+   "static_ts": "2026-09-05T07:55:18Z",
+   "dynamic_ts": "2026-09-05T07:55:18Z",
+   "locations": 2054,
+   "evses": 5695
   },
   {
    "code": "NL",
