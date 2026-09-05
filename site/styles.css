@@ -270,3 +270,9 @@ td.op-name { max-width: 118px; overflow: hidden; text-overflow: ellipsis; font-w
 .chip.live { background: color-mix(in srgb, var(--st-a) 18%, var(--surface)); color: var(--ink); border-color: transparent; }
 .chip.static, .chip.public, .chip.public_static { background: color-mix(in srgb, var(--accent) 16%, var(--surface)); color: var(--ink); border-color: transparent; }
 .chip.partial, .chip.registration { background: color-mix(in srgb, var(--st-b) 22%, var(--surface)); color: var(--ink); border-color: transparent; }
+
+/* Inventory-only countries: no status semantics on screen */
+body.no-live .legend .lg { display: none; }
+body.no-live .legend::before { content: "Inventory only: no live status in this registry"; font-size: 12px; color: var(--ink-2); }
+body.no-live #f-status { opacity: .5; pointer-events: none; }
+body.no-live .ops th:nth-child(n+5), body.no-live .ops td:nth-child(n+5) { display: none; }

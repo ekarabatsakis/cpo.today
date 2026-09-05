@@ -18,7 +18,7 @@ class SourceError(ValueError):
 @dataclass(frozen=True)
 class Feed:
     url: str
-    kind: str = "json"                 # json | zip-json | gz-json | ocpi-pages
+    kind: str = "json"                 # json | zip-json | gz-json | csv | ocpi-pages
     max_bytes: int = 40 << 20          # cap on the downloaded body
     max_inflated: int = 400 << 20      # cap after zip/gzip inflation
     page_size: int = 1000              # ocpi-pages only
@@ -36,7 +36,7 @@ class SourceSpec:
     bbox: tuple                        # (min lat, min lon, max lat, max lon)
     static: Feed
     parse_static: Callable[[Any, "SourceSpec"], dict]
-    parse_dynamic: Callable[[Any, "SourceSpec"], dict]
+    parse_dynamic: Callable[[Any, "SourceSpec"], dict] | None   # None: inventory-only source (no live status)
     dynamic: Feed | None = None        # None: status comes from the static feed every tick
     tariffs: Feed | None = None        # optional OCPI tariffs feed, resolved via connector tariff_ids
     parse_tariffs: Callable[[Any, "SourceSpec"], dict] | None = None   # doc -> {tariff id: OCPI tariff}
@@ -47,3 +47,7 @@ class SourceSpec:
     @property
     def single_feed(self) -> bool:
         return self.dynamic is None
+
+    @property
+    def has_status(self) -> bool:
+        return self.parse_dynamic is not None

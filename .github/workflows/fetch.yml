@@ -17,7 +17,7 @@ on:
     inputs:
       countries:
         description: "Space-separated country codes to refresh (default: all)"
-        default: "gr lt nl"
+        default: "gr lt nl fr"
         type: string
       force_static:
         description: "Re-process static inventories even if unchanged"
@@ -69,7 +69,7 @@ jobs:
         working-directory: pipeline
         env:
           FORCE_STATIC: ${{ inputs.force_static && '--force-static' || '' }}
-          COUNTRIES: ${{ inputs.countries || 'gr lt nl' }}
+          COUNTRIES: ${{ inputs.countries || 'gr lt nl fr' }}
         run: |
           set -uo pipefail
           python3 --version

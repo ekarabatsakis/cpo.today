@@ -16,6 +16,7 @@ cpo.today exists so that charge point operators (CPOs), investors, fleets, plann
 | Greece | [MYFAH](https://electrokinisi.yme.gov.gr/public/HelpMyfah/PublicData/), Hellenic Ministry of Infrastructure and Transport | ZIP/JSON (OCPI 2.2) | daily | every 10 min | 2026-09 |
 | Lithuania | [Via Lietuva](https://ev.vialietuva.lt/en/data-provision) | OCPI 2.3.0 API | every 10 min | every 10 min | 2026-09 |
 | Netherlands | [NDW](https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/) | OCPI JSON (gzip) | every 10 min | every 10 min | 2026-09 |
+| France | [Base nationale des IRVE](https://transport.data.gouv.fr/datasets?locale=en&type=charging-stations), transport.data.gouv.fr | CSV (IRVE schema) | daily | none published | 2026-09 |
 
 All 28 EU/UK registries and their current status are listed in `site/coverage.json` and on the site's **Coverage** tab. Adding a country is one module under `pipeline/cpo_pipeline/sources/` (see [docs/ADDING_A_COUNTRY.md](docs/ADDING_A_COUNTRY.md)).
 

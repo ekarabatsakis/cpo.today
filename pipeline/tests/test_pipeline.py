@@ -299,7 +299,7 @@ class SingleFeedTests(unittest.TestCase):
             self.assertEqual(tf["tariffs"][0]["kwh"], 0.38)
             self.assertEqual(tf["locations"]["LT-1"]["535"]["650306"], 0)
             locs = json.loads((lt_dir / "locations" / "00.json").read_text())
-            self.assertEqual(locs["locations"][0]["evses"][0]["st"], "A")
+            self.assertNotIn("st", locs["locations"][0]["evses"][0], "live status must not be stored in shards")
             meta0 = json.loads((lt_dir / "meta.json").read_text())
 
             # Second tick: only the status changed. Inventory file must not be rewritten.
@@ -344,3 +344,67 @@ class OcpiPagesTests(unittest.TestCase):
         self.assertEqual([i["id"] for i in items], [0, 1, 2, 3, 4])
         self.assertEqual(info["pages"], 3)
         self.assertEqual(info["total_count"], 5)
+
+
+FR_HEADER = "nom_amenageur,siren_amenageur,contact_amenageur,nom_operateur,contact_operateur,telephone_operateur,nom_enseigne,id_station_itinerance,id_station_local,nom_station,implantation_station,adresse_station,code_insee_commune,coordonneesXY,nbre_pdc,id_pdc_itinerance,id_pdc_local,puissance_nominale,prise_type_ef,prise_type_2,prise_type_combo_ccs,prise_type_chademo,prise_type_autre,gratuit,paiement_acte,paiement_cb,paiement_autre,tarification,condition_acces,reservation,horaires,accessibilite_pmr,restriction_gabarit,station_deux_roues,raccordement,num_pdl,date_mise_en_service,observations,date_maj,cable_t2_attache,last_modified,datagouv_dataset_id,datagouv_resource_id,datagouv_organization_or_owner,consolidated_longitude,consolidated_latitude,consolidated_code_postal,consolidated_commune,consolidated_is_lon_lat_correct,consolidated_is_code_insee_verified"
+
+
+def fr_row(**kw):
+    base = {c: "" for c in FR_HEADER.split(",")}
+    base.update({"nom_amenageur": "Ville de Paris", "nom_operateur": "Total Marketing France", "id_station_itinerance": "FRTCBP00123",
+                 "nom_station": "Paris Bastille", "implantation_station": "Voirie", "adresse_station": "1 Place de la Bastille",
+                 "coordonneesXY": "[2.369, 48.853]", "nbre_pdc": "2", "id_pdc_itinerance": "FRTCBE001231", "puissance_nominale": "22",
+                 "prise_type_2": "true", "prise_type_combo_ccs": "false", "prise_type_chademo": "false", "prise_type_ef": "false",
+                 "paiement_cb": "true", "horaires": "24/7", "date_maj": "2026-09-01", "consolidated_longitude": "2.369",
+                 "consolidated_latitude": "48.853", "consolidated_code_postal": "75004", "consolidated_commune": "Paris"})
+    base.update(kw)
+    return base
+
+
+class FranceTests(unittest.TestCase):
+    def csv_text(self, rows):
+        import csv as _csv
+        buf = io.StringIO()
+        w = _csv.DictWriter(buf, fieldnames=FR_HEADER.split(","))
+        w.writeheader()
+        for r in rows:
+            w.writerow(r)
+        return buf.getvalue()
+
+    def test_static_groups_points_into_stations(self):
+        from cpo_pipeline.sources import fr_irve as fr
+        text = self.csv_text([
+            fr_row(),
+            fr_row(id_pdc_itinerance="FRTCBE001232", puissance_nominale="150000", prise_type_2="false", prise_type_combo_ccs="true"),
+            fr_row(id_station_itinerance="FRXYZP9", id_pdc_itinerance="FRXYZE9", nom_operateur="Other", consolidated_latitude="60.0"),
+        ])
+        norm = fr.parse_static(text, fr.SPEC)
+        self.assertEqual(len(norm["locations"]), 1)
+        st = norm["locations"][0]
+        self.assertEqual(st["op"], "TCB")
+        self.assertEqual(len(st["evses"]), 2)
+        self.assertEqual(st["evses"][0]["conns"][0]["std"], "T2")
+        self.assertEqual(st["evses"][0]["conns"][0]["kw"], 22.0)
+        self.assertEqual(st["evses"][1]["conns"][0]["std"], "CCS2")
+        self.assertEqual(st["evses"][1]["conns"][0]["kw"], 150.0)   # watts normalised
+        self.assertTrue(st["h24"])
+        self.assertEqual(norm["dropped"], [("FRXYZP9", "outside bbox")])
+        self.assertEqual(norm["operators"]["TCB"]["name"], "Total Marketing France")
+
+    def test_inventory_only_tick(self):
+        from cpo_pipeline.sources import fr_irve as fr
+        with TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "irve.csv").write_text(self.csv_text([fr_row()]), encoding="utf-8")
+            t0 = dt.datetime(2026, 9, 5, 4, 0, tzinfo=dt.timezone.utc)
+            t = Tick(fr.SPEC, root / "data", static_file=root / "irve.csv", now=t0)
+            t.run_static(); t.run_tariffs(); t.run_dynamic(); t.finish()
+            self.assertEqual(t.warnings, [])
+            fr_dir = root / "data" / "fr"
+            self.assertTrue((fr_dir / "points.json").exists())
+            self.assertFalse((fr_dir / "status.json").exists())
+            ops = json.loads((fr_dir / "operators.json").read_text())
+            self.assertEqual(ops["totals"]["evses"], 1)
+            self.assertIsNone(ops["totals"]["avail_pct"])
+            index = json.loads((root / "data" / "index.json").read_text())
+            self.assertFalse(index["countries"][0]["live"])

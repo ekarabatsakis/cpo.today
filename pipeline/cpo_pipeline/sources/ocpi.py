@@ -42,11 +42,12 @@ def _evse_key(e, i):
     return _s(e.get("evse_id"), 80) or f"#{i}"
 
 
-def normalize_locations(raw_locs, spec, *, evse_status=True) -> dict:
+def normalize_locations(raw_locs, spec, *, evse_status=False) -> dict:
     """Inventory model from OCPI locations. `dropped` lists rejected rows.
 
-    When `evse_status` is true the current EVSE status is also recorded on
-    each EVSE as `st` (used by single-feed sources).
+    Live status is never stored in the inventory (it lives in status.json),
+    so shards only change when equipment changes. `evse_status` is accepted
+    for backwards compatibility and ignored.
     """
     if not isinstance(raw_locs, list) or not raw_locs:
         raise SourceError("locations list missing or empty")
@@ -98,8 +99,6 @@ def normalize_locations(raw_locs, spec, *, evse_status=True) -> dict:
                     "kw": kw,
                 })
             evse = {"uid": _evse_key(e, i), "id": _s(e.get("evse_id"), 80) or _evse_key(e, i), "conns": conns}
-            if evse_status:
-                evse["st"] = status_code(e.get("status"))
             caps = e.get("capabilities") or []
             if caps:
                 evse["caps"] = sorted({str(x)[:40] for x in caps})
@@ -123,7 +122,7 @@ def normalize_locations(raw_locs, spec, *, evse_status=True) -> dict:
             "lat": round(lat, 6),
             "lon": round(lon, 6),
             "evses": evses,
-            "upd": _s(raw.get("last_updated"), 19),
+            "upd": _s(raw.get("last_updated"), 10),   # day granularity: keeps shards stable
         }
         if raw.get("publish") is False:
             loc["unpub"] = True

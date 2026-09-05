@@ -146,10 +146,14 @@ def fetch_ocpi_pages(url: str, *, page_size: int, max_pages: int, max_bytes: int
         offset += page_size
         if res.total_count and res.total_count.isdigit():
             total = int(res.total_count)
-        # Servers may return short pages (unpublished rows filtered after paging),
-        # so advance by page size and stop only on an empty page or past the total.
-        if not data or (total is not None and offset >= total):
+        # Servers may return short or even empty pages (unpublished rows are
+        # filtered after paging), so advance by page size and stop at the total;
+        # only without a total does an empty page mean the end.
+        if total is not None:
+            if offset >= total:
+                break
+        elif not data:
             break
-    if total is not None and len(items) < total * 0.5:
+    if total is not None and len(items) < total * 0.3:
         raise FetchError(f"{url}: got only {len(items)} of {total} items after {pages} pages")
     return items, {"pages": pages, "body_bytes": bytes_total, "total_count": total}

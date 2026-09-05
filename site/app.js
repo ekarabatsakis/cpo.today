@@ -18,7 +18,7 @@
 
   const COVERAGE_LABEL = { live: "Live", static: "Inventory", public: "Public feed", public_static: "Public, static", partial: "Partial", registration: "Registration", pending: "Pending", web_only: "Web only", cpo_api: "Operator APIs" };
   const flag = (cc) => String.fromCodePoint(...[...cc.toUpperCase()].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65));
-  const STATUS_LABEL = { A: "Available", C: "Charging", B: "Blocked", R: "Reserved", I: "Inoperative", O: "Out of order", U: "Unknown", P: "Planned", M: "Removed", X: "Other" };
+  const STATUS_LABEL = { N: "No live status", A: "Available", C: "Charging", B: "Blocked", R: "Reserved", I: "Inoperative", O: "Out of order", U: "Unknown", P: "Planned", M: "Removed", X: "Other" };
   const CONN_LABEL = { T2: "Type 2", CCS2: "CCS", CHADEMO: "CHAdeMO", T1: "Type 1", CCS1: "CCS1", DOM: "Domestic", IND: "Industrial", TESLA_S: "Tesla", TESLA_R: "Tesla" };
   const PT_LABEL = { AC1: "AC 1-ph", AC2: "AC 2-ph", AC3: "AC 3-ph", DC: "DC", NA: "" };
   const POWER_CLASS = (kw) => kw == null ? "na" : kw < 11 ? "slow" : kw < 43 ? "ac" : kw < 150 ? "fast" : "ultra";
@@ -100,12 +100,13 @@
     state.shardCache = new Map();
     state.tariffs = null;
     setFreshness("loading", `Loading ${c.name}…`);
+    state.live = c.live !== false;
     const [meta, pts, status, opTable, history] = await Promise.all([
       getJSON(`${c.path}/meta.json`, { revalidate: true }),
       getJSON(`${c.path}/points.json`, { revalidate: true }),
-      getJSON(`${c.path}/status.json`, { revalidate: true }),
+      state.live ? getJSON(`${c.path}/status.json`, { revalidate: true }) : Promise.resolve({ ts: null, locations: {} }),
       getJSON(`${c.path}/operators.json`, { revalidate: true }).catch(() => null),
-      loadHistory(c.path, 48),
+      state.live ? loadHistory(c.path, 48) : Promise.resolve([]),
     ]);
     state.meta = meta;
     state.shards = pts.shards || 1;
@@ -123,7 +124,12 @@
     state.lastFetch = Date.now();
     indexLocations();
     populateOperatorFilter();
-    $("source-line").textContent = `Source: ${c.source_name}. Inventory ${fmtDateTime(pts.ts)}, status ${fmtDateTime(status.ts)}.`;
+    $("source-line").textContent = state.live
+      ? `Source: ${c.source_name}. Inventory ${fmtDateTime(pts.ts)}, status ${fmtDateTime(status.ts)}.`
+      : `Source: ${c.source_name}. Inventory ${fmtDateTime(pts.ts)}. This registry publishes no live status.`;
+    document.body.classList.toggle("no-live", !state.live);
+    $("tab-trends").hidden = !state.live;
+    if (!state.live && $("tab-trends").getAttribute("aria-selected") === "true") showTab("operators");
     applyFilters();
     fitCountry();
     scheduleRefresh();
@@ -132,6 +138,12 @@
 
   async function refreshDynamic() {
     if (!state.country || document.hidden) return;
+    if (!state.live) {
+      const idx = await getJSON("index.json", { revalidate: true }).catch(() => null);
+      const entry = idx && idx.countries.find((x) => x.code === state.country.code);
+      if (entry && entry.static_ts !== state.country.static_ts) { state.index = idx; await loadCountry(state.country.code); }
+      return;
+    }
     const c = state.country;
     try {
       const [status, history, opTable] = await Promise.all([
@@ -178,7 +190,7 @@
         if (k === "a") a++; else if (k === "c") c++; else if (k === "d") d++; else if (k === "h") h++; else u++;
       }
       p.cnt = { a, c, d, u, h, n: p.n };
-      p.st = a ? "A" : c ? "C" : d ? "D" : h ? "B" : "U";
+      p.st = !state.live ? "N" : a ? "A" : c ? "C" : d ? "D" : h ? "B" : "U";
       p.sts = s;
     }
   }
@@ -187,7 +199,7 @@
     if (f.op && loc.op !== f.op) return false;
     if (f.pw && !(loc.kmask & (state.classBits[f.pw] || 0))) return false;
     if (f.cn && !(loc.cmask & (state.connBits[f.cn] || 0))) return false;
-    if (f.st) {
+    if (f.st && state.live) {
       if (f.st === "A" && !loc.cnt.a) return false;
       if (f.st === "C" && !loc.cnt.c) return false;
       if (f.st === "D" && !loc.cnt.d) return false;
@@ -222,6 +234,12 @@
     const known = evses - u;
     $("kpi-locations").textContent = fmtInt(locs);
     $("kpi-evses").textContent = fmtInt(evses);
+    if (!state.live) {
+      for (const id of ["kpi-available", "kpi-charging", "kpi-down"]) $(id).textContent = "–";
+      for (const id of ["kpi-available-sub", "kpi-charging-sub", "kpi-down-sub"]) $(id).textContent = "no live feed";
+      $("kpi-operators").textContent = fmtInt(ops.size);
+      return;
+    }
     $("kpi-available").textContent = fmtInt(a);
     $("kpi-available-sub").textContent = known ? `${fmtPct(100 * a / known)} of known` : "";
     $("kpi-charging").textContent = fmtInt(c);
@@ -564,7 +582,7 @@
       id: "points", type: "circle", source: "locations", filter: ["!", ["has", "point_count"]],
       paint: {
         "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, 3.5, 10, 5.5, 14, 8],
-        "circle-color": ["match", ["get", "st"], "A", colorA, "C", colorC, "D", colorD, "B", colorB, "rgba(0,0,0,0)"],
+        "circle-color": ["match", ["get", "st"], "A", colorA, "C", colorC, "D", colorD, "B", colorB, "N", colorU, "rgba(0,0,0,0)"],
         "circle-stroke-color": ["match", ["get", "st"], "D", ink, "C", colorC, "U", colorU, surface],
         "circle-stroke-width": ["match", ["get", "st"], "D", 2.5, "C", 2, "U", 2, 1],
         "circle-opacity": 0.95,
@@ -681,7 +699,7 @@
     add("Registry ID", loc.id);
     const list = tpl.querySelector(".evse-list");
     loc.evses.forEach((e, i) => {
-      const stc = (pt.sts && pt.sts[i]) || e.st || "U";
+      const stc = (pt.sts && pt.sts[i]) || (state.live ? "U" : "N");
       const li = el("li", "evse");
       const k = STATUS_CLASS(stc);
       li.append(el("i", `dot dot-${k === "h" ? "b" : k}`));
@@ -708,7 +726,9 @@
       li.append(main);
       list.append(li);
     });
-    tpl.querySelector(".loc-foot").textContent = `Inventory last updated by operator ${fmtDateTime(loc.upd)}. Live status ${fmtDateTime(state.status.ts)}.`;
+    tpl.querySelector(".loc-foot").textContent = state.live
+      ? `Inventory last updated by operator on ${loc.upd || "–"}. Live status ${fmtDateTime(state.status.ts)}.`
+      : `Inventory last updated by operator on ${loc.upd || "–"}. No live status in this registry.`;
     const actions = el("div", "loc-actions");
     const nav = el("a", "btn-ghost", "Open in maps");
     nav.href = `https://www.google.com/maps/dir/?api=1&destination=${loc.lat},${loc.lon}`;
@@ -736,7 +756,7 @@
       const li = el("li", `cov${r.live ? " live" : ""}`);
       li.append(el("span", "cov-flag", flag(r.code)));
       li.append(el("span", "cov-name", r.name));
-      const status = r.live ? "live" : r.status;
+      const status = r.live ? (r.live.live === false ? "static" : "live") : r.status;
       li.append(el("span", `chip ${status}`, COVERAGE_LABEL[status] || status));
       const src = el("span", "cov-src");
       const a = el("a", null, r.source); a.href = r.url; a.rel = "noopener"; a.target = "_blank";
@@ -744,7 +764,9 @@
       if (r.formats && r.formats.length) src.append(document.createTextNode(` · ${r.formats.join(", ")}`));
       li.append(src);
       const stat = el("span", "cov-stat");
-      if (r.live) stat.textContent = `${fmtInt(r.live.locations)} locations · ${fmtInt(r.live.evses)} charge points · status ${fmtTime(r.live.dynamic_ts)} UTC`;
+      if (r.live) stat.textContent = r.live.live === false
+        ? `${fmtInt(r.live.locations)} locations · ${fmtInt(r.live.evses)} charge points · inventory ${(r.live.static_ts || "").slice(0, 10)}`
+        : `${fmtInt(r.live.locations)} locations · ${fmtInt(r.live.evses)} charge points · status ${fmtTime(r.live.dynamic_ts)} UTC`;
       else stat.textContent = r.note || (cov.statuses[r.status] || "");
       li.append(stat);
       if (r.live) {
@@ -764,6 +786,12 @@
     $("freshness-text").textContent = text;
   }
   function updateFreshness() {
+    if (!state.live) {
+      const when = state.country && state.country.static_ts ? fmtDateTime(state.country.static_ts) : "–";
+      setFreshness("ok", window.innerWidth <= 860 ? `Inventory · ${when.slice(0, 10)}` : `Inventory only · updated ${when} · no live status in this registry`);
+      $("freshness").title = "This national registry publishes locations and equipment but no live availability.";
+      return;
+    }
     if (!state.status) return;
     const age = Date.now() - Date.parse(state.status.ts);
     const mins = Math.max(0, Math.round(age / 60000));

@@ -59,7 +59,7 @@ def structural_fingerprint(norm: dict) -> str:
     """Hash of the inventory ignoring volatile fields (timestamps, live status)."""
     def strip(o):
         if isinstance(o, dict):
-            return {k: strip(v) for k, v in o.items() if k not in ("upd", "st")}
+            return {k: strip(v) for k, v in o.items() if k not in ("upd",)}
         if isinstance(o, list):
             return [strip(x) for x in o]
         return o
@@ -114,7 +114,7 @@ class Tick:
             fp = sha256(raw)
             if fp == m.get("sha256") and skip_unchanged:
                 return None, None, None
-            return parse_json(raw), self.now, {"sha256": fp, "source": str(local)}
+            return self._parse(feed, raw), self.now, {"sha256": fp, "source": str(local)}
         if feed.kind == "ocpi-pages":
             docs, info = fetch_ocpi_pages(feed.url, page_size=feed.page_size, max_pages=feed.max_pages,
                                           max_bytes=feed.max_bytes, headers=feed.headers)
@@ -139,7 +139,13 @@ class Tick:
         source_ts = parse_http_date(res.last_modified) or self.now
         info = {"sha256": fp, "etag": res.etag, "last_modified": res.last_modified,
                 "body_bytes": len(res.body), "json_bytes": len(raw)}
-        return parse_json(raw), source_ts, info
+        return self._parse(feed, raw), source_ts, info
+
+    @staticmethod
+    def _parse(feed: Feed, raw: bytes):
+        if feed.kind == "csv":
+            return raw.decode("utf-8-sig", errors="replace")
+        return parse_json(raw)
 
     # -- static ------------------------------------------------------------
 
@@ -256,6 +262,8 @@ class Tick:
 
     def run_dynamic(self) -> bool:
         spec = self.spec
+        if not spec.has_status:
+            return self._run_inventory_only()
         static = self.load_inventory()
         if not static:
             self.warnings.append("dynamic: no static snapshot yet; skipping")
@@ -331,6 +339,19 @@ class Tick:
         log.info("dynamic: %d evses, %d changes, %d orphan, %d missing", len(got), len(changes), orphan, missing)
         return True
 
+    def _run_inventory_only(self) -> bool:
+        """No live feed: publish the operator table from the inventory alone."""
+        if self._inventory is None:
+            return False
+        ts = self.meta["static"].get("source_ts") or iso(self.now)
+        self.changed |= write_json(self.store.operators, operator_table(self._inventory, {}, [], {}, ts))
+        for stale in (self.store.status, self.store.tariffs):
+            if stale.exists():
+                stale.unlink()
+                self.changed = True
+        self.meta["dynamic"] = {"source_ts": None, "note": "inventory-only source"}
+        return True
+
     # -- wrap-up -----------------------------------------------------------
 
     def finish(self):
@@ -353,6 +374,7 @@ class Tick:
             "code": spec.country, "name": spec.country_name, "path": self.store.country,
             "source": spec.source_id, "source_name": spec.source_name, "source_url": spec.source_url,
             "refresh_minutes": spec.refresh_minutes,
+            "live": spec.has_status,
             "static_ts": self.meta["static"].get("source_ts"),
             "dynamic_ts": self.meta["dynamic"].get("source_ts"),
             "locations": self.meta["static"].get("locations"),

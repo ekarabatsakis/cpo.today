@@ -66,11 +66,10 @@ Shard of a location id = first 8 hex digits of `sha1(id)` modulo `shards`, zero-
       "ptype": "ON_STREET",            // optional parking type
       "h24": true,                     // or "hours": [[weekday, "08:00", "21:00"], …]
       "green": true, "fac": ["CAFE"], "subop": "…", "owner": "…", "unpub": true,   // all optional
-      "upd": "2026-09-05T01:23:21",    // operator's own last_updated as published
+      "upd": "2026-09-05",             // day the operator last updated this location (as published)
       "evses": [
         {
           "uid": "GR-PPC-E0000002027-1", "id": "GR*PPC*E0000002027*1",
-          "st": "A",                                     // single-feed sources only: status at inventory time
           "caps": ["REMOTE_START_STOP_CAPABLE"], "mfr": "ABB", "model": "…", "ref": "…", "park": ["PLUGGED"],
           "conns": [ { "id": "112844", "std": "T2", "fmt": "SOCKET", "pt": "AC3", "kw": 22.0 } ]
         }
