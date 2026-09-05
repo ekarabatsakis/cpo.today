@@ -4,7 +4,8 @@ Everything below is a one-time setup. After it, the system runs itself.
 
 ## 1. GitHub (already done by the pipeline)
 
-- Code lives on `main`. Data is published to the orphan branch `data` by the workflow **Fetch Greece (MYFAH)** (`.github/workflows/fetch-gr.yml`), scheduled every 10 minutes.
+- Code lives on `main`. Data is published to the orphan branch `data` by the workflow **Fetch registries** (`.github/workflows/fetch.yml`), scheduled every 10 minutes. It refreshes every integrated country in sequence and commits once; a failing registry never blocks the others.
+- **Probe endpoints** (`.github/workflows/probe.yml`) is a manual, read-only helper: give it a list of URLs and it records status, headers, sizes and samples, which is how new registries are evaluated before writing a source module.
 - The first run creates the `data` branch. You can trigger it by hand: *Actions → Fetch Greece (MYFAH) → Run workflow*.
 - Recommended repository settings (Settings → Actions → General): *Workflow permissions: Read repository contents and packages permissions*. The workflow requests `contents: write` explicitly, which is allowed under that default.
 - Recommended branch protection for `main`: require the CI workflow to pass, require a pull request.
@@ -45,7 +46,7 @@ The site deploys as one Worker: `wrangler.jsonc` serves `site/` as static assets
 
 - **Upstream outage**: the pipeline keeps the last good data, records a warning in `<cc>/meta.json`, and the site header turns amber after 35 minutes without a new status file.
 - **Bad snapshot**: a static file that lost more than 30% of locations is rejected (see `meta.json → static.rejected`). Re-run with *force_static* once the registry is healthy.
-- **Adding a country**: add `pipeline/cpo_pipeline/sources/<cc>_<source>.py` with `normalize_static` / `normalize_dynamic`, a `run_<cc>.py`, a workflow, and the country appears in `index.json` automatically; the site needs no change.
+- **Adding a country**: add `pipeline/cpo_pipeline/sources/<cc>_<source>.py` exposing a `SourceSpec`, register it in `sources/__init__.py` and in the workflow's country list; the country appears in `index.json` and on the site automatically. See `docs/ADDING_A_COUNTRY.md`.
 - **Repository size**: see *Growth and retention* in [DATA.md](DATA.md).
 
 ## 5. Optional upgrades

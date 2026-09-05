@@ -11,25 +11,27 @@ cpo.today exists so that charge point operators (CPOs), investors, fleets, plann
 
 ## Countries
 
-| Country | Source | Inventory | Live status | Since |
-|---|---|---|---|---|
-| Greece | [MYFAH](https://electrokinisi.yme.gov.gr/public/HelpMyfah/PublicData/), Hellenic Ministry of Infrastructure and Transport | daily | every 10 min | 2026-09 |
+| Country | Source | Format | Inventory | Live status | Since |
+|---|---|---|---|---|---|
+| Greece | [MYFAH](https://electrokinisi.yme.gov.gr/public/HelpMyfah/PublicData/), Hellenic Ministry of Infrastructure and Transport | ZIP/JSON (OCPI 2.2) | daily | every 10 min | 2026-09 |
+| Lithuania | [Via Lietuva](https://ev.vialietuva.lt/en/data-provision) | OCPI 2.3.0 API | every 10 min | every 10 min | 2026-09 |
+| Netherlands | [NDW](https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/) | OCPI JSON (gzip) | every 10 min | every 10 min | 2026-09 |
 
-More EU and UK registries follow the same pattern: one module under `pipeline/cpo_pipeline/sources/`, one folder under the `data` branch.
+All 28 EU/UK registries and their current status are listed in `site/coverage.json` and on the site's **Coverage** tab. Adding a country is one module under `pipeline/cpo_pipeline/sources/` (see [docs/ADDING_A_COUNTRY.md](docs/ADDING_A_COUNTRY.md)).
 
 ## How it works
 
 ```
- MYFAH (zip/json)  ──►  GitHub Actions, every 10 min  ──►  `data` branch (compact JSON)
-                        pipeline/ (stdlib Python)              │
-                        validate · normalise · diff            ▼
-                                                     Cloudflare Worker ◄──  site/ (static assets, MapLibre)
-                                                     /data/* answered by worker/ (edge proxy)
+ national registries  ──►  GitHub Actions, every 10 min  ──►  `data` branch (compact JSON)
+ (OCPI, zip, gz, API)      pipeline/ (stdlib Python)              │
+                           validate · normalise · diff            ▼
+                                                        Cloudflare Worker ◄──  site/ (static assets, MapLibre)
+                                                        /data/* answered by worker/ (edge proxy)
 ```
 
 1. **Fetch.** A scheduled workflow downloads the registry's static (daily) and dynamic (10-minute) files with conditional requests, so unchanged files cost the ministry nothing.
 2. **Validate.** Size caps, zip inspection, envelope checks, bounding-box checks, duplicate detection, and a "shrink guard" that refuses a snapshot that lost more than 30% of the network overnight.
-3. **Normalise.** OCPI-style documents become a compact, cross-country model (`locations.json`, `status.json`, `tariffs.json`), plus per-tick history, status-change events, daily inventory snapshots and an operator comparison table.
+3. **Normalise.** OCPI-style documents become a compact, cross-country model (`points.json` for the map, sharded `locations/`, `status.json`, `tariffs.json`), plus per-tick history, status-change events, daily inventory snapshots and an operator comparison table.
 4. **Publish.** Results are committed to the orphan `data` branch. Code history on `main` stays clean; data history is a full audit trail.
 5. **Present.** The site is static HTML/CSS/JS with a vendored MapLibre build, a strict Content Security Policy and no third-party scripts, served by a Cloudflare Worker that also proxies `/data/*` to the data branch. It reads only the published data files.
 
@@ -45,8 +47,8 @@ More EU and UK registries follow the same pattern: one module under `pipeline/cp
 ## Local development
 
 ```bash
-# run the pipeline against a data directory (downloads from MYFAH)
-cd pipeline && python3 -m cpo_pipeline gr --data-dir ../data-local
+# run the pipeline for one country against a data directory (downloads from the registry)
+cd pipeline && python3 -m cpo_pipeline gr --data-dir ../data-local     # or lt, nl
 
 # or against files you already have
 python3 -m cpo_pipeline gr --data-dir ../data-local --static-file static.zip --dynamic-file dynamic.zip

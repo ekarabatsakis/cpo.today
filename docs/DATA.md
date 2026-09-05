@@ -6,8 +6,9 @@ Timestamps are ISO 8601 UTC (`2026-09-05T04:06:48Z`). Files are compact JSON (on
 ```
 index.json                      countries and their freshness
 <cc>/meta.json                  pipeline state: ETags, counts, warnings (pretty-printed)
-<cc>/locations.json             inventory: locations → EVSEs → connectors (daily)
-<cc>/status.json                live EVSE status (every 10 min)
+<cc>/points.json                one compact row per location: the map layer (rewritten when the inventory changes)
+<cc>/locations/<shard>.json     full inventory: locations → EVSEs → connectors, split into shards
+<cc>/status.json                live EVSE status, one letter per EVSE (every 10 min)
 <cc>/tariffs.json               de-duplicated tariffs + connector → tariff index (every 10 min)
 <cc>/operators.json             per-operator comparison table + national totals (every 10 min)
 <cc>/history/YYYY-MM-DD.jsonl   one line per tick: status counts per operator + charging kW
@@ -15,13 +16,15 @@ index.json                      countries and their freshness
 <cc>/daily/YYYY-MM-DD.json      daily inventory snapshot for growth trends
 ```
 
+The layout is the same for a 4,000-location registry (Greece) and a 60,000-location one (Netherlands): the map needs only `points.json` + `status.json`; details are fetched per shard.
+
 `<cc>` is the lower-case ISO country code (`gr`).
 
 ## Identifiers
 
 Registry EVSE `uid` and connector `id` values are **only unique within a location** (MYFAH reuses `1`, `2`, … across operators).
 The canonical keys are therefore `(location id, evse uid)` and `(location id, evse uid, connector id)`.
-`status.json`, `tariffs.json` and events are nested accordingly.
+Live status and events refer to an EVSE by its **position** in the location's `evses` array (0-based), which is stable as long as `points.json → ts` / the shard's `source_ts` is unchanged. `status.json` carries the inventory `structure` hash it was encoded against.
 
 ## Enumerations
 
@@ -33,13 +36,28 @@ The canonical keys are therefore `(location id, evse uid)` and `(location id, ev
 | Connector `fmt` | `SOCKET` · `CABLE` |
 | Power class | `slow` < 11 kW · `ac` 11–43 kW · `fast` 43–150 kW · `ultra` ≥ 150 kW · `na` unknown |
 
-## `locations.json`
+## `points.json`
 
 ```jsonc
 {
-  "country": "GR", "source": "MYFAH",
-  "generated": "…", "source_ts": "…",          // when we ran; upstream file time
-  "operators": { "PPC": { "id": "PPC", "name": "DEI Blue" }, … },   // party_id → display name
+  "ts": "…", "shards": 8,
+  "operators": [ { "id": "PPC", "name": "DEI Blue" }, … ],           // index = "op" column below
+  "fields": ["id","lon","lat","op","name","city","evses","dc","max_kw","class_mask","conn_mask","flags"],
+  "class_bits": { "slow": 1, "ac": 2, "fast": 4, "ultra": 8, "na": 16 },
+  "conn_bits":  { "T2": 1, "CCS2": 2, "CHADEMO": 4, "T1": 8, "CCS1": 16, "DOM": 32, "IND": 64, "TESLA_S": 128 },
+  "points": [ ["GR-PPC-Scs32622-L", 23.766972, 37.83628, 17, "Y003 Vari…", "Voula", 4, 0, 22.0, 2, 1, 1], … ]
+}
+```
+
+`flags`: bit 1 = 24/7, bit 2 = declared green energy, bit 4 = not published by the operator.
+
+## `locations/<shard>.json`
+
+Shard of a location id = first 8 hex digits of `sha1(id)` modulo `shards`, zero-padded to two hex digits (`00`…`7f`).
+
+```jsonc
+{
+  "country": "GR", "source_ts": "…", "shard": "03",
   "locations": [
     {
       "id": "GR-PPC-Scs32622-L", "op": "PPC",
@@ -48,10 +66,11 @@ The canonical keys are therefore `(location id, evse uid)` and `(location id, ev
       "ptype": "ON_STREET",            // optional parking type
       "h24": true,                     // or "hours": [[weekday, "08:00", "21:00"], …]
       "green": true, "fac": ["CAFE"], "subop": "…", "owner": "…", "unpub": true,   // all optional
-      "upd": "2026-09-05T01:23:21",    // operator's own last_updated (registry local time, no zone)
+      "upd": "2026-09-05T01:23:21",    // operator's own last_updated as published
       "evses": [
         {
           "uid": "GR-PPC-E0000002027-1", "id": "GR*PPC*E0000002027*1",
+          "st": "A",                                     // single-feed sources only: status at inventory time
           "caps": ["REMOTE_START_STOP_CAPABLE"], "mfr": "ABB", "model": "…", "ref": "…", "park": ["PLUGGED"],
           "conns": [ { "id": "112844", "std": "T2", "fmt": "SOCKET", "pt": "AC3", "kw": 22.0 } ]
         }
@@ -64,11 +83,11 @@ The canonical keys are therefore `(location id, evse uid)` and `(location id, ev
 ## `status.json`
 
 ```jsonc
-{ "country": "GR", "ts": "2026-09-05T04:06:48Z", "generated": "…",
-  "locations": { "GR-PPC-Scs32622-L": { "GR-PPC-E0000002027-1": "A", … }, … } }
+{ "country": "GR", "ts": "2026-09-05T04:06:48Z", "generated": "…", "structure": "<inventory hash>",
+  "locations": { "GR-PPC-Scs32622-L": "AACU", … } }     // i-th letter = status of evses[i]
 ```
 
-`ts` is the upstream file's `Last-Modified` time: the moment the registry generated the snapshot.
+`ts` is the upstream file's `Last-Modified` time (or the fetch time for paginated APIs): the moment the registry generated the snapshot.
 
 ## `tariffs.json`
 
@@ -92,10 +111,10 @@ Prices are as published by the operator (EUR). `kwh` per kWh, `hour` per hour of
 ## `events/YYYY-MM-DD.jsonl`
 
 ```jsonc
-{ "ts": "…", "ch": [ ["<location id>", "<evse uid>", "A", "C"], … ] }
+{ "ts": "…", "ch": [ ["<location id>", 0, "A", "C"], … ] }     // [location, evse index, from, to]
 ```
 
-Each entry is a transition observed between two consecutive ticks (`from`, `to`). Session length, utilisation and reliability metrics can be derived from these.
+Each entry is a transition observed between two consecutive ticks. `-` means the EVSE was absent from the feed on one side. Session length, utilisation and reliability metrics can be derived from these.
 
 ## `operators.json`
 
@@ -103,8 +122,8 @@ Per operator: `locations`, `evses`, `connectors`, `dc_evses`, `ac_evses`, `kw_to
 
 ## Growth and retention
 
-One 10-minute tick adds roughly 15 KB to the packed repository (status delta, events, history, operator table). That is about 2 MB per day and under 1 GB per year for Greece. When the branch approaches a few GB, older `events/` and `history/` days will be compacted into monthly gzip archives; the file schema above will not change.
+One 10-minute tick adds roughly 10 KB to the packed repository for Greece (status delta, events, history, operator table), more for the Netherlands in proportion to its size. Inventories are only rewritten when their structure changes, never for timestamps. When the branch approaches a few GB, older `events/` and `history/` days will be compacted into monthly gzip archives; the file schema above will not change.
 
 ## Terms
 
-Data is republished from official public registries under their public-data terms. Attribute **cpo.today** and the registry (for Greece: *MYFAH, Hellenic Ministry of Infrastructure and Transport*). No warranty: status is exactly what operators report.
+Data is republished from official public registries under their public-data terms. Attribute **cpo.today** and the registry (Greece: *MYFAH, Hellenic Ministry of Infrastructure and Transport*; Lithuania: *Via Lietuva*; Netherlands: *NDW*). No warranty: status is exactly what operators report.
