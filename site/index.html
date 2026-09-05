@@ -32,6 +32,7 @@
     </label>
     <div class="freshness" id="freshness" aria-live="polite">
       <span class="pulse" aria-hidden="true"></span>
+      <span class="mode-chip" id="mode-chip" hidden>Inventory only</span>
       <span id="freshness-text">Loading data…</span>
     </div>
   </div>
@@ -208,6 +209,8 @@
       <span class="lg"><i class="dot dot-c"></i>In use</span>
       <span class="lg"><i class="dot dot-d"></i>Out of service</span>
       <span class="lg"><i class="dot dot-u"></i>Unknown</span>
+      <span class="lg lg-static"><span class="mode-chip">Inventory only</span></span>
+      <span class="lg lg-static"><i class="dot dot-n"></i>Charging location (this registry publishes no live status)</span>
     </div>
     <div class="map-note" id="map-note" hidden></div>
   </div>

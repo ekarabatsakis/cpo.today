@@ -73,6 +73,10 @@ button, select, input { font: inherit; color: inherit; }
 #freshness-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pulse { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--st-a); box-shadow: 0 0 0 0 rgba(12,163,12,.5); animation: pulse 2.4s infinite; }
 .freshness.stale .pulse { background: var(--st-b); animation: none; }
+.freshness.static .pulse { background: var(--st-u); animation: none; box-shadow: none; }
+.freshness.static { color: var(--ink-2); }
+.freshness .mode-chip { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; background: var(--surface-2); border: 1px solid var(--border); color: var(--ink-2); margin-right: 6px; }
+.freshness.static .mode-chip { background: color-mix(in srgb, var(--st-u) 18%, var(--surface)); }
 .freshness.error .pulse { background: var(--st-d); animation: none; }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(12,163,12,.45);} 70% { box-shadow: 0 0 0 8px rgba(12,163,12,0);} 100% { box-shadow: 0 0 0 0 rgba(12,163,12,0);} }
 .topbar-links { display: flex; gap: 16px; font-size: 13px; }
@@ -294,6 +298,9 @@ td.op-name { max-width: 118px; overflow: hidden; text-overflow: ellipsis; font-w
 
 /* Inventory-only countries: no status semantics on screen */
 body.no-live .legend .lg { display: none; }
-body.no-live .legend::before { content: "Inventory only: no live status in this registry"; font-size: 12px; color: var(--ink-2); }
+body.no-live .legend .lg-static { display: inline-flex; }
+.legend .lg-static { display: none; }
+.dot-n { background: var(--st-u); }
+.legend .mode-chip { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; background: color-mix(in srgb, var(--st-u) 18%, var(--surface)); border: 1px solid var(--border); color: var(--ink-2); }
 body.no-live #f-status { opacity: .5; pointer-events: none; }
 body.no-live .ops th:nth-child(n+5), body.no-live .ops td:nth-child(n+5) { display: none; }

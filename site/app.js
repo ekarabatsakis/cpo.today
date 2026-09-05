@@ -16,7 +16,7 @@
     defaultZoom: 5.6,
   };
 
-  const COVERAGE_LABEL = { live: "Live", static: "Inventory", public: "Public feed", public_static: "Public, static", partial: "Partial", registration: "Registration", pending: "Pending", web_only: "Web only", cpo_api: "Operator APIs" };
+  const COVERAGE_LABEL = { live: "Live", static: "Inventory only", public: "Public feed", public_static: "Public, static", partial: "Partial", registration: "Registration", pending: "Pending", web_only: "Web only", cpo_api: "Operator APIs" };
   const flag = (cc) => String.fromCodePoint(...[...cc.toUpperCase()].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65));
   const STATUS_LABEL = { N: "No live status", A: "Available", C: "Charging", B: "Blocked", R: "Reserved", I: "Inoperative", O: "Out of order", U: "Unknown", P: "Planned", M: "Removed", X: "Other" };
   const CONN_LABEL = { T2: "Type 2", CCS2: "CCS", CHADEMO: "CHAdeMO", T1: "Type 1", CCS1: "CCS1", DOM: "Domestic", IND: "Industrial", TESLA_S: "Tesla", TESLA_R: "Tesla" };
@@ -825,11 +825,12 @@
     const f = $("freshness");
     f.className = `freshness ${cls === "ok" ? "" : cls}`;
     $("freshness-text").textContent = text;
+    $("mode-chip").hidden = cls !== "static";
   }
   function updateFreshness() {
     if (!state.live) {
       const when = state.country && state.country.static_ts ? fmtDateTime(state.country.static_ts) : "–";
-      setFreshness("ok", window.innerWidth <= 860 ? `Inventory · ${fmtDate(state.country.static_ts)}` : `Inventory only · updated ${when} · no live status in this registry`);
+      setFreshness("static", window.innerWidth <= 860 ? `updated ${fmtDate(state.country.static_ts)}` : `inventory updated ${when} · this registry publishes no live status`);
       $("freshness").title = "This national registry publishes locations and equipment but no live availability.";
       return;
     }
@@ -997,7 +998,7 @@
       fetch("coverage.json", { credentials: "omit" }).then((r) => r.ok ? r.json() : null).then((c) => { state.coverage = c; }).catch(() => {});
       const sel = $("country");
       sel.replaceChildren();
-      for (const c of state.index.countries) sel.append(new Option(`${flag(c.code)} ${c.name}`, c.code));
+      for (const c of state.index.countries) sel.append(new Option(`${flag(c.code)} ${c.name}${c.live === false ? " · inventory only" : ""}`, c.code));
       const want = state.index.countries.some((c) => c.code === h.country) ? h.country : state.index.countries[0].code;
       sel.value = want;
       await loadCountry(want);
