@@ -156,7 +156,8 @@
               <th scope="col" class="num"><button data-sort="avail_pct" title="Available now, share of points with known status">Avail%</button></th>
               <th scope="col" class="num"><button data-sort="charging_pct" title="Charging now, share of points with known status">Busy%</button></th>
               <th scope="col" class="num"><button data-sort="down_pct" title="Out of order or inoperative, share of points with known status">Down%</button></th>
-              <th scope="col" class="num"><button data-sort="median_kwh_price" title="Median published energy price">€/kWh</button></th>
+              <th scope="col" class="num"><button data-sort="median_kwh_ac" title="Median published energy price on AC connectors">AC €/kWh</button></th>
+              <th scope="col" class="num"><button data-sort="median_kwh_dc" title="Median published energy price on DC connectors">DC €/kWh</button></th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -248,7 +249,7 @@
     <h3>Accuracy and responsibility</h3>
     <p>We collect this data every 10 minutes for statistical and analytical purposes only. We do not verify, correct or edit it. If a location, status, price or any other detail is wrong, the error is in what the operator reported to the registry: please contact the operator or the responsible authority directly. cpo.today accepts no responsibility for the accuracy, completeness or timeliness of registry data, or for decisions taken on the basis of it.</p>
     <h3>Prices</h3>
-    <p>Prices are the ad-hoc tariffs operators publish in the registry, in the registry's currency. The per-kWh figure is the energy component of the tariff attached to each connector; an operator's "€/kWh" in the table is the median across its priced connectors. Session fees, time-based and parking components are shown on the location card when published. Many connectors publish no tariff at all.</p>
+    <p>Prices are the ad-hoc tariffs operators publish in the registry, in the registry's currency. The per-kWh figure is the energy component of the tariff attached to each connector; an operator's "AC €/kWh" and "DC €/kWh" in the table are the medians across its priced AC and DC connectors, kept apart because most operators price DC charging higher than AC. Hover a price to see how many connectors it rests on. Session fees, time-based and parking components are shown on the location card when published. Many connectors publish no tariff at all.</p>
     <h3>Questions</h3>
     <p>For any question, correction request about this site, or data partnership, email <a href="mailto:ask@cpo.today">ask@cpo.today</a>.</p>
     <p class="about-small">Base map: OpenFreeMap, © OpenStreetMap contributors. Charge point data comes only from the official registries.</p>

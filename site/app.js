@@ -262,7 +262,7 @@
     const f = { ...state.filters, op: "" };
     const rows = new Map();
     const priceOf = {};
-    if (state.opTable) for (const o of state.opTable.operators) priceOf[o.id] = o.median_kwh_price;
+    if (state.opTable) for (const o of state.opTable.operators) priceOf[o.id] = o;
     for (const l of state.points) {
       if (!matches(l, f)) continue;
       let r = rows.get(l.op);
@@ -280,7 +280,11 @@
       r.avail_pct = known ? 100 * r.a / known : null;
       r.charging_pct = known ? 100 * r.c / known : null;
       r.down_pct = known ? 100 * r.d / known : null;
-      r.median_kwh_price = priceOf[r.id] != null ? priceOf[r.id] : null;
+      const po = priceOf[r.id] || {};
+      r.median_kwh_ac = po.median_kwh_ac != null ? po.median_kwh_ac : null;
+      r.median_kwh_dc = po.median_kwh_dc != null ? po.median_kwh_dc : null;
+      r.priced_ac = po.priced_ac || 0;
+      r.priced_dc = po.priced_dc || 0;
       out.push(r);
     }
     return out;
@@ -317,7 +321,11 @@
       const dn = el("td", "num", fmtPct(r.down_pct));
       if (r.down_pct != null && r.down_pct >= 15) dn.style.fontWeight = "600";
       tr.append(dn);
-      tr.append(el("td", "num", r.median_kwh_price != null ? r.median_kwh_price.toFixed(2) : "–"));
+      for (const [price, n, kind] of [[r.median_kwh_ac, r.priced_ac, "AC"], [r.median_kwh_dc, r.priced_dc, "DC"]]) {
+        const td = el("td", "num", price != null ? price.toFixed(2) : "–");
+        td.title = price != null ? `Median of ${fmtInt(n)} priced ${kind} connector${n === 1 ? "" : "s"}` : `No ${kind} tariff published`;
+        tr.append(td);
+      }
       tr.addEventListener("click", () => {
         $("f-operator").value = state.filters.op === r.id ? "" : r.id;
         state.filters.op = $("f-operator").value;

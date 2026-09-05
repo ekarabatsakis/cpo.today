@@ -196,7 +196,7 @@ def operator_table(static, statuses, tariffs, connector_tariffs, ts):
             "locations": 0, "evses": 0, "connectors": 0,
             "dc_evses": 0, "ac_evses": 0, "kw_total": 0.0, "max_kw": 0.0,
             "classes": Counter(), "connector_types": Counter(),
-            "cities": set(), "status": _empty_status(), "kwh_prices": [],
+            "cities": set(), "status": _empty_status(), "kwh_prices": [], "kwh_ac": [], "kwh_dc": [],
             "h24": 0, "green": 0, "evse_objs": [],
         })
         r["locations"] += 1
@@ -225,6 +225,9 @@ def operator_table(static, statuses, tariffs, connector_tariffs, ts):
                 t = tariffs.get(idx) if isinstance(tariffs, dict) else (tariffs[idx] if idx is not None and isinstance(idx, int) and idx < len(tariffs) else None)
                 if t and t.get("kwh") is not None and t["kwh"] > 0:
                     r["kwh_prices"].append(t["kwh"])
+                    # Operators commonly price DC above AC, so the two are
+                    # summarised separately as well as together.
+                    r["kwh_dc" if c.get("pt") == "DC" else "kwh_ac"].append(t["kwh"])
             s = loc_status.get(e["uid"], "U")
             r["status"][s] = r["status"].get(s, 0) + 1
 
@@ -254,6 +257,10 @@ def operator_table(static, statuses, tariffs, connector_tariffs, ts):
             "unknown_pct": round(100.0 * st.get("U", 0) / r["evses"], 1) if r["evses"] else None,
             "median_kwh_price": round(median(r["kwh_prices"]), 3) if r["kwh_prices"] else None,
             "priced_connectors": len(r["kwh_prices"]),
+            "median_kwh_ac": round(median(r["kwh_ac"]), 3) if r["kwh_ac"] else None,
+            "priced_ac": len(r["kwh_ac"]),
+            "median_kwh_dc": round(median(r["kwh_dc"]), 3) if r["kwh_dc"] else None,
+            "priced_dc": len(r["kwh_dc"]),
             "hardware": hardware_mix(r["evse_objs"]),
         })
     out.sort(key=lambda r: (-r["evses"], r["id"]))

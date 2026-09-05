@@ -65,6 +65,8 @@ def to_dynamic(static_doc, overrides=None, tariffs=None):
                 cc = {"id": c["id"]}
                 if tariffs:
                     cc["_openapiTariffs"] = tariffs
+                elif "_openapiTariffs" in c:
+                    cc["_openapiTariffs"] = c["_openapiTariffs"]
                 conns.append(cc)
             evs.append({"uid": e["uid"], "evse_id": e["evse_id"], "status": st,
                         "connectors": conns, "last_updated": e["last_updated"]})
@@ -206,6 +208,22 @@ class AggregateTests(unittest.TestCase):
         self.assertEqual(row["median_kwh_price"], 0.54)
         self.assertEqual(table["totals"]["kw_total"], 72)
         self.assertEqual(table["totals"]["hardware"]["none"]["n"], 2)
+
+    def test_operator_table_splits_ac_and_dc_prices(self):
+        ac_tariff = [{"currency": "EUR", "elements": [{"price_components": [{"type": "ENERGY", "price": "0.40"}]}]}]
+        dc_tariff = [{"currency": "EUR", "elements": [{"price_components": [{"type": "ENERGY", "price": "0.59"}]}]}]
+        loc = location(evses=[
+            evse("1", "AVAILABLE", [connector("10", 22000, tariffs=ac_tariff)]),
+            evse("2", "AVAILABLE", [connector("11", 50000, "IEC_62196_T2_COMBO", "DC", tariffs=dc_tariff)]),
+            evse("3", "AVAILABLE", [connector("12", 22000)]),
+        ])
+        static = gr.normalize_static(envelope([loc]))
+        dyn = gr.normalize_dynamic(to_dynamic(envelope([loc])))
+        table = aggregate.operator_table(static, dyn["statuses"], dyn["tariffs"], dyn["connector_tariffs"], "t")
+        row = table["operators"][0]
+        self.assertEqual((row["median_kwh_ac"], row["priced_ac"]), (0.4, 1))
+        self.assertEqual((row["median_kwh_dc"], row["priced_dc"]), (0.59, 1))
+        self.assertEqual((row["median_kwh_price"], row["priced_connectors"]), (0.495, 2))
 
     def test_hardware_mix_normalises_spellings(self):
         mix = aggregate.hardware_mix([{"mfr": "ABB"}, {"mfr": "Abb "}, {"mfr": "ABB E-mobility", "model": "Terra 184"}, {"mfr": "alpitronic GmbH", "model": "HYC300"}, {}])

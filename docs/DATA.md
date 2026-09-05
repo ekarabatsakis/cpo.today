@@ -117,7 +117,7 @@ Each entry is a transition observed between two consecutive ticks. `-` means the
 
 ## `operators.json`
 
-Per operator: `locations`, `evses`, `connectors`, `dc_evses`, `ac_evses`, `kw_total`, `max_kw`, `classes`, `connector_types`, `cities`, `h24_locations`, `green_locations`, `status` (counts), `avail_pct`, `charging_pct`, `down_pct`, `unknown_pct` (percentages exclude EVSEs with unknown status, except `unknown_pct`), `median_kwh_price`, `priced_connectors`. Plus `totals`.
+Per operator: `locations`, `evses`, `connectors`, `dc_evses`, `ac_evses`, `kw_total`, `max_kw`, `classes`, `connector_types`, `cities`, `h24_locations`, `green_locations`, `status` (counts), `avail_pct`, `charging_pct`, `down_pct`, `unknown_pct` (percentages exclude EVSEs with unknown status, except `unknown_pct`), `median_kwh_price`, `priced_connectors` (all priced connectors), `median_kwh_ac`, `priced_ac`, `median_kwh_dc`, `priced_dc` (the same split by connector power type, since operators usually price DC above AC). Medians are of the energy component only, as published. Plus `totals`.
 
 ## Growth and retention
 
