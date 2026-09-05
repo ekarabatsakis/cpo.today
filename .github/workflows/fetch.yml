@@ -1,21 +1,26 @@
-# Refresh Greek charge-point data from MYFAH every 10 minutes and publish it
-# to the `data` branch. The pipeline code lives on `main`; the data branch is
-# an orphan so its history never mixes with the code history.
+# Refresh every integrated national registry every 10 minutes and publish the
+# results to the `data` branch in one commit. The pipeline code lives on
+# `main`; the data branch is an orphan so its history never mixes with code.
+# Countries run sequentially; one failing registry never blocks the others.
 #
 # Security posture:
 #   * least-privilege GITHUB_TOKEN (contents:write only, nothing else)
 #   * no third-party actions beyond actions/checkout
 #   * no secrets required; the pipeline is stdlib-only Python
 #   * concurrency group prevents overlapping runs racing on the data branch
-name: Fetch Greece (MYFAH)
+name: Fetch registries
 
 on:
   schedule:
     - cron: "*/10 * * * *"
   workflow_dispatch:
     inputs:
+      countries:
+        description: "Space-separated country codes to refresh (default: all)"
+        default: "gr lt nl"
+        type: string
       force_static:
-        description: "Re-download the daily static file even if unchanged"
+        description: "Re-process static inventories even if unchanged"
         type: boolean
         default: false
 
@@ -23,7 +28,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: data-gr
+  group: data-branch
   cancel-in-progress: false
 
 env:
@@ -64,10 +69,20 @@ jobs:
         working-directory: pipeline
         env:
           FORCE_STATIC: ${{ inputs.force_static && '--force-static' || '' }}
+          COUNTRIES: ${{ inputs.countries || 'gr lt nl' }}
         run: |
-          set -euo pipefail
+          set -uo pipefail
           python3 --version
-          python3 -m cpo_pipeline gr --data-dir ../data $FORCE_STATIC
+          rc=0
+          for c in $COUNTRIES; do
+            echo "::group::$c"
+            if ! python3 -m cpo_pipeline "$c" --data-dir ../data $FORCE_STATIC; then
+              echo "::warning::$c: pipeline reported a problem (see log); other countries continue"
+              rc=1
+            fi
+            echo "::endgroup::"
+          done
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
 
       - name: Commit and push
         shell: bash
@@ -79,8 +94,16 @@ jobs:
             echo "no data changes"
             exit 0
           fi
-          TS=$(python3 -c "import json;print(json.load(open('gr/meta.json'))['dynamic'].get('source_ts','n/a'))")
-          git commit -q -m "gr: ${TS}"
+          MSG=$(python3 - <<'PY'
+          import json, glob
+          parts = []
+          for m in sorted(glob.glob("*/meta.json")):
+              d = json.load(open(m))
+              parts.append(f"{d.get('country','?').lower()} {d.get('dynamic',{}).get('source_ts','n/a')}")
+          print("data: " + "; ".join(parts))
+          PY
+          )
+          git commit -q -m "$MSG"
           for attempt in 1 2 3 4; do
             if git push origin "HEAD:$DATA_BRANCH"; then
               exit 0
@@ -97,11 +120,16 @@ jobs:
         if: always()
         shell: bash
         run: |
-          if [ -f data/gr/meta.json ]; then
+          for m in data/*/meta.json; do
+            [ -f "$m" ] || continue
             {
-              echo '### Greece (MYFAH)'
+              echo "### $(python3 -c "import json;d=json.load(open('$m'));print(d.get('country_name'), '(' + d.get('source','') + ')')")"
               echo '```json'
-              python3 -c "import json;m=json.load(open('data/gr/meta.json'));print(json.dumps({k:m.get(k) for k in ('last_run','static','dynamic','warnings')},indent=1))"
+              python3 -c "import json;m=json.load(open('$m'));print(json.dumps({k:m.get(k) for k in ('last_run','static','tariffs','dynamic','warnings')},indent=1))"
               echo '```'
             } >> "$GITHUB_STEP_SUMMARY"
+          done
+          if [ "${{ steps.pipeline.outputs.rc }}" = "1" ]; then
+            echo "::error::at least one registry failed this tick; data for the others was published"
+            exit 1
           fi

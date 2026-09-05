@@ -29,14 +29,15 @@ class FetchResult:
     etag: str | None
     last_modified: str | None
     content_type: str | None
+    total_count: str | None = None
 
 
 def http_get(url: str, *, etag: str | None = None, last_modified: str | None = None,
-             max_bytes: int, timeout: int = DEFAULT_TIMEOUT) -> FetchResult:
+             max_bytes: int, timeout: int = DEFAULT_TIMEOUT, headers: dict | None = None) -> FetchResult:
     """GET `url`, honouring conditional headers. Refuses bodies above `max_bytes`."""
     if not url.startswith("https://"):
         raise FetchError(f"refusing non-https URL: {url}")
-    headers = {"User-Agent": USER_AGENT, "Accept": "*/*"}
+    headers = {"User-Agent": USER_AGENT, "Accept": "*/*", **(headers or {})}
     if etag:
         headers["If-None-Match"] = etag
     if last_modified:
@@ -61,6 +62,7 @@ def http_get(url: str, *, etag: str | None = None, last_modified: str | None = N
                 etag=resp.headers.get("ETag"),
                 last_modified=resp.headers.get("Last-Modified"),
                 content_type=resp.headers.get("Content-Type"),
+                total_count=resp.headers.get("X-Total-Count"),
             )
     except urllib.error.HTTPError as e:
         if e.code == 304:
@@ -110,3 +112,40 @@ def parse_json(raw: bytes):
         return json.loads(text)
     except json.JSONDecodeError as e:
         raise FetchError(f"invalid JSON: {e}") from e
+
+
+def fetch_ocpi_pages(url: str, *, page_size: int, max_pages: int, max_bytes: int,
+                     headers: dict | None = None, timeout: int = DEFAULT_TIMEOUT):
+    """Walk an OCPI paginated list endpoint with offset/limit.
+
+    Returns (list of location objects, info dict). Uses X-Total-Count when the
+    server sends it, otherwise stops at the first short page.
+    """
+    items = []
+    total = None
+    pages = 0
+    bytes_total = 0
+    sep = "&" if "?" in url else "?"
+    while pages < max_pages:
+        page_url = f"{url}{sep}offset={len(items)}&limit={page_size}"
+        res = http_get(page_url, max_bytes=max_bytes, timeout=timeout, headers=headers)
+        bytes_total += len(res.body)
+        doc = parse_json(res.body)
+        if isinstance(doc, dict):
+            sc = doc.get("status_code")
+            if sc is not None and int(sc) != 1000:
+                raise FetchError(f"{page_url}: OCPI status_code {sc} {doc.get('status_message')!r}")
+            data = doc.get("data")
+        else:
+            data = doc
+        if not isinstance(data, list):
+            raise FetchError(f"{page_url}: OCPI data is not a list")
+        items.extend(data)
+        pages += 1
+        if res.total_count and res.total_count.isdigit():
+            total = int(res.total_count)
+        if not data or len(data) < page_size or (total is not None and len(items) >= total):
+            break
+    if total is not None and len(items) < total:
+        raise FetchError(f"{url}: got {len(items)} of {total} items after {pages} pages")
+    return items, {"pages": pages, "body_bytes": bytes_total, "total_count": total}

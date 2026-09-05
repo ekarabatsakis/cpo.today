@@ -13,6 +13,84 @@ from .schema import STATUS_NAMES, power_class
 
 STATUS_ORDER = ["A", "C", "B", "R", "I", "O", "U", "P", "M", "X"]
 
+# Bitmasks used in points.json so the map can filter without loading details.
+CLASS_BITS = {"slow": 1, "ac": 2, "fast": 4, "ultra": 8, "na": 16}
+CONN_BITS = {"T2": 1, "CCS2": 2, "CHADEMO": 4, "T1": 8, "CCS1": 16, "DOM": 32, "IND": 64, "TESLA_S": 128, "TESLA_R": 128}
+
+
+def encode_statuses(static, statuses):
+    """{lid: 'ACU...'}: one status letter per EVSE, in inventory order."""
+    out = {}
+    for loc in static["locations"]:
+        ls = statuses.get(loc["id"], {})
+        out[loc["id"]] = "".join(ls.get(e["uid"], "U") for e in loc["evses"])
+    return out
+
+
+def diff_encoded(prev: dict | None, cur: dict):
+    """Transitions between two encoded status maps: [[lid, evse index, from, to], ...]."""
+    if not prev or not all(isinstance(v, str) for v in prev.values()):
+        return []   # nothing to diff, or a previous layout we cannot compare
+    changes = []
+    for lid, s in cur.items():
+        p = prev.get(lid)
+        if p is None:
+            for i, c in enumerate(s):
+                changes.append([lid, i, "-", c])
+            continue
+        if p == s:
+            continue
+        for i in range(max(len(p), len(s))):
+            a = p[i] if i < len(p) else "-"
+            b = s[i] if i < len(s) else "-"
+            if a != b:
+                changes.append([lid, i, a, b])
+    for lid in prev.keys() - cur.keys():
+        for i, c in enumerate(prev[lid]):
+            changes.append([lid, i, c, "-"])
+    changes.sort()
+    return changes
+
+
+def points_layer(static, ts, n_shards):
+    """Compact per-location rows for the map and the filters.
+
+    Row: [id, lon, lat, operator index, name, city, evse count, dc evse count,
+          max kW, power-class bitmask, connector bitmask, flags]
+    flags bit 1 = 24/7, bit 2 = green energy, bit 4 = unpublished
+    """
+    ops = list(static["operators"].keys())
+    op_index = {o: i for i, o in enumerate(ops)}
+    rows = []
+    for loc in static["locations"]:
+        n = len(loc["evses"])
+        dc = 0
+        maxkw = 0.0
+        cmask = 0
+        kmask = 0
+        for e in loc["evses"]:
+            kw = evse_max_kw(e)
+            if kw:
+                maxkw = max(maxkw, kw)
+            kmask |= CLASS_BITS.get(power_class(kw), 16)
+            if evse_is_dc(e):
+                dc += 1
+            for c in e.get("conns", []):
+                cmask |= CONN_BITS.get(c.get("std"), 0)
+        flags = (1 if loc.get("h24") else 0) | (2 if loc.get("green") else 0) | (4 if loc.get("unpub") else 0)
+        rows.append([loc["id"], loc["lon"], loc["lat"], op_index.get(loc["op"], -1), loc.get("name", ""),
+                     loc.get("city", ""), n, dc, maxkw or 0, kmask, cmask, flags])
+    return {
+        "ts": ts,
+        "shards": n_shards,
+        "operators": [{"id": o, "name": static["operators"][o]["name"]} for o in ops],
+        "fields": ["id", "lon", "lat", "op", "name", "city", "evses", "dc", "max_kw", "class_mask", "conn_mask", "flags"],
+        "class_bits": CLASS_BITS,
+        "conn_bits": {k: v for k, v in CONN_BITS.items() if k != "TESLA_R"},
+        "points": rows,
+    }
+
+
 
 def _empty_status():
     return {k: 0 for k in STATUS_ORDER}

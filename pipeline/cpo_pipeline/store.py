@@ -51,7 +51,10 @@ class CountryStore:
     @property
     def meta(self): return self.dir / "meta.json"
     @property
-    def locations(self): return self.dir / "locations.json"
+    def points(self): return self.dir / "points.json"
+    @property
+    def shard_dir(self): return self.dir / "locations"
+    def shard(self, name): return self.shard_dir / f"{name}.json"
     @property
     def status(self): return self.dir / "status.json"
     @property
@@ -61,3 +64,19 @@ class CountryStore:
     def history(self, day): return self.dir / "history" / f"{day}.jsonl"
     def events(self, day): return self.dir / "events" / f"{day}.jsonl"
     def daily(self, day): return self.dir / "daily" / f"{day}.json"
+
+
+import hashlib
+
+
+def shard_count(n_locations: int) -> int:
+    """Power-of-two shard count, roughly 800 locations per shard, 1..128."""
+    n = 1
+    while n < 128 and n_locations / n > 800:
+        n *= 2
+    return n
+
+
+def shard_of(location_id: str, n_shards: int) -> str:
+    h = int(hashlib.sha1(location_id.encode("utf-8")).hexdigest()[:8], 16)
+    return f"{h % n_shards:02x}"

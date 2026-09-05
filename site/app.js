@@ -16,6 +16,8 @@
     defaultZoom: 5.6,
   };
 
+  const COVERAGE_LABEL = { live: "Live", static: "Inventory", public: "Public feed", public_static: "Public, static", partial: "Partial", registration: "Registration", pending: "Pending", web_only: "Web only", cpo_api: "Operator APIs" };
+  const flag = (cc) => String.fromCodePoint(...[...cc.toUpperCase()].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65));
   const STATUS_LABEL = { A: "Available", C: "Charging", B: "Blocked", R: "Reserved", I: "Inoperative", O: "Out of order", U: "Unknown", P: "Planned", M: "Removed", X: "Other" };
   const CONN_LABEL = { T2: "Type 2", CCS2: "CCS", CHADEMO: "CHAdeMO", T1: "Type 1", CCS1: "CCS1", DOM: "Domestic", IND: "Industrial", TESLA_S: "Tesla", TESLA_R: "Tesla" };
   const PT_LABEL = { AC1: "AC 1-ph", AC2: "AC 2-ph", AC3: "AC 3-ph", DC: "DC", NA: "" };
@@ -35,12 +37,16 @@
 
   const state = {
     index: null,
+    coverage: null,
     country: null,
     meta: null,
-    locations: [],
-    operators: {},
-    status: null,        // {ts, locations: {lid: {uid: code}}}
-    tariffs: null,       // {tariffs: [], locations: {lid: {uid: {cid: idx}}}}
+    points: [],          // compact location rows from points.json (see DATA.md)
+    operators: {},       // id -> {id, name}
+    opTable: null,       // operators.json (server-side aggregates incl. prices)
+    status: null,        // {ts, locations: {lid: "ACU…"}}
+    tariffs: null,       // lazily loaded tariffs.json
+    shards: 1,
+    shardCache: new Map(),
     history: [],         // tick summaries, oldest first
     filters: { op: "", st: "", pw: "", cn: "", q: "" },
     sort: { key: "evses", dir: -1 },
@@ -91,40 +97,52 @@
   async function loadCountry(code) {
     const c = state.index.countries.find((x) => x.code === code) || state.index.countries[0];
     state.country = c;
+    state.shardCache = new Map();
+    state.tariffs = null;
     setFreshness("loading", `Loading ${c.name}…`);
-    const [meta, locs, status, tariffs, history] = await Promise.all([
+    const [meta, pts, status, opTable, history] = await Promise.all([
       getJSON(`${c.path}/meta.json`, { revalidate: true }),
-      getJSON(`${c.path}/locations.json`),
+      getJSON(`${c.path}/points.json`, { revalidate: true }),
       getJSON(`${c.path}/status.json`, { revalidate: true }),
-      getJSON(`${c.path}/tariffs.json`).catch(() => ({ tariffs: [], locations: {} })),
+      getJSON(`${c.path}/operators.json`, { revalidate: true }).catch(() => null),
       loadHistory(c.path, 48),
     ]);
     state.meta = meta;
-    state.locations = locs.locations;
-    state.operators = locs.operators;
+    state.shards = pts.shards || 1;
+    state.operators = Object.fromEntries(pts.operators.map((o) => [o.id, o]));
+    state.points = pts.points.map((r) => ({
+      id: r[0], lon: r[1], lat: r[2], op: (pts.operators[r[3]] || {}).id || "?", name: r[4] || "", city: r[5] || "",
+      n: r[6], dc: r[7], maxKw: r[8] || null, kmask: r[9], cmask: r[10], flags: r[11],
+      search: `${r[4] || ""} ${r[5] || ""} ${r[0]} ${(pts.operators[r[3]] || {}).name || ""}`.toLowerCase(),
+    }));
+    state.classBits = pts.class_bits || { slow: 1, ac: 2, fast: 4, ultra: 8, na: 16 };
+    state.connBits = pts.conn_bits || { T2: 1, CCS2: 2, CHADEMO: 4 };
+    state.opTable = opTable;
     state.status = status;
-    state.tariffs = tariffs;
     state.history = history;
     state.lastFetch = Date.now();
     indexLocations();
     populateOperatorFilter();
-    $("source-line").textContent = `Source: ${c.source_name}. Inventory ${fmtDateTime(locs.source_ts)}, status ${fmtDateTime(status.ts)}.`;
+    $("source-line").textContent = `Source: ${c.source_name}. Inventory ${fmtDateTime(pts.ts)}, status ${fmtDateTime(status.ts)}.`;
     applyFilters();
     fitCountry();
     scheduleRefresh();
+    if (!$("view-coverage").hidden) renderCoverage();
   }
 
   async function refreshDynamic() {
     if (!state.country || document.hidden) return;
     const c = state.country;
     try {
-      const [status, history] = await Promise.all([
+      const [status, history, opTable] = await Promise.all([
         getJSON(`${c.path}/status.json`, { revalidate: true }),
         loadHistory(c.path, 48),
+        getJSON(`${c.path}/operators.json`, { revalidate: true }).catch(() => state.opTable),
       ]);
       if (status.ts !== state.status.ts) {
         state.status = status;
         state.history = history;
+        state.opTable = opTable;
         indexLocations();
         applyFilters();
       }
@@ -148,45 +166,27 @@
   }
 
   // ------------------------------------------------------------ derived ----
+  const STATUS_CLASS = (ch) => ch === "A" ? "a" : ch === "C" ? "c" : DOWN.has(ch) ? "d" : HOLD.has(ch) ? "h" : "u";
+
   function indexLocations() {
     const st = (state.status && state.status.locations) || {};
-    const tl = (state.tariffs && state.tariffs.locations) || {};
-    for (const loc of state.locations) {
-      const ls = st[loc.id] || {};
-      const lt = tl[loc.id] || {};
-      let a = 0, c = 0, d = 0, u = 0, h = 0, maxKw = 0, dc = false;
-      const conns = new Set();
-      const classes = new Set();
-      for (const e of loc.evses) {
-        const s = ls[e.uid] || "U";
-        e.st = s;
-        if (s === "A") a++; else if (s === "C") c++; else if (DOWN.has(s)) d++; else if (HOLD.has(s)) h++; else u++;
-        let ekw = 0;
-        for (const cn of e.conns) {
-          conns.add(cn.std);
-          if (cn.kw && cn.kw > ekw) ekw = cn.kw;
-          if (cn.pt === "DC") dc = true;
-          const ti = lt[e.uid] && lt[e.uid][cn.id];
-          cn.tariff = ti != null ? state.tariffs.tariffs[ti] : null;
-        }
-        e.kw = ekw || null;
-        classes.add(POWER_CLASS(e.kw));
-        if (ekw > maxKw) maxKw = ekw;
+    for (const p of state.points) {
+      const s = st[p.id] || "";
+      let a = 0, c = 0, d = 0, u = 0, h = 0;
+      for (let i = 0; i < p.n; i++) {
+        const k = STATUS_CLASS(s[i] || "U");
+        if (k === "a") a++; else if (k === "c") c++; else if (k === "d") d++; else if (k === "h") h++; else u++;
       }
-      loc.cnt = { a, c, d, u, h, n: loc.evses.length };
-      loc.st = a ? "A" : c ? "C" : d ? "D" : h ? "B" : "U";
-      loc.maxKw = maxKw || null;
-      loc.dc = dc;
-      loc.conns = conns;
-      loc.classes = classes;
-      loc.search = `${loc.name} ${loc.addr} ${loc.city} ${loc.id} ${loc.op} ${(state.operators[loc.op] || {}).name || ""}`.toLowerCase();
+      p.cnt = { a, c, d, u, h, n: p.n };
+      p.st = a ? "A" : c ? "C" : d ? "D" : h ? "B" : "U";
+      p.sts = s;
     }
   }
 
   function matches(loc, f) {
     if (f.op && loc.op !== f.op) return false;
-    if (f.pw && !loc.classes.has(f.pw)) return false;
-    if (f.cn && !loc.conns.has(f.cn)) return false;
+    if (f.pw && !(loc.kmask & (state.classBits[f.pw] || 0))) return false;
+    if (f.cn && !(loc.cmask & (state.connBits[f.cn] || 0))) return false;
     if (f.st) {
       if (f.st === "A" && !loc.cnt.a) return false;
       if (f.st === "C" && !loc.cnt.c) return false;
@@ -200,14 +200,14 @@
   function applyFilters() {
     const f = state.filters;
     f.q = f.q.trim().toLowerCase();
-    state.filtered = state.locations.filter((l) => matches(l, f));
+    state.filtered = state.points.filter((l) => matches(l, f));
     renderKpis();
     renderOperators();
     renderTrends();
     renderMapData();
     updateFreshness();
     writeHash();
-    const total = state.locations.length;
+    const total = state.points.length;
     const n = state.filtered.length;
     $("filter-result").textContent = n === total ? `${fmtInt(total)} locations` : `${fmtInt(n)} of ${fmtInt(total)} locations match`;
   }
@@ -236,20 +236,17 @@
     // list always shows all operators under the current slice.
     const f = { ...state.filters, op: "" };
     const rows = new Map();
-    for (const l of state.locations) {
+    const priceOf = {};
+    if (state.opTable) for (const o of state.opTable.operators) priceOf[o.id] = o.median_kwh_price;
+    for (const l of state.points) {
       if (!matches(l, f)) continue;
       let r = rows.get(l.op);
       if (!r) {
-        r = { id: l.op, name: (state.operators[l.op] || {}).name || l.op, locations: 0, evses: 0, dc: 0, a: 0, c: 0, d: 0, u: 0, prices: [] };
+        r = { id: l.op, name: (state.operators[l.op] || {}).name || l.op, locations: 0, evses: 0, dc: 0, a: 0, c: 0, d: 0, u: 0 };
         rows.set(l.op, r);
       }
-      r.locations++;
-      for (const e of l.evses) {
-        r.evses++;
-        if (e.conns.some((cn) => cn.pt === "DC")) r.dc++;
-        if (e.st === "A") r.a++; else if (e.st === "C") r.c++; else if (DOWN.has(e.st)) r.d++; else if (e.st === "U" || e.st === "X") r.u++;
-        for (const cn of e.conns) if (cn.tariff && cn.tariff.kwh > 0) r.prices.push(cn.tariff.kwh);
-      }
+      r.locations++; r.evses += l.n; r.dc += l.dc;
+      r.a += l.cnt.a; r.c += l.cnt.c; r.d += l.cnt.d; r.u += l.cnt.u;
     }
     const out = [];
     for (const r of rows.values()) {
@@ -258,8 +255,7 @@
       r.avail_pct = known ? 100 * r.a / known : null;
       r.charging_pct = known ? 100 * r.c / known : null;
       r.down_pct = known ? 100 * r.d / known : null;
-      r.prices.sort((x, y) => x - y);
-      r.median_kwh_price = r.prices.length ? r.prices[Math.floor(r.prices.length / 2)] : null;
+      r.median_kwh_price = priceOf[r.id] != null ? priceOf[r.id] : null;
       out.push(r);
     }
     return out;
@@ -594,7 +590,7 @@
     return [[minX, minY], [maxX, maxY]];
   }
   function fitCountry() {
-    const b = boundsOf(state.locations);
+    const b = boundsOf(state.points);
     if (b && state.map) state.map.fitBounds(b, { padding: 40, duration: 0, maxZoom: 9 });
   }
   function fitFiltered() {
@@ -608,35 +604,75 @@
   }
 
   // ----------------------------------------------------- location detail ----
-  function selectLocation(id, coords) {
-    const loc = state.locations.find((l) => l.id === id);
-    if (!loc) return;
-    state.selected = loc;
-    const opName = (state.operators[loc.op] || {}).name || loc.op;
+  async function shardOf(id, n) {
+    if (n <= 1) return "00";
+    const buf = await crypto.subtle.digest("SHA-1", new TextEncoder().encode(id));
+    const hex = [...new Uint8Array(buf).slice(0, 4)].map((b) => b.toString(16).padStart(2, "0")).join("");
+    return (parseInt(hex, 16) % n).toString(16).padStart(2, "0");
+  }
+  async function loadLocationDetail(id) {
+    const shard = await shardOf(id, state.shards);
+    let locs = state.shardCache.get(shard);
+    if (!locs) {
+      const doc = await getJSON(`${state.country.path}/locations/${shard}.json`);
+      locs = new Map(doc.locations.map((l) => [l.id, l]));
+      state.shardCache.set(shard, locs);
+    }
+    return locs.get(id) || null;
+  }
+  async function loadTariffs() {
+    if (state.tariffs === null) {
+      state.tariffs = await getJSON(`${state.country.path}/tariffs.json`).catch(() => ({ tariffs: [], locations: {} }));
+    }
+    return state.tariffs;
+  }
 
-    // popup
+  function popupFor(pt, coords) {
+    const opName = (state.operators[pt.op] || {}).name || pt.op;
     if (state.popup) state.popup.remove();
     const pop = el("div");
-    pop.append(el("p", "popup-name", loc.name || loc.id), el("p", "popup-op", opName));
+    pop.append(el("p", "popup-name", pt.name || pt.id), el("p", "popup-op", opName));
     const st = el("p", "popup-status");
     const chip = (cls, n, label) => { const s = el("span"); s.append(el("i", `dot ${cls}`), document.createTextNode(`${n} ${label}`)); return s; };
-    if (loc.cnt.a) st.append(chip("dot-a", loc.cnt.a, "available"));
-    if (loc.cnt.c) st.append(chip("dot-c", loc.cnt.c, "in use"));
-    if (loc.cnt.d) st.append(chip("dot-d", loc.cnt.d, "down"));
-    if (loc.cnt.h) st.append(chip("dot-b", loc.cnt.h, "blocked"));
-    if (loc.cnt.u) st.append(chip("dot-u", loc.cnt.u, "unknown"));
+    if (pt.cnt.a) st.append(chip("dot-a", pt.cnt.a, "available"));
+    if (pt.cnt.c) st.append(chip("dot-c", pt.cnt.c, "in use"));
+    if (pt.cnt.d) st.append(chip("dot-d", pt.cnt.d, "down"));
+    if (pt.cnt.h) st.append(chip("dot-b", pt.cnt.h, "blocked"));
+    if (pt.cnt.u) st.append(chip("dot-u", pt.cnt.u, "unknown"));
     pop.append(st);
-    state.popup = new maplibregl.Popup({ offset: 10, maxWidth: "280px" }).setLngLat(coords || [loc.lon, loc.lat]).setDOMContent(pop).addTo(state.map);
+    state.popup = new maplibregl.Popup({ offset: 10, maxWidth: "280px" }).setLngLat(coords || [pt.lon, pt.lat]).setDOMContent(pop).addTo(state.map);
+  }
 
-    // detail panel
+  async function selectLocation(id, coords) {
+    const pt = state.points.find((l) => l.id === id);
+    if (!pt) return;
+    state.selected = pt;
+    popupFor(pt, coords);
+    writeHash();
+    $("tab-location").hidden = false;
+    $("location-detail").replaceChildren(el("p", "hint", "Loading details…"));
+    showTab("location");
+    if (window.innerWidth <= 860) $("panel").classList.add("open");
+    let loc, tariffs;
+    try {
+      [loc, tariffs] = await Promise.all([loadLocationDetail(id), loadTariffs()]);
+    } catch (e) {
+      $("location-detail").replaceChildren(el("p", "hint", "Could not load location details."));
+      return;
+    }
+    if (!loc || state.selected !== pt) return;
+    const opName = (state.operators[pt.op] || {}).name || pt.op;
+    const tl = (tariffs.locations || {})[loc.id] || {};
     const tpl = $("tpl-location").content.cloneNode(true);
     tpl.querySelector(".loc-name").textContent = loc.name || loc.id;
     tpl.querySelector(".loc-op").textContent = loc.subop && loc.subop !== opName ? `${opName} · ${loc.subop}` : opName;
     tpl.querySelector(".loc-addr").textContent = [loc.addr, loc.pc, loc.city].filter(Boolean).join(", ");
+    const conns = new Set();
+    for (const e of loc.evses) for (const cn of e.conns) conns.add(cn.std);
     const meta = tpl.querySelector(".loc-meta");
     const add = (k, v) => { if (v) meta.append(el("dt", null, k), el("dd", null, v)); };
-    add("Max power", fmtKw(loc.maxKw));
-    add("Connectors", [...loc.conns].map((c) => CONN_LABEL[c] || c).join(", "));
+    add("Max power", fmtKw(pt.maxKw));
+    add("Connectors", [...conns].map((c) => CONN_LABEL[c] || c).join(", "));
     add("Access", loc.h24 ? "24/7" : loc.hours ? "Limited hours" : "");
     add("Parking", loc.ptype ? loc.ptype.toLowerCase().replace(/_/g, " ") : "");
     add("Facilities", (loc.fac || []).map((f) => f.toLowerCase().replace(/_/g, " ")).join(", "));
@@ -644,24 +680,26 @@
     add("Owner", loc.owner);
     add("Registry ID", loc.id);
     const list = tpl.querySelector(".evse-list");
-    for (const e of loc.evses) {
+    loc.evses.forEach((e, i) => {
+      const stc = (pt.sts && pt.sts[i]) || e.st || "U";
       const li = el("li", "evse");
-      const cls = e.st === "A" ? "dot-a" : e.st === "C" ? "dot-c" : DOWN.has(e.st) ? "dot-d" : HOLD.has(e.st) ? "dot-b" : "dot-u";
-      li.append(el("i", `dot ${cls}`));
+      const k = STATUS_CLASS(stc);
+      li.append(el("i", `dot dot-${k === "h" ? "b" : k}`));
       const main = el("div", "evse-main");
-      main.append(el("div", "evse-status", STATUS_LABEL[e.st] || e.st));
+      main.append(el("div", "evse-status", STATUS_LABEL[stc] || stc));
       main.append(el("div", "evse-id", e.id));
+      const et = tl[e.uid] || {};
       for (const cn of e.conns) {
         const line = el("div", "conn");
-        let s = `${CONN_LABEL[cn.std] || cn.std} · ${cn.fmt === "CABLE" ? "cable" : "socket"} · ${PT_LABEL[cn.pt] || cn.pt}${cn.kw ? ` · ${fmtKw(cn.kw)}` : ""}`;
-        line.textContent = s;
-        if (cn.tariff) {
-          const t = cn.tariff;
+        line.textContent = `${CONN_LABEL[cn.std] || cn.std} · ${cn.fmt === "CABLE" ? "cable" : "socket"} · ${PT_LABEL[cn.pt] || cn.pt}${cn.kw ? ` · ${fmtKw(cn.kw)}` : ""}`;
+        const ti = et[cn.id];
+        const t = ti != null ? tariffs.tariffs[ti] : null;
+        if (t) {
           const parts = [];
-          if (t.kwh != null) parts.push(`${t.kwh.toFixed(2)} €/kWh`);
-          if (t.hour) parts.push(`${t.hour.toFixed(2)} €/h`);
-          if (t.flat) parts.push(`${t.flat.toFixed(2)} € start`);
-          if (t.park_hour) parts.push(`${t.park_hour.toFixed(2)} €/h parking`);
+          if (t.kwh != null) parts.push(`${t.kwh.toFixed(2)} ${t.cur || "EUR"}/kWh`);
+          if (t.hour) parts.push(`${t.hour.toFixed(2)}/h`);
+          if (t.flat) parts.push(`${t.flat.toFixed(2)} start`);
+          if (t.park_hour) parts.push(`${t.park_hour.toFixed(2)}/h parking`);
           if (parts.length) { line.append(document.createTextNode(" · ")); line.append(el("span", "price", parts.join(", "))); }
         }
         main.append(line);
@@ -669,7 +707,7 @@
       if (e.mfr || e.model) main.append(el("div", "conn", [e.mfr, e.model].filter(Boolean).join(" ")));
       li.append(main);
       list.append(li);
-    }
+    });
     tpl.querySelector(".loc-foot").textContent = `Inventory last updated by operator ${fmtDateTime(loc.upd)}. Live status ${fmtDateTime(state.status.ts)}.`;
     const actions = el("div", "loc-actions");
     const nav = el("a", "btn-ghost", "Open in maps");
@@ -678,9 +716,45 @@
     actions.append(nav);
     tpl.querySelector(".loc").append(actions);
     $("location-detail").replaceChildren(tpl);
-    $("tab-location").hidden = false;
-    showTab("location");
-    if (window.innerWidth <= 860) $("panel").classList.add("open");
+  }
+
+  // ----------------------------------------------------------- coverage ----
+  function renderCoverage() {
+    const cov = state.coverage;
+    if (!cov) return;
+    const liveCodes = new Map((state.index ? state.index.countries : []).map((c) => [c.code, c]));
+    const rows = cov.countries.map((c) => ({ ...c, live: liveCodes.get(c.code) })).sort((a, b) => {
+      const ra = a.live ? 0 : 1, rb = b.live ? 0 : 1;
+      return ra - rb || a.name.localeCompare(b.name);
+    });
+    const nLive = rows.filter((r) => r.live).length;
+    const totalEvses = rows.reduce((n, r) => n + ((r.live && r.live.evses) || 0), 0);
+    $("coverage-summary").textContent = `${nLive} of ${rows.length} countries live on cpo.today (${fmtInt(totalEvses)} charge points). The rest are tracked from official registries and national access points.`;
+    const list = $("coverage-list");
+    list.replaceChildren();
+    for (const r of rows) {
+      const li = el("li", `cov${r.live ? " live" : ""}`);
+      li.append(el("span", "cov-flag", flag(r.code)));
+      li.append(el("span", "cov-name", r.name));
+      const status = r.live ? "live" : r.status;
+      li.append(el("span", `chip ${status}`, COVERAGE_LABEL[status] || status));
+      const src = el("span", "cov-src");
+      const a = el("a", null, r.source); a.href = r.url; a.rel = "noopener"; a.target = "_blank";
+      src.append(a);
+      if (r.formats && r.formats.length) src.append(document.createTextNode(` · ${r.formats.join(", ")}`));
+      li.append(src);
+      const stat = el("span", "cov-stat");
+      if (r.live) stat.textContent = `${fmtInt(r.live.locations)} locations · ${fmtInt(r.live.evses)} charge points · status ${fmtTime(r.live.dynamic_ts)} UTC`;
+      else stat.textContent = r.note || (cov.statuses[r.status] || "");
+      li.append(stat);
+      if (r.live) {
+        li.setAttribute("role", "button"); li.tabIndex = 0;
+        const go = () => { $("country").value = r.code; loadCountry(r.code).catch(fail); showTab("operators"); };
+        li.addEventListener("click", go);
+        li.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
+      }
+      list.append(li);
+    }
   }
 
   // ---------------------------------------------------------- freshness ----
@@ -706,7 +780,7 @@
     const cur = state.filters.op;
     sel.replaceChildren(new Option("All operators", ""));
     const counts = {};
-    for (const l of state.locations) counts[l.op] = (counts[l.op] || 0) + l.evses.length;
+    for (const l of state.points) counts[l.op] = (counts[l.op] || 0) + l.n;
     const ops = Object.values(state.operators).sort((a, b) => (counts[b.id] || 0) - (counts[a.id] || 0) || a.name.localeCompare(b.name));
     for (const o of ops) sel.append(new Option(`${o.name} (${fmtInt(counts[o.id] || 0)})`, o.id));
     sel.value = ops.some((o) => o.id === cur) ? cur : "";
@@ -719,17 +793,19 @@
       $(t.getAttribute("aria-controls")).hidden = !on;
     }
     if (name === "trends") renderTrends();
+    if (name === "coverage") renderCoverage();
   }
   function readHash() {
     const h = location.hash.replace(/^#/, "");
     if (!h) return {};
     const q = new URLSearchParams(h.includes("?") ? h.slice(h.indexOf("?") + 1) : h);
-    return { country: (h.split("?")[0] || "").toUpperCase(), op: q.get("op") || "", st: q.get("st") || "", pw: q.get("pw") || "", cn: q.get("cn") || "", q: q.get("q") || "" };
+    return { country: (h.split("?")[0] || "").toUpperCase(), op: q.get("op") || "", st: q.get("st") || "", pw: q.get("pw") || "", cn: q.get("cn") || "", q: q.get("q") || "", loc: q.get("loc") || "" };
   }
   function writeHash() {
     if (!state.country) return;
     const q = new URLSearchParams();
     for (const k of ["op", "st", "pw", "cn", "q"]) if (state.filters[k]) q.set(k, state.filters[k]);
+    if (state.selected) q.set("loc", state.selected.id);
     const s = q.toString();
     const next = `#${state.country.code.toLowerCase()}${s ? "?" + s : ""}`;
     if (location.hash !== next) history.replaceState(null, "", next);
@@ -745,6 +821,7 @@
     $("f-search").addEventListener("input", (e) => { clearTimeout(t); t = setTimeout(() => { f.q = e.target.value; applyFilters(); if (f.q.length >= 3) fitFiltered(); }, 200); });
     $("f-reset").addEventListener("click", () => {
       Object.assign(f, { op: "", st: "", pw: "", cn: "", q: "" });
+      state.selected = null; $("tab-location").hidden = true;
       for (const id of ["f-operator", "f-status", "f-power", "f-connector", "f-search"]) $(id).value = "";
       applyFilters(); fitCountry();
     });
@@ -789,12 +866,18 @@
     $("f-status").value = state.filters.st; $("f-power").value = state.filters.pw; $("f-connector").value = state.filters.cn; $("f-search").value = state.filters.q;
     try {
       state.index = await getJSON("index.json", { revalidate: true });
+      fetch("coverage.json", { credentials: "omit" }).then((r) => r.ok ? r.json() : null).then((c) => { state.coverage = c; }).catch(() => {});
       const sel = $("country");
       sel.replaceChildren();
-      for (const c of state.index.countries) sel.append(new Option(c.name, c.code));
+      for (const c of state.index.countries) sel.append(new Option(`${flag(c.code)} ${c.name}`, c.code));
       const want = state.index.countries.some((c) => c.code === h.country) ? h.country : state.index.countries[0].code;
       sel.value = want;
       await loadCountry(want);
+      if (h.loc && state.points.some((p) => p.id === h.loc)) {
+        const pt = state.points.find((p) => p.id === h.loc);
+        state.map.jumpTo({ center: [pt.lon, pt.lat], zoom: 14 });
+        selectLocation(pt.id);
+      }
     } catch (e) {
       fail(e);
     }

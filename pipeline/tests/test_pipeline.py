@@ -8,8 +8,9 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from cpo_pipeline import aggregate, fetch, schema
-from cpo_pipeline.run_gr import Tick
+from cpo_pipeline.runner import Tick
 from cpo_pipeline.sources import gr_myfah as gr
+from cpo_pipeline.sources.base import SourceError
 
 
 def location(lid="GR-OPX-S1-L", party="OPX", name="Test", lat="37.9", lon="23.7", evses=None):
@@ -140,9 +141,9 @@ class NormalizeTests(unittest.TestCase):
         self.assertEqual({why for _, why in norm["dropped"]}, {"outside bbox", "duplicate id", "missing id/coords"})
 
     def test_static_rejects_bad_envelope(self):
-        with self.assertRaises(gr.SourceError):
+        with self.assertRaises(SourceError):
             gr.normalize_static({"status": "error", "Locations": []})
-        with self.assertRaises(gr.SourceError):
+        with self.assertRaises(SourceError):
             gr.normalize_static(["not", "an", "object"])
 
     def test_dynamic_nested_and_tariffs(self):
@@ -160,13 +161,25 @@ class NormalizeTests(unittest.TestCase):
 
 
 class AggregateTests(unittest.TestCase):
-    def test_diff(self):
-        prev = {"L1": {"1": "A", "2": "C"}, "L2": {"9": "A"}}
-        cur = {"L1": {"1": "C", "2": "C", "3": "A"}, "L3": {"9": "A"}}
-        self.assertEqual(aggregate.diff_statuses(prev, cur), [
-            ["L1", "1", "A", "C"], ["L1", "3", "-", "A"], ["L2", "9", "A", "-"], ["L3", "9", "-", "A"],
+    def test_diff_encoded(self):
+        prev = {"L1": "AC", "L2": "A"}
+        cur = {"L1": "CCA", "L3": "A"}
+        self.assertEqual(aggregate.diff_encoded(prev, cur), [
+            ["L1", 0, "A", "C"], ["L1", 2, "-", "A"], ["L2", 0, "A", "-"], ["L3", 0, "-", "A"],
         ])
-        self.assertEqual(aggregate.diff_statuses(None, cur), [])
+        self.assertEqual(aggregate.diff_encoded(None, cur), [])
+
+    def test_points_layer(self):
+        static = gr.normalize_static(envelope([location()]))
+        pts = aggregate.points_layer(static, "t", 1)
+        row = pts["points"][0]
+        self.assertEqual(row[0], "GR-OPX-S1-L")
+        self.assertEqual(row[6], 2)          # evses
+        self.assertEqual(row[7], 1)          # dc evses
+        self.assertEqual(row[8], 50.0)       # max kW
+        self.assertEqual(row[9], aggregate.CLASS_BITS["ac"] | aggregate.CLASS_BITS["fast"])
+        self.assertEqual(row[10], aggregate.CONN_BITS["T2"] | aggregate.CONN_BITS["CCS2"])
+        self.assertEqual(row[11] & 1, 1)     # 24/7
 
     def test_operator_table(self):
         static = gr.normalize_static(envelope([location()]))
@@ -190,7 +203,7 @@ class TickTests(unittest.TestCase):
     def run_tick(self, root, static_doc, dyn_doc, now):
         (root / "static.zip").write_bytes(zipped(static_doc))
         (root / "dynamic.zip").write_bytes(zipped(dyn_doc))
-        t = Tick(root / "data", static_file=root / "static.zip", dynamic_file=root / "dynamic.zip", now=now)
+        t = Tick(gr.SPEC, root / "data", static_file=root / "static.zip", dynamic_file=root / "dynamic.zip", now=now)
         t.run_static()
         t.run_dynamic()
         t.finish()
@@ -204,8 +217,11 @@ class TickTests(unittest.TestCase):
             t = self.run_tick(root, static_doc, to_dynamic(static_doc), t0)
             self.assertEqual(t.warnings, [])
             gr_dir = root / "data" / "gr"
-            self.assertTrue((gr_dir / "locations.json").exists())
+            self.assertTrue((gr_dir / "points.json").exists())
+            self.assertTrue((gr_dir / "locations" / "00.json").exists())
             self.assertTrue((gr_dir / "status.json").exists())
+            st = json.loads((gr_dir / "status.json").read_text())
+            self.assertEqual(st["locations"], {"GR-OPX-S1-L": "AC"})
             self.assertFalse((gr_dir / "events" / "2026-09-05.jsonl").exists())
             hist = (gr_dir / "history" / "2026-09-05.jsonl").read_text().splitlines()
             self.assertEqual(len(hist), 1)
@@ -216,7 +232,7 @@ class TickTests(unittest.TestCase):
             hist = (gr_dir / "history" / "2026-09-05.jsonl").read_text().splitlines()
             self.assertEqual(len(hist), 2)
             ev = json.loads((gr_dir / "events" / "2026-09-05.jsonl").read_text())
-            self.assertEqual(ev["ch"], [["GR-OPX-S1-L", "1", "A", "O"]])
+            self.assertEqual(ev["ch"], [["GR-OPX-S1-L", 0, "A", "O"]])
             meta = json.loads((gr_dir / "meta.json").read_text())
             self.assertEqual(meta["dynamic"]["changes"], 1)
             index = json.loads((root / "data" / "index.json").read_text())
@@ -231,8 +247,8 @@ class TickTests(unittest.TestCase):
             few = envelope([location(lid=f"GR-OPX-S{i}-L") for i in range(3)])
             t = self.run_tick(root, few, to_dynamic(few), t0 + dt.timedelta(days=1))
             self.assertTrue(any("refusing" in w for w in t.warnings))
-            locs = json.loads((root / "data" / "gr" / "locations.json").read_text())
-            self.assertEqual(len(locs["locations"]), 10)
+            pts = json.loads((root / "data" / "gr" / "points.json").read_text())
+            self.assertEqual(len(pts["points"]), 10)
 
     def test_unchanged_dynamic_is_skipped(self):
         with TemporaryDirectory() as d:
@@ -247,3 +263,84 @@ class TickTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SingleFeedTests(unittest.TestCase):
+    """Sources where one OCPI document carries inventory and live status (LT, NL)."""
+
+    def ocpi_doc(self, status="AVAILABLE", tariff_ids=None):
+        loc = location(lid="LT-1", party="IBG", lat="54.68", lon="25.28", evses=[
+            evse("535", status, [connector("650306", 22000, tariffs=None)]),
+        ])
+        if tariff_ids is not None:
+            loc["evses"][0]["connectors"][0]["tariff_ids"] = tariff_ids
+        return {"status_code": 1000, "data": [loc]}
+
+    def run_tick(self, root, doc, now, spec):
+        (root / "feed.json").write_text(json.dumps(doc))
+        t = Tick(spec, root / "data", static_file=root / "feed.json", now=now)
+        t.run_static()
+        t.tariff_lookup = {"t1": {"id": "t1", "currency": "EUR", "elements": [{"price_components": [{"type": "ENERGY", "price": "0.38"}]}]}}
+        t.run_dynamic()
+        t.finish()
+        return t
+
+    def test_lt_single_feed_with_tariff_lookup(self):
+        from cpo_pipeline.sources import lt_vialietuva as lt
+        with TemporaryDirectory() as d:
+            root = Path(d)
+            t0 = dt.datetime(2026, 9, 5, 4, 0, tzinfo=dt.timezone.utc)
+            t = self.run_tick(root, self.ocpi_doc(tariff_ids=["t1"]), t0, lt.SPEC)
+            self.assertEqual(t.warnings, [])
+            lt_dir = root / "data" / "lt"
+            st = json.loads((lt_dir / "status.json").read_text())
+            self.assertEqual(st["locations"]["LT-1"], "A")
+            tf = json.loads((lt_dir / "tariffs.json").read_text())
+            self.assertEqual(tf["tariffs"][0]["kwh"], 0.38)
+            self.assertEqual(tf["locations"]["LT-1"]["535"]["650306"], 0)
+            locs = json.loads((lt_dir / "locations" / "00.json").read_text())
+            self.assertEqual(locs["locations"][0]["evses"][0]["st"], "A")
+            meta0 = json.loads((lt_dir / "meta.json").read_text())
+
+            # Second tick: only the status changed. Inventory file must not be rewritten.
+            t = self.run_tick(root, self.ocpi_doc(status="CHARGING", tariff_ids=["t1"]), t0 + dt.timedelta(minutes=10), lt.SPEC)
+            meta1 = json.loads((lt_dir / "meta.json").read_text())
+            self.assertEqual(meta0["static"]["structure"], meta1["static"]["structure"])
+            locs2 = json.loads((lt_dir / "locations" / "00.json").read_text())
+            self.assertEqual(locs2["source_ts"], locs["source_ts"], "shard rewritten despite unchanged structure")
+            ev = json.loads((lt_dir / "events" / "2026-09-05.jsonl").read_text())
+            self.assertEqual(ev["ch"], [["LT-1", 0, "A", "C"]])
+            hist = (lt_dir / "history" / "2026-09-05.jsonl").read_text().splitlines()
+            self.assertEqual(len(hist), 2)
+            index = json.loads((root / "data" / "index.json").read_text())
+            self.assertEqual([c["code"] for c in index["countries"]], ["LT"])
+
+    def test_nl_bbox_and_plain_list(self):
+        from cpo_pipeline.sources import nl_ndw as nl
+        doc = [location(lid="NLLOC1", party="ALLEGO", lat="52.37", lon="4.89"),
+               location(lid="FAR", party="X", lat="37.9", lon="23.7")]
+        norm = nl.parse_static(doc, nl.SPEC)
+        self.assertEqual([l["id"] for l in norm["locations"]], ["NLLOC1"])
+        self.assertEqual(norm["dropped"], [("FAR", "outside bbox")])
+
+
+class OcpiPagesTests(unittest.TestCase):
+    def test_pagination_via_total_count(self):
+        from cpo_pipeline import fetch as F
+        calls = []
+
+        def fake_get(url, **kw):
+            calls.append(url)
+            off = int(url.split("offset=")[1].split("&")[0])
+            data = [{"id": i} for i in range(off, min(off + 2, 5))]
+            return F.FetchResult(200, json.dumps({"status_code": 1000, "data": data}).encode(), None, None, None, "5")
+
+        orig = F.http_get
+        F.http_get = fake_get
+        try:
+            items, info = F.fetch_ocpi_pages("https://x/locations", page_size=2, max_pages=10, max_bytes=1 << 20)
+        finally:
+            F.http_get = orig
+        self.assertEqual([i["id"] for i in items], [0, 1, 2, 3, 4])
+        self.assertEqual(info["pages"], 3)
+        self.assertEqual(info["total_count"], 5)

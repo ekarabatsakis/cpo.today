@@ -106,6 +106,7 @@
     <div class="tabs" role="tablist" aria-label="Panel sections">
       <button role="tab" id="tab-operators" aria-selected="true" aria-controls="view-operators">Operators</button>
       <button role="tab" id="tab-trends" aria-selected="false" aria-controls="view-trends">Trends</button>
+      <button role="tab" id="tab-coverage" aria-selected="false" aria-controls="view-coverage">Coverage</button>
       <button role="tab" id="tab-location" aria-selected="false" aria-controls="view-location" hidden>Location</button>
     </div>
 
@@ -159,6 +160,12 @@
         <summary>Table view</summary>
         <div class="table-wrap"><table id="trend-table"><thead><tr><th>Time (UTC)</th><th class="num">In use</th><th class="num">kW</th><th class="num">Down</th><th class="num">Avail%</th></tr></thead><tbody></tbody></table></div>
       </details>
+    </section>
+
+    <section class="view" id="view-coverage" role="tabpanel" aria-labelledby="tab-coverage" hidden>
+      <p class="coverage-intro" id="coverage-summary"></p>
+      <ul class="coverage-list" id="coverage-list"></ul>
+      <p class="hint">Statuses reflect what each national registry publishes today. Countries move up as feeds become available; contributions and pointers to official endpoints are welcome on GitHub.</p>
     </section>
 
     <section class="view" id="view-location" role="tabpanel" aria-labelledby="tab-location" hidden>
