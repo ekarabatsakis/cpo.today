@@ -1,0 +1,25 @@
+{
+ "static": {},
+ "dynamic": {},
+ "tariffs": {
+  "sha256": "e4e7ad722bffc66b5017638aec26ff93bca78c930d8d83686567ac72feb0ccc3",
+  "etag": null,
+  "last_modified": null,
+  "body_bytes": 1572653,
+  "json_bytes": 1572653,
+  "fetched": "2026-09-05T07:43:11Z",
+  "count": 1611
+ },
+ "country": "LT",
+ "country_name": "Lithuania",
+ "source": "VIALIETUVA",
+ "source_name": "Via Lietuva - national EV charging data service",
+ "source_url": "https://ev.vialietuva.lt/en/data-provision",
+ "licence": "Open data of Via Lietuva (Lithuanian Road Administration)",
+ "pipeline_version": "0.1.0",
+ "last_run": "2026-09-05T07:43:11Z",
+ "warnings": [
+  "run_static: https://ev.vialietuva.lt/ocpi/2.3.0/locations: got 92 of 3248 items after 1 pages",
+  "dynamic: no static snapshot yet; skipping"
+ ]
+}
