@@ -6,7 +6,7 @@
   "body_bytes": 55559083,
   "json_bytes": 55559083,
   "structure": "14af27ae473a0a0eab4423ac8c883f3c1c3b2cf8a0e7bf6e1bc99ff48640ae69",
-  "fetched": "2026-09-05T08:31:30Z",
+  "fetched": "2026-09-05T08:43:56Z",
   "source_ts": "2026-09-03T07:39:47Z",
   "locations": 71989,
   "evses": 209130,
@@ -23,6 +23,6 @@
  "source_url": "https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/E-Mobilitaet/Ladesaeulenkarte/start.html",
  "licence": "Datenlizenz Deutschland Namensnennung 2.0",
  "pipeline_version": "0.1.0",
- "last_run": "2026-09-05T08:31:30Z",
+ "last_run": "2026-09-05T08:43:56Z",
  "warnings": []
 }
