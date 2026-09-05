@@ -14,6 +14,10 @@
 <meta property="og:url" content="https://cpo.today/">
 <title>cpo.today - live EV charging network map</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="cpo.today">
 <link rel="stylesheet" href="vendor/maplibre-gl.css">
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -44,13 +48,14 @@
     <svg viewBox="0 0 24 24" aria-hidden="true" class="icon-moon"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
     <svg viewBox="0 0 24 24" aria-hidden="true" class="icon-sun"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1" stroke-width="2" stroke-linecap="round"/></svg>
   </button>
-  <button class="panel-toggle" id="panel-toggle" aria-controls="panel" aria-expanded="false">
-    <span class="panel-toggle-label">Data</span>
-  </button>
 </header>
 
 <main class="layout">
   <aside class="panel" id="panel" aria-label="Network data">
+    <div class="sheet-head" id="sheet-head">
+      <button class="sheet-handle" id="sheet-handle" aria-label="Expand or collapse the data panel" aria-expanded="false"><span></span></button>
+      <div class="sheet-fresh" id="sheet-fresh"></div>
+    </div>
     <div class="panel-tools">
       <span class="panel-tools-label" id="panel-tools-label"></span>
       <button class="icon-btn small" id="panel-wide" aria-pressed="false" title="Wider data panel" aria-label="Wider data panel">

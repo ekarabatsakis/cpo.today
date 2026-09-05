@@ -681,7 +681,7 @@
     $("tab-location").hidden = false;
     $("location-detail").replaceChildren(el("p", "hint", "Loading details…"));
     showTab("location");
-    if (window.innerWidth <= 860) $("panel").classList.add("open");
+    if (isMobile()) setSheet("half");
     let loc, tariffs;
     try {
       [loc, tariffs] = await Promise.all([loadLocationDetail(id), loadTariffs()]);
@@ -917,16 +917,85 @@
     }
     $("country").addEventListener("change", (e) => loadCountry(e.target.value).catch(fail));
     $("about-link").addEventListener("click", (e) => { e.preventDefault(); $("about").showModal(); });
-    $("panel-toggle").addEventListener("click", () => {
-      const p = $("panel"); const open = !p.classList.contains("open");
-      p.classList.toggle("open", open); $("panel-toggle").setAttribute("aria-expanded", String(open));
-    });
+    bindSheet();
     document.addEventListener("visibilitychange", () => { if (!document.hidden && Date.now() - state.lastFetch > 60000) refreshDynamic(); });
     $("theme-toggle").addEventListener("click", () => setTheme(isDark() ? "light" : "dark"));
     bindPanelSizing();
     let rt;
     window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(renderTrends, 150); });
     setInterval(updateFreshness, 30000);
+  }
+
+  // ---------------------------------------------------- mobile sheet ----
+  const isMobile = () => window.matchMedia("(max-width: 860px)").matches;
+  const SHEET_STATES = ["peek", "half", "full"];
+  function setSheet(state) {
+    const p = $("panel");
+    for (const st of SHEET_STATES) p.classList.toggle(st, st === state);
+    p.style.transform = "";
+    document.body.classList.toggle("sheet-open", state !== "peek");
+    $("sheet-handle").setAttribute("aria-expanded", String(state !== "peek"));
+    state === "full" || state === "half" ? null : $("panel").querySelector(".panel-scroll") && ($("panel").querySelector(".panel-scroll").scrollTop = 0);
+    clearTimeout(state._rt); setTimeout(renderTrends, 300);
+  }
+  function currentSheet() {
+    const p = $("panel");
+    return SHEET_STATES.find((st) => p.classList.contains(st)) || "peek";
+  }
+  function placeFreshness() {
+    // The live indicator lives in the header on desktop and in the sheet head on phones.
+    const f = $("freshness");
+    const target = isMobile() ? $("sheet-fresh") : document.querySelector(".topbar-center");
+    if (f.parentElement !== target) target.append(f);
+    if (isMobile() && !SHEET_STATES.some((st) => $("panel").classList.contains(st))) setSheet("peek");
+    if (!isMobile()) { for (const st of SHEET_STATES) $("panel").classList.remove(st); document.body.classList.remove("sheet-open"); }
+  }
+  function bindSheet() {
+    // Wrap everything below the sheet head in a scroll container.
+    const p = $("panel");
+    const scroll = el("div", "panel-scroll");
+    const head = $("sheet-head");
+    while (head.nextSibling) scroll.append(head.nextSibling);
+    p.append(scroll);
+    placeFreshness();
+    window.matchMedia("(max-width: 860px)").addEventListener("change", placeFreshness);
+
+    const handle = $("sheet-handle");
+    let startY = 0, startT = 0, dragging = false, moved = false;
+    const vh = () => window.innerHeight - 50;
+    const offsetFor = (st) => st === "full" ? 0 : st === "half" ? vh() * 0.46 : vh() - 118;
+    head.addEventListener("pointerdown", (e) => {
+      if (!isMobile()) return;
+      dragging = true; moved = false; startY = e.clientY; startT = offsetFor(currentSheet());
+      p.classList.add("dragging"); head.setPointerCapture(e.pointerId);
+    });
+    head.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      const dy = e.clientY - startY;
+      if (Math.abs(dy) > 4) moved = true;
+      const y = Math.max(0, Math.min(vh() - 60, startT + dy));
+      p.style.transform = `translateY(${y}px)`;
+    });
+    const end = (e) => {
+      if (!dragging) return;
+      dragging = false; p.classList.remove("dragging");
+      const dy = e.clientY - startY;
+      const cur = currentSheet();
+      if (!moved) { setSheet(cur === "peek" ? "half" : "peek"); return; }
+      const y = Math.max(0, Math.min(vh(), startT + dy));
+      let best = "peek", bd = Infinity;
+      for (const st of SHEET_STATES) { const d = Math.abs(offsetFor(st) - y); if (d < bd) { bd = d; best = st; } }
+      setSheet(best);
+    };
+    head.addEventListener("pointerup", end); head.addEventListener("pointercancel", end);
+    handle.addEventListener("keydown", (e) => {
+      const i = SHEET_STATES.indexOf(currentSheet());
+      if (e.key === "ArrowUp" && i < 2) { setSheet(SHEET_STATES[i + 1]); e.preventDefault(); }
+      if (e.key === "ArrowDown" && i > 0) { setSheet(SHEET_STATES[i - 1]); e.preventDefault(); }
+    });
+    // Tapping a tab from the peek state opens the sheet.
+    for (const t of document.querySelectorAll('[role="tab"]')) t.addEventListener("click", () => { if (isMobile() && currentSheet() === "peek") setSheet("half"); });
+    for (const id of ["f-operator", "f-status", "f-power", "f-connector", "f-search"]) $(id).addEventListener("focus", () => { if (isMobile() && currentSheet() === "peek") setSheet("half"); });
   }
 
   // ------------------------------------------------ theme + panel sizing ----
@@ -966,7 +1035,7 @@
       if (persist) { try { localStorage.setItem("cpo.panelw", String(w)); } catch (e) { /* ignore */ } }
       clearTimeout(state._rt); state._rt = setTimeout(renderTrends, 120);
     };
-    if (saved && window.innerWidth > 860) apply(saved, false);
+    if (saved && !isMobile()) apply(saved, false);
     $("panel-wide").addEventListener("click", () => {
       const cur = panel.getBoundingClientRect().width;
       apply(cur > DEFAULT + 80 ? DEFAULT : Math.min(window.innerWidth * 0.62, 1100), true);

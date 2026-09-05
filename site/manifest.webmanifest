@@ -1,0 +1,10 @@
+{
+  "name": "cpo.today - live EV charging map",
+  "short_name": "cpo.today",
+  "description": "Every public EV charge point from official registries, refreshed every 10 minutes.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f9f9f7",
+  "theme_color": "#f9f9f7",
+  "icons": [{ "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
