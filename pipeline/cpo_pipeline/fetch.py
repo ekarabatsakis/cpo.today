@@ -125,9 +125,10 @@ def fetch_ocpi_pages(url: str, *, page_size: int, max_pages: int, max_bytes: int
     total = None
     pages = 0
     bytes_total = 0
+    offset = 0
     sep = "&" if "?" in url else "?"
     while pages < max_pages:
-        page_url = f"{url}{sep}offset={len(items)}&limit={page_size}"
+        page_url = f"{url}{sep}offset={offset}&limit={page_size}"
         res = http_get(page_url, max_bytes=max_bytes, timeout=timeout, headers=headers)
         bytes_total += len(res.body)
         doc = parse_json(res.body)
@@ -142,10 +143,13 @@ def fetch_ocpi_pages(url: str, *, page_size: int, max_pages: int, max_bytes: int
             raise FetchError(f"{page_url}: OCPI data is not a list")
         items.extend(data)
         pages += 1
+        offset += page_size
         if res.total_count and res.total_count.isdigit():
             total = int(res.total_count)
-        if not data or len(data) < page_size or (total is not None and len(items) >= total):
+        # Servers may return short pages (unpublished rows filtered after paging),
+        # so advance by page size and stop only on an empty page or past the total.
+        if not data or (total is not None and offset >= total):
             break
-    if total is not None and len(items) < total:
-        raise FetchError(f"{url}: got {len(items)} of {total} items after {pages} pages")
+    if total is not None and len(items) < total * 0.5:
+        raise FetchError(f"{url}: got only {len(items)} of {total} items after {pages} pages")
     return items, {"pages": pages, "body_bytes": bytes_total, "total_count": total}

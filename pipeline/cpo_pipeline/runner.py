@@ -227,24 +227,28 @@ class Tick:
     # -- tariffs (optional separate OCPI feed) ------------------------------
 
     def run_tariffs(self) -> bool:
+        """Fetch the optional tariffs feed. Always re-downloaded: the lookup is
+        needed every tick and caching 70 MB of raw tariffs in git is not worth it."""
         spec = self.spec
         if spec.tariffs is None:
             return False
         self.meta.setdefault("tariffs", {})
+        stale = self.store.dir / "tariffs.raw.json"
+        if stale.exists():
+            stale.unlink()
+            self.changed = True
         try:
-            doc, _ts, info = self._acquire("tariffs", spec.tariffs, None)
-        except FetchError as e:
-            # A tariff outage must not stop status collection; reuse the cached lookup.
-            log.warning("tariffs: %s (keeping cached)", e)
+            res = http_get(spec.tariffs.url, max_bytes=spec.tariffs.max_bytes, headers=spec.tariffs.headers)
+            raw = decode_body(spec.tariffs, res.body)
+            self.tariff_lookup = spec.parse_tariffs(parse_json(raw), spec) if spec.parse_tariffs else {}
+        except (FetchError, SourceError, ValueError) as e:
+            # A tariff outage must not stop status collection.
+            log.warning("tariffs: %s (previous tariffs.json kept)", e)
             self.warnings.append(f"tariffs: {e}")
-            doc = None
-        if doc is None:
-            cached = read_json(self.store.dir / "tariffs.raw.json", None)
-            self.tariff_lookup = cached or {}
+            self.tariff_lookup = {}
             return False
-        self.tariff_lookup = spec.parse_tariffs(doc, spec) if spec.parse_tariffs else {}
-        write_json(self.store.dir / "tariffs.raw.json", self.tariff_lookup)
-        self.meta["tariffs"] = {**info, "fetched": iso(self.now), "count": len(self.tariff_lookup)}
+        self.meta["tariffs"] = {"fetched": iso(self.now), "last_modified": res.last_modified,
+                                "body_bytes": len(res.body), "json_bytes": len(raw), "count": len(self.tariff_lookup)}
         log.info("tariffs: %d tariff objects", len(self.tariff_lookup))
         return True
 
@@ -297,11 +301,16 @@ class Tick:
         self.changed |= write_json(self.store.status, status_doc)
         tariffs = norm["tariffs"]
         conn_tariffs = norm["connector_tariffs"]
-        self.changed |= write_json(self.store.tariffs, {
-            "country": spec.country, "ts": ts,
-            "tariffs": tariffs,
-            "locations": {lid: ev for lid, ev in sorted(conn_tariffs.items())},
-        })
+        if spec.tariffs is not None and not self.tariff_lookup and self.store.tariffs.exists():
+            # Tariff feed unavailable this tick: keep yesterday's prices rather than publishing none.
+            prev_t = read_json(self.store.tariffs, {}) or {}
+            tariffs, conn_tariffs = prev_t.get("tariffs", []), prev_t.get("locations", {})
+        else:
+            self.changed |= write_json(self.store.tariffs, {
+                "country": spec.country, "ts": ts,
+                "tariffs": tariffs,
+                "locations": {lid: ev for lid, ev in sorted(conn_tariffs.items())},
+            })
         self.changed |= write_json(self.store.operators,
                                    operator_table(static, statuses, tariffs, conn_tariffs, ts))
         append_jsonl(self.store.history(day), tick_summary(static, statuses, ts))
@@ -350,7 +359,9 @@ class Tick:
             "evses": self.meta["static"].get("evses"),
         }
         others = [c for c in index.get("countries", []) if c.get("code") != spec.country]
-        index = {"generated": iso(self.now), "countries": sorted(others + [entry], key=lambda c: c["code"])}
+        # A country is listed only once it has an inventory; a failed first run stays invisible.
+        mine = [entry] if self.meta["static"].get("locations") else []
+        index = {"generated": iso(self.now), "countries": sorted(others + mine, key=lambda c: c["code"])}
         self.changed |= write_json(index_path, index, compact=False)
         return self.changed
 
