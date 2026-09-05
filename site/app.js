@@ -502,7 +502,11 @@
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: false }), "top-right");
     map.addControl(new maplibregl.GeolocateControl({ positionOptions: { enableHighAccuracy: false }, trackUserLocation: false }), "top-right");
     map.addControl(new maplibregl.ScaleControl({ maxWidth: 120, unit: "metric" }), "bottom-right");
-    map.addControl(new maplibregl.AttributionControl({ compact: true, customAttribution: "Data: national registries via cpo.today" }), "bottom-right");
+    map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
+    // Keep the attribution collapsed behind the "i" button; MapLibre auto-expands it on load.
+    const collapseAttribution = () => { for (const a of document.querySelectorAll(".maplibregl-ctrl-attrib")) { a.classList.remove("maplibregl-compact-show"); a.removeAttribute("open"); } };
+    map.on("load", collapseAttribution);
+    map.on("style.load", () => setTimeout(collapseAttribution, 50));
 
     const FALLBACK_MSG = "Basemap tiles unavailable, showing charge points only.";
     state.pendingStyles = chain.slice(1);
