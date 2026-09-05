@@ -430,3 +430,83 @@ class FranceTests(unittest.TestCase):
             self.assertIsNone(ops["totals"]["avail_pct"])
             index = json.loads((root / "data" / "index.json").read_text())
             self.assertFalse(index["countries"][0]["live"])
+
+
+DATEX_TABLE = """<?xml version="1.0" encoding="utf-8"?>
+<d2:payload xsi:type="egi:EnergyInfrastructureTablePublication" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:com="https://datex2.eu/schema/3/common" xmlns:egi="https://datex2.eu/schema/3/energyInfrastructure"
+  xmlns:fac="https://datex2.eu/schema/3/facilities" xmlns:loc="https://datex2.eu/schema/3/locationReferencing" xmlns:d2="https://datex2.eu/schema/3/d2Payload">
+  <egi:energyInfrastructureTable id="T" version="1">
+    <egi:energyInfrastructureSite id="EGI-S-1" version="v1">
+      <fac:name><com:values><com:value lang="lt">Vilnius Hub</com:value></com:values></fac:name>
+      <egi:energyInfrastructureStation id="EGI-ST-1" version="v1">
+        <egi:lastUpdated>2026-07-09T09:28:04+03:00</egi:lastUpdated>
+        <egi:energyProvider xsi:type="fac:OrganisationSpecification">
+          <fac:name><com:values><com:value lang="lt">In Balance grid, UAB</com:value></com:values></fac:name>
+        </egi:energyProvider>
+        <egi:siteLocation xsi:type="loc:LocationReference"><loc:pointByCoordinates><loc:pointCoordinates>
+          <loc:latitude>54.7049540</loc:latitude><loc:longitude>25.2724750</loc:longitude></loc:pointCoordinates></loc:pointByCoordinates></egi:siteLocation>
+        <egi:refillPoint xsi:type="egi:ElectricChargingPoint" id="LT-IBG-P-A" version="v1">
+          <egi:connector><egi:connectorType>Type 2</egi:connectorType><egi:maxPowerAtSocket>22</egi:maxPowerAtSocket></egi:connector>
+        </egi:refillPoint>
+        <egi:refillPoint xsi:type="egi:ElectricChargingPoint" id="LT-IBG-P-B" version="v1">
+          <egi:connector><egi:connectorType>CCS</egi:connectorType><egi:maxPowerAtSocket>150000</egi:maxPowerAtSocket></egi:connector>
+        </egi:refillPoint>
+      </egi:energyInfrastructureStation>
+    </egi:energyInfrastructureSite>
+    <egi:energyInfrastructureSite id="EGI-S-2" version="v1">
+      <egi:energyInfrastructureStation id="EGI-ST-2" version="v1">
+        <egi:siteLocation><loc:pointByCoordinates><loc:pointCoordinates><loc:latitude>10</loc:latitude><loc:longitude>10</loc:longitude></loc:pointCoordinates></loc:pointByCoordinates></egi:siteLocation>
+        <egi:refillPoint id="X"><egi:connector><egi:connectorType>chademo</egi:connectorType></egi:connector></egi:refillPoint>
+      </egi:energyInfrastructureStation>
+    </egi:energyInfrastructureSite>
+  </egi:energyInfrastructureTable>
+</d2:payload>"""
+
+DATEX_STATUS = """<?xml version="1.0" encoding="utf-8"?>
+<d2:payload xsi:type="egi:EnergyInfrastructureStatusPublication" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:egi="https://datex2.eu/schema/3/energyInfrastructure" xmlns:fac="https://datex2.eu/schema/3/facilities" xmlns:d2="https://datex2.eu/schema/3/d2Payload">
+  <egi:energyInfrastructureSiteStatus id="EGI-S-1" version="v1">
+    <egi:energyInfrastructureStationStatus id="EGI-ST-1" version="v1">
+      <egi:refillPointStatus id="LT-IBG-P-A"><egi:status>OUTOFORDER</egi:status></egi:refillPointStatus>
+      <egi:refillPointStatus id="1"><egi:status>occupied</egi:status></egi:refillPointStatus>
+    </egi:energyInfrastructureStationStatus>
+  </egi:energyInfrastructureSiteStatus>
+</d2:payload>"""
+
+
+class DatexTests(unittest.TestCase):
+    def spec(self):
+        from cpo_pipeline.sources import lt_vialietuva as lt
+        return lt.SPEC
+
+    def test_table(self):
+        from cpo_pipeline.sources import datex2
+        norm = datex2.parse_table(DATEX_TABLE.encode(), self.spec())
+        self.assertEqual([l["id"] for l in norm["locations"]], ["EGI-S-1"])
+        self.assertEqual(norm["dropped"], [("EGI-S-2", "outside bbox")])
+        loc = norm["locations"][0]
+        self.assertEqual(loc["name"], "Vilnius Hub")
+        self.assertEqual(norm["operators"][loc["op"]]["name"], "In Balance grid, UAB")
+        self.assertEqual(loc["lat"], 54.704954)
+        self.assertEqual([e["uid"] for e in loc["evses"]], ["LT-IBG-P-A", "LT-IBG-P-B"])
+        self.assertEqual(loc["evses"][0]["conns"][0], {"id": "1", "std": "T2", "fmt": "SOCKET", "pt": "AC3", "kw": 22.0})
+        self.assertEqual(loc["evses"][1]["conns"][0]["std"], "CCS2")
+        self.assertEqual(loc["evses"][1]["conns"][0]["kw"], 150.0)
+        self.assertEqual(loc["evses"][1]["conns"][0]["pt"], "DC")
+        self.assertEqual(loc["upd"], "2026-07-09")
+
+    def test_status_by_id_and_position(self):
+        from cpo_pipeline.sources import datex2
+        inv = datex2.parse_table(DATEX_TABLE.encode(), self.spec())
+        st = datex2.parse_status(DATEX_STATUS.encode(), inv)
+        self.assertEqual(st["statuses"], {"EGI-S-1": {"LT-IBG-P-A": "O", "LT-IBG-P-B": "C"}})
+
+    def test_codes(self):
+        from cpo_pipeline.sources import datex2
+        self.assertEqual(datex2.status_code("outOfOrder"), "O")
+        self.assertEqual(datex2.status_code("AVAILABLE"), "A")
+        self.assertEqual(datex2.status_code("weird"), "U")
+        self.assertEqual(datex2.connector_code("iec62196T2Combo"), "CCS2")
+        self.assertEqual(datex2.connector_code("Type 2"), "T2")
+        self.assertEqual(datex2.connector_code("CHAdeMO"), "CHADEMO")
