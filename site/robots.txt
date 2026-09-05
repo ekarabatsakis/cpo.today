@@ -1,4 +1,19 @@
+# cpo.today welcomes search engines and AI crawlers. Bulk JSON under /data/ is
+# for programmatic use (see /llms.txt); the HTML pages carry the same facts.
 User-agent: *
 Allow: /
+Allow: /data/index.json
 Disallow: /data/
+
+User-agent: GPTBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+User-agent: Applebot-Extended
+Allow: /
+
 Sitemap: https://cpo.today/sitemap.xml

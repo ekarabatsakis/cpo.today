@@ -5,14 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://tiles.openfreemap.org; worker-src blob:; child-src blob:; font-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="color-scheme" content="light dark">
-<meta name="description" content="cpo.today: live, open map and analytics of public EV charging networks in Europe, built from official registries. Refreshed every 10 minutes.">
+<meta name="description" content="Live, open map and analytics of public EV charging networks in Europe: every charge point from official national registries (Greece, Netherlands, Lithuania, Belgium, Luxembourg, France, Germany, Cyprus), refreshed every 10 minutes. Compare operators, availability, power and prices.">
 <meta name="theme-color" content="#f9f9f7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0d0d0d" media="(prefers-color-scheme: dark)">
-<meta property="og:title" content="cpo.today - live EV charging network map">
+<meta property="og:title" content="cpo.today - live map of public EV charging in Europe">
 <meta property="og:description" content="Every public charge point from official national registries, one map, refreshed every 10 minutes. Compare operators, watch availability, get a true signal.">
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="cpo.today">
 <meta property="og:url" content="https://cpo.today/">
-<title>cpo.today - live EV charging network map</title>
+<meta property="og:image" content="https://cpo.today/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="cpo.today - live map of public EV charging in Europe">
+<meta name="twitter:description" content="Every public charge point from official national registries, refreshed every 10 minutes.">
+<meta name="twitter:image" content="https://cpo.today/og.png">
+<link rel="canonical" href="https://cpo.today/">
+<link rel="alternate" type="application/json" href="https://cpo.today/data/index.json" title="cpo.today open data index">
+<title>cpo.today - live map of public EV charging in Europe</title>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://cpo.today/#website","url":"https://cpo.today/","name":"cpo.today","description":"Live, open map and analytics of public EV charging networks in Europe, built from official national registries and refreshed every 10 minutes.","publisher":{"@id":"https://cpo.today/#org"},"inLanguage":"en"},{"@type":"Organization","@id":"https://cpo.today/#org","name":"cpo.today","url":"https://cpo.today/","email":"ask@cpo.today","logo":"https://cpo.today/favicon.svg"},{"@type":"WebApplication","name":"cpo.today live map","url":"https://cpo.today/","applicationCategory":"Map","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"browserRequirements":"Requires JavaScript"}]}</script>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -23,12 +34,18 @@
 </head>
 <body>
 <a class="skip" href="#panel">Skip to data panel</a>
+<noscript>
+  <section class="noscript">
+    <h2>Public EV charging networks in Europe, from official registries</h2>
+    <p>cpo.today aggregates every public charge point published by national charging registries and refreshes it every 10 minutes. This interactive map needs JavaScript; the same facts are on the <a href="/countries/">country pages</a> and in the <a href="/about/">about page</a>.</p>
+  </section>
+</noscript>
 
 <header class="topbar" role="banner">
-  <a class="brand" href="/" aria-label="cpo.today home">
+  <h1 class="brand-h1"><a class="brand" href="/" aria-label="cpo.today home">
     <svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 2 4 13.5h6.5L9.5 22 20 9.5h-6.5z"/></svg>
     <span class="brand-name">cpo<span class="brand-dot">.</span>today</span>
-  </a>
+  </a><span class="visually-hidden"> live map of public EV charging in Europe</span></h1>
   <div class="topbar-center">
     <label class="country" for="country">
       <span class="visually-hidden">Country</span>
@@ -203,6 +220,7 @@
     <footer class="panel-foot">
       <p id="source-line">Source: official national registries.</p>
       <p>Times are shown in your local time zone. Status is exactly what operators report to their registry; cpo.today does not alter it.</p>
+      <p><a href="/countries/">Country pages</a> · <a href="/about/">About</a> · <a href="/data/index.json">Open data</a></p>
     </footer>
   </aside>
 

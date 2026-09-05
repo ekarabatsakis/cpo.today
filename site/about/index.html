@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About cpo.today - open, live EV charging data from official registries</title>
+<meta name="description" content="What cpo.today is, where the data comes from, how prices and availability are derived, and who is responsible for errors. An open, free public resource refreshed every 10 minutes.">
+<link rel="canonical" href="https://cpo.today/about/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/pages.css">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="cpo.today">
+<meta property="og:title" content="About cpo.today">
+<meta property="og:description" content="Open, live EV charging data from official national registries, refreshed every 10 minutes.">
+<meta property="og:url" content="https://cpo.today/about/">
+<meta property="og:image" content="https://cpo.today/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"cpo.today","url":"https://cpo.today/","email":"ask@cpo.today","logo":"https://cpo.today/favicon.svg","description":"Open, live map and analytics of public EV charging networks in Europe, built from official national registries."}</script>
+</head>
+<body>
+<header class="ph"><a class="brand" href="/"><span class="mark">⚡</span> cpo<span class="dot">.</span>today</a><nav><a href="/">Live map</a><a href="/countries/">Countries</a><a href="/about/">About</a></nav></header>
+<main class="pm">
+<h1>About cpo.today</h1>
+<p class="lead">cpo.today puts every public EV charge point from official national registries on one open map and refreshes it every 10 minutes. It exists so that charge point operators, investors, fleets, planners and drivers can see, compare and analyse charging networks from a true signal.</p>
+<h2>Where the data comes from</h2>
+<p>Everything shown is pulled, unchanged, from official public sources: the national charging registries and national access points that operators are legally required to report to under EU Regulation 2023/1804 (AFIR) and national law. For example Greece's MYFAH (Ministry of Infrastructure and Transport), Lithuania's Via Lietuva, the Netherlands' NDW, France's national IRVE base, Belgium's and Luxembourg's national access points, Germany's Bundesnetzagentur register and Cyprus' EMS dataset. The <a href="/countries/">countries page</a> lists each source, and the map's Coverage tab tracks the status of every EU and UK registry, including those not yet integrated.</p>
+<h2>Live versus inventory only</h2>
+<p>Where a registry publishes live status, cpo.today shows availability, points in use and points out of service, refreshed every 10 minutes. Where a registry publishes only the inventory (for example France and Germany), the country is clearly labelled "Inventory only" and no availability figures are shown.</p>
+<h2>Accuracy and responsibility</h2>
+<p>We collect this data every 10 minutes for statistical and analytical purposes only. We do not verify, correct or edit it. If a location, status, price or any other detail is wrong, the error is in what the operator reported to the registry: please contact the operator or the responsible authority directly. cpo.today accepts no responsibility for the accuracy, completeness or timeliness of registry data, or for decisions taken on the basis of it.</p>
+<h2>Prices</h2>
+<p>Prices are the ad-hoc tariffs operators publish in the registry, in the registry's currency. The per-kWh figure is the energy component of the tariff attached to each connector; an operator's price in the tables is the median across its priced connectors. Session fees, time-based and parking components are shown on the location card when published. Many connectors publish no tariff at all.</p>
+<h2>Open data</h2>
+<p>All normalised data is available as JSON without a key under <code>/data/</code>, including 10-minute history and status-change events. Start at <a href="/data/index.json">/data/index.json</a>; the schema is documented in the <a href="https://github.com/ekarabatsakis/cpo.today/blob/main/docs/DATA.md">data documentation</a>. Attribute cpo.today and the originating registry when you reuse it. AI agents and search engines can read <a href="/llms.txt">/llms.txt</a>.</p>
+<h2>Questions</h2>
+<p>For any question, correction request about this site, or data partnership, email <a href="mailto:ask@cpo.today">ask@cpo.today</a>.</p>
+</main>
+<footer class="pf"><p>cpo.today republishes official national charging registries unchanged, every 10 minutes, for statistical purposes.</p></footer>
+</body>
+</html>
