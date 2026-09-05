@@ -59,12 +59,12 @@ jobs:
               -D "out/$tag.headers" -o "out/$tag.body" -w "status=%{http_code} type=%{content_type} bytes=%{size_download} time=%{time_total}s final=%{url_effective}\n" "$url" \
               | tee "out/$tag.meta" || echo "curl failed" | tee -a "out/$tag.meta"
             echo "$url" > "out/$tag.url"
+            if grep -qi "text/html" "out/$tag.headers"; then
+              echo "--- links of interest (full body):"; grep -oiE '(href|src)="[^"]*(csv|xlsx|json|xml|zip|gz|download|ladesaeulen|datex|ocpi|resource|blob)[^"]*"' "out/$tag.body" | sort -u | head -60
+            fi
             if file "out/$tag.body" | grep -qi gzip; then gunzip -c "out/$tag.body" > "out/$tag.full" 2>/dev/null; head -c "$SAMPLE" "out/$tag.full" > "out/$tag.sample"; wc -c < "out/$tag.full" > "out/$tag.size"; rm -f "out/$tag.full"; else head -c "$SAMPLE" "out/$tag.body" > "out/$tag.sample"; wc -c < "out/$tag.body" > "out/$tag.size"; fi
             rm -f "out/$tag.body"
             grep -iE "^(HTTP|content-type|content-length|last-modified|etag|cache-control|x-total|x-limit|link|access-control)" "out/$tag.headers" | head -20
-            if grep -qi "text/html" "out/$tag.headers"; then
-              echo "--- links of interest:"; grep -oiE 'href="[^"]*(csv|xlsx|json|xml|zip|gz|download|ladesaeulen|datex|ocpi|resource)[^"]*"' "out/$tag.sample" | sort -u | head -40
-            fi
             echo "--- size: $(cat "out/$tag.size") bytes; sample:"; head -c "${SAMPLE}" "out/$tag.sample"; echo; echo
           done <<< "$URLS"
       - uses: actions/upload-artifact@v4
