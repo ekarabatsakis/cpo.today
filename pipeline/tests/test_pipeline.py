@@ -140,6 +140,19 @@ class NormalizeTests(unittest.TestCase):
         self.assertEqual(len(norm["locations"]), 1)
         self.assertEqual({why for _, why in norm["dropped"]}, {"outside bbox", "duplicate id", "missing id/coords"})
 
+    def test_static_tolerates_malformed_subobjects(self):
+        loc = location()
+        loc["energy_mix"] = []            # seen in the Lithuanian feed
+        loc["opening_times"] = None
+        loc["operator"] = ["not", "an", "object"]
+        loc["evses"][0]["capabilities"] = None
+        loc["evses"][0]["connectors"][0]["tariff_ids"] = None
+        norm = gr.normalize_static(envelope([loc]))
+        self.assertEqual(len(norm["locations"]), 1)
+        self.assertEqual(norm["operators"]["OPX"]["name"], "OPX")
+        dyn = gr.normalize_dynamic(envelope([loc]))
+        self.assertEqual(dyn["evse_count"], 2)
+
     def test_static_rejects_bad_envelope(self):
         with self.assertRaises(SourceError):
             gr.normalize_static({"status": "error", "Locations": []})

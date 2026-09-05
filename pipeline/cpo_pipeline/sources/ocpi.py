@@ -24,8 +24,17 @@ def _s(x, n):
     return str(x).strip()[:n] if x is not None else ""
 
 
+def _d(x):
+    """Sub-object or {}: registries sometimes publish lists/nulls where OCPI expects an object."""
+    return x if isinstance(x, dict) else {}
+
+
+def _l(x):
+    return x if isinstance(x, list) else []
+
+
 def _coords(raw):
-    c = raw.get("coordinates") or {}
+    c = _d(raw.get("coordinates"))
     lat, lon = _f(c.get("latitude")), _f(c.get("longitude"))
     if lat is None or lon is None:
         # GeoJSON-ish variants
@@ -72,16 +81,16 @@ def normalize_locations(raw_locs, spec, *, evse_status=False) -> dict:
             continue
         seen.add(lid)
         party = (_s(raw.get("party_id"), 8) or "???").upper()
-        op_name = _s((raw.get("operator") or {}).get("name"), 80) or party
+        op_name = _s(_d(raw.get("operator")).get("name"), 80) or party
         op = operators.setdefault(party, {"id": party, "name": op_name, "names": {}})
         op["names"][op_name] = op["names"].get(op_name, 0) + 1
 
         evses = []
-        for i, e in enumerate(raw.get("evses") or []):
+        for i, e in enumerate(_l(raw.get("evses"))):
             if not isinstance(e, dict):
                 continue
             conns = []
-            for j, c in enumerate(e.get("connectors") or []):
+            for j, c in enumerate(_l(e.get("connectors"))):
                 if not isinstance(c, dict):
                     continue
                 kw = _f(c.get("max_electric_power"))
@@ -99,7 +108,7 @@ def normalize_locations(raw_locs, spec, *, evse_status=False) -> dict:
                     "kw": kw,
                 })
             evse = {"uid": _evse_key(e, i), "id": _s(e.get("evse_id"), 80) or _evse_key(e, i), "conns": conns}
-            caps = e.get("capabilities") or []
+            caps = _l(e.get("capabilities"))
             if caps:
                 evse["caps"] = sorted({str(x)[:40] for x in caps})
             if e.get("manufacturer"):
@@ -108,7 +117,7 @@ def normalize_locations(raw_locs, spec, *, evse_status=False) -> dict:
                 evse["model"] = _s(e["model_name"], 40)
             if e.get("physical_reference"):
                 evse["ref"] = _s(e["physical_reference"], 40)
-            if e.get("parking_restrictions"):
+            if _l(e.get("parking_restrictions")):
                 evse["park"] = sorted({str(x)[:24] for x in e["parking_restrictions"]})
             evses.append(evse)
 
@@ -128,22 +137,22 @@ def normalize_locations(raw_locs, spec, *, evse_status=False) -> dict:
             loc["unpub"] = True
         if raw.get("parking_type"):
             loc["ptype"] = _s(raw["parking_type"], 24)
-        ot = raw.get("opening_times") or {}
+        ot = _d(raw.get("opening_times"))
         if ot.get("twentyfourseven") is True:
             loc["h24"] = True
-        elif ot.get("regular_hours"):
+        elif _l(ot.get("regular_hours")):
             loc["hours"] = [
                 [int(h.get("weekday", 0) or 0), _s(h.get("period_begin"), 5), _s(h.get("period_end"), 5)]
                 for h in ot["regular_hours"] if isinstance(h, dict)
             ]
-        if (raw.get("energy_mix") or {}).get("is_green_energy") is True:
+        if _d(raw.get("energy_mix")).get("is_green_energy") is True:
             loc["green"] = True
-        if raw.get("facilities"):
+        if _l(raw.get("facilities")):
             loc["fac"] = sorted({str(x)[:24] for x in raw["facilities"]})
-        sub = (raw.get("suboperator") or {}).get("name")
+        sub = _d(raw.get("suboperator")).get("name")
         if sub:
             loc["subop"] = _s(sub, 60)
-        owner = (raw.get("owner") or {}).get("name")
+        owner = _d(raw.get("owner")).get("name")
         if owner:
             loc["owner"] = _s(owner, 80)
         locations.append(loc)
@@ -168,8 +177,8 @@ def tariff_summary(tariffs):
         if not isinstance(t, dict):
             continue
         summ = {"cur": _s(t.get("currency"), 3) or "EUR", "type": _s(t.get("type"), 16)}
-        for el in t.get("elements") or []:
-            for pc in (el or {}).get("price_components") or []:
+        for el in _l(t.get("elements")):
+            for pc in _l(_d(el).get("price_components")):
                 if not isinstance(pc, dict):
                     continue
                 p = _f(pc.get("price"))
@@ -211,13 +220,13 @@ def extract_dynamic(raw_locs, *, tariff_keys=("_openapiTariffs", "tariffs"), tar
         if not lid:
             continue
         loc_status = statuses.setdefault(lid, {})
-        for i, e in enumerate(raw.get("evses") or []):
+        for i, e in enumerate(_l(raw.get("evses"))):
             if not isinstance(e, dict):
                 continue
             uid = _evse_key(e, i)
             loc_status[uid] = status_code(e.get("status"))
             n += 1
-            for j, c in enumerate(e.get("connectors") or []):
+            for j, c in enumerate(_l(e.get("connectors"))):
                 if not isinstance(c, dict):
                     continue
                 t = None
@@ -225,7 +234,7 @@ def extract_dynamic(raw_locs, *, tariff_keys=("_openapiTariffs", "tariffs"), tar
                     t = tariff_summary(c.get(k))
                     if t:
                         break
-                if not t and tariff_lookup and c.get("tariff_ids"):
+                if not t and tariff_lookup and _l(c.get("tariff_ids")):
                     t = tariff_summary([tariff_lookup.get(str(i)) for i in c["tariff_ids"] if str(i) in tariff_lookup])
                 if not t:
                     continue
