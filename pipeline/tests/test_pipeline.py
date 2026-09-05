@@ -272,6 +272,20 @@ class TickTests(unittest.TestCase):
             pts = json.loads((root / "data" / "gr" / "points.json").read_text())
             self.assertEqual(len(pts["points"]), 10)
 
+    def test_evse_order_is_stable(self):
+        with TemporaryDirectory() as d:
+            root = Path(d)
+            t0 = dt.datetime(2026, 9, 5, 4, 0, tzinfo=dt.timezone.utc)
+            doc = envelope([location()])
+            self.run_tick(root, doc, to_dynamic(doc), t0)
+            shard = (root / "data" / "gr" / "locations" / "00.json").read_text()
+            swapped = envelope([location()])
+            swapped["Locations"][0]["evses"].reverse()
+            self.run_tick(root, swapped, to_dynamic(swapped, overrides={("GR-OPX-S1-L", "1"): "CHARGING"}), t0 + dt.timedelta(minutes=10))
+            self.assertEqual((root / "data" / "gr" / "locations" / "00.json").read_text(), shard, "EVSE reorder must not rewrite the shard")
+            st = json.loads((root / "data" / "gr" / "status.json").read_text())
+            self.assertEqual(st["locations"]["GR-OPX-S1-L"], "CC")
+
     def test_unchanged_dynamic_is_skipped(self):
         with TemporaryDirectory() as d:
             root = Path(d)

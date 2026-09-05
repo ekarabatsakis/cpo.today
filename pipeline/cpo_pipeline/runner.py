@@ -202,6 +202,10 @@ class Tick:
         # Upstream files are not guaranteed to keep their order between generations;
         # sort so fingerprints, shards and points only change when content changes.
         norm["locations"].sort(key=lambda l: l["id"])
+        for l in norm["locations"]:
+            # Feeds reorder EVSEs between generations; a stable order keeps shards
+            # and index-based status strings from churning.
+            l["evses"].sort(key=lambda e: str(e["uid"]))
         n_loc = len(norm["locations"])
         n_evse = sum(len(l["evses"]) for l in norm["locations"])
         prev = self.meta["static"]
