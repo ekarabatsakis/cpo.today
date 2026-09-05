@@ -1,0 +1,16 @@
+{
+ "generated": "2026-09-05T04:35:50Z",
+ "countries": [
+  {
+   "code": "GR",
+   "name": "Greece",
+   "path": "gr",
+   "source": "MYFAH",
+   "source_name": "MYFAH - Hellenic Ministry of Infrastructure and Transport",
+   "source_url": "https://electrokinisi.yme.gov.gr/public/HelpMyfah/PublicData/",
+   "refresh_minutes": 10,
+   "static_ts": "2026-09-05T01:37:54Z",
+   "dynamic_ts": "2026-09-05T04:26:45Z"
+  }
+ ]
+}
