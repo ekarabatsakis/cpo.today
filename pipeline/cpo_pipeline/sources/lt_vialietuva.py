@@ -43,6 +43,7 @@ SPEC = SourceSpec(
     parse_dynamic=parse_dynamic,
     parse_tariffs=parse_tariffs,
     refresh_minutes=10,
+    location_updated=False,
     licence="Open data of Via Lietuva (Lithuanian Road Administration)",
     notes="Single OCPI feed provides inventory and live status; tariffs resolved via tariff_ids.",
 )

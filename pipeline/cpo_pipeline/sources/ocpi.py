@@ -131,7 +131,7 @@ def normalize_locations(raw_locs, spec, *, evse_status=False) -> dict:
             "lat": round(lat, 6),
             "lon": round(lon, 6),
             "evses": evses,
-            "upd": _s(raw.get("last_updated"), 10),   # day granularity: keeps shards stable
+            "upd": _s(raw.get("last_updated"), 10) if getattr(spec, "location_updated", True) else "",
         }
         if raw.get("publish") is False:
             loc["unpub"] = True

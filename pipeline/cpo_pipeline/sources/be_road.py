@@ -50,6 +50,7 @@ SPEC = SourceSpec(
     parse_tariffs=parse_tariffs,
     parts=((Feed(INDIGO_URL, "csv", max_bytes=40 << 20), parse_indigo),),
     refresh_minutes=10,
+    location_updated=False,
     licence="Open data (transportdata.be)",
     notes="Partial coverage: the Road/E-Flux network (live) and INDIGO car parks (inventory); other operators publish behind keys.",
 )

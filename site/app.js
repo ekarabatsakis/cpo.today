@@ -737,9 +737,10 @@
       li.append(main);
       list.append(li);
     });
+    const updLine = loc.upd ? `Inventory last updated by operator on ${loc.upd}. ` : "";
     tpl.querySelector(".loc-foot").textContent = state.live
-      ? `Inventory last updated by operator on ${loc.upd || "–"}. Live status ${fmtDateTime(state.status.ts)}.`
-      : `Inventory last updated by operator on ${loc.upd || "–"}. No live status in this registry.`;
+      ? `${updLine}Live status ${fmtDateTime(state.status.ts)}.`
+      : `${updLine}No live status in this registry.`;
     const actions = el("div", "loc-actions");
     const nav = el("a", "btn-ghost", "Open in maps");
     nav.href = `https://www.google.com/maps/dir/?api=1&destination=${loc.lat},${loc.lon}`;

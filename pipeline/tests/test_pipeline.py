@@ -351,6 +351,11 @@ class SingleFeedTests(unittest.TestCase):
             index = json.loads((root / "data" / "index.json").read_text())
             self.assertEqual([c["code"] for c in index["countries"]], ["LT"])
 
+    def test_nl_drops_volatile_last_updated(self):
+        from cpo_pipeline.sources import nl_ndw as nl
+        norm = nl.parse_static([location(lid="NLLOC1", party="ALLEGO", lat="52.37", lon="4.89")], nl.SPEC)
+        self.assertEqual(norm["locations"][0]["upd"], "")
+
     def test_nl_bbox_and_plain_list(self):
         from cpo_pipeline.sources import nl_ndw as nl
         doc = [location(lid="NLLOC1", party="ALLEGO", lat="52.37", lon="4.89"),

@@ -45,6 +45,7 @@ SPEC = SourceSpec(
     parse_dynamic=parse_dynamic,
     parse_tariffs=parse_tariffs,
     refresh_minutes=10,
+    location_updated=False,
     licence="NDW open data",
     notes="Single OCPI file provides inventory and live status; tariffs from a separate OCPI tariffs file.",
 )

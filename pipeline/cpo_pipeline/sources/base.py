@@ -48,6 +48,10 @@ class SourceSpec:
     # (feed, parser) where parser(doc, spec) returns the normalised model and may
     # carry "statuses" when that publisher also reports live status.
     parts: tuple = ()
+    # Whether the feed's location last_updated reflects inventory changes. In
+    # single-feed OCPI sources it moves with every status change, which would
+    # rewrite inventory shards every tick, so those sources set it to False.
+    location_updated: bool = True
     refresh_minutes: int = 10
     licence: str = ""
     notes: str = ""
