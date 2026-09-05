@@ -1,0 +1,71 @@
+# Manual probe: fetch candidate national endpoints from a runner with open
+# internet and upload headers + samples as an artifact, so sources can be
+# evaluated without guessing. Read-only; never touches the data branch.
+name: Probe endpoints
+
+on:
+  workflow_dispatch:
+    inputs:
+      urls:
+        description: "Newline-separated URLs to probe (default: built-in candidate list)"
+        required: false
+        type: string
+      sample_bytes:
+        description: "Bytes of body to keep per URL"
+        default: "20000"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Probe
+        shell: bash
+        env:
+          URLS: ${{ inputs.urls }}
+          SAMPLE: ${{ inputs.sample_bytes }}
+        run: |
+          set -uo pipefail
+          mkdir -p out
+          if [ -z "${URLS:-}" ]; then
+            URLS=$(cat <<'LIST'
+          https://ev.vialietuva.lt/ocpi/2.3.0/locations
+          https://ev.vialietuva.lt/ocpi/2.3.0/locations?offset=0&limit=5
+          https://ev.vialietuva.lt/publicdata/EnergyInfrastructureStatusPublication
+          https://ev.vialietuva.lt/publicdata/EnergyInfrastructureTablePublication
+          https://opendata.ndw.nu/charging_point_locations_ocpi.json.gz
+          https://dotnl.ndw.nu/api/rest/geojson/dynamic-road-status/charge-point-data/v1/features?bbox=4.8,52.3,4.95,52.4
+          https://transport.data.gouv.fr/api/datasets?type=charging-stations
+          https://www.data.gouv.fr/fr/datasets/r/eb76d20a-8501-400e-b336-d85724de5435
+          https://www.traffic4cyprus.org.cy/en_AU/dataset/electricvehiclecharges
+          https://data.bundesnetzagentur.de/Bundesnetzagentur/SharedDocs/Downloads/DE/Sachgebiete/Energie/Unternehmen_Institutionen/E_Mobilitaet/Ladesaeulenregister.csv
+          https://nobil.no/api/server/datadump.php?apikey=&countrycode=SWE&format=json
+          https://transportdata.be/api/3/action/package_search?q=charging&rows=50
+          https://data.public.lu/api/1/datasets/?q=charging
+          LIST
+          )
+          fi
+          i=0
+          while IFS= read -r url; do
+            [ -z "$url" ] && continue
+            i=$((i+1))
+            tag=$(printf "%02d" "$i")
+            echo "=== [$tag] $url"
+            curl -sS -L -m 120 -A "cpo.today/0.1 (+https://cpo.today; open EV charging data aggregator)" \
+              -D "out/$tag.headers" -o "out/$tag.body" -w "status=%{http_code} type=%{content_type} bytes=%{size_download} time=%{time_total}s final=%{url_effective}\n" "$url" \
+              | tee "out/$tag.meta" || echo "curl failed" | tee -a "out/$tag.meta"
+            echo "$url" > "out/$tag.url"
+            if file "out/$tag.body" | grep -qi gzip; then gunzip -c "out/$tag.body" | head -c "$SAMPLE" > "out/$tag.sample"; gunzip -c "out/$tag.body" | wc -c > "out/$tag.size"; else head -c "$SAMPLE" "out/$tag.body" > "out/$tag.sample"; wc -c < "out/$tag.body" > "out/$tag.size"; fi
+            rm -f "out/$tag.body"
+            grep -iE "^(HTTP|content-type|content-length|last-modified|etag|cache-control|x-total|x-limit|link|access-control)" "out/$tag.headers" | head -20
+            echo "--- sample:"; head -c 600 "out/$tag.sample"; echo; echo
+          done <<< "$URLS"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: probe
+          path: out
+          retention-days: 3
