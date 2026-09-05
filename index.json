@@ -1,6 +1,20 @@
 {
- "generated": "2026-09-05T07:47:48Z",
+ "generated": "2026-09-05T07:52:42Z",
  "countries": [
+  {
+   "code": "FR",
+   "name": "France",
+   "path": "fr",
+   "source": "IRVE",
+   "source_name": "Base nationale des IRVE (transport.data.gouv.fr)",
+   "source_url": "https://transport.data.gouv.fr/datasets?locale=en&type=charging-stations",
+   "refresh_minutes": 1440,
+   "live": false,
+   "static_ts": "2026-09-05T03:36:01Z",
+   "dynamic_ts": null,
+   "locations": 56887,
+   "evses": 227473
+  },
   {
    "code": "GR",
    "name": "Greece",
@@ -9,6 +23,7 @@
    "source_name": "MYFAH - Hellenic Ministry of Infrastructure and Transport",
    "source_url": "https://electrokinisi.yme.gov.gr/public/HelpMyfah/PublicData/",
    "refresh_minutes": 10,
+   "live": true,
    "static_ts": "2026-09-05T01:37:54Z",
    "dynamic_ts": "2026-09-05T07:46:48Z",
    "locations": 4180,
@@ -22,8 +37,9 @@
    "source_name": "NDW - Nationaal Dataportaal Wegverkeer",
    "source_url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
    "refresh_minutes": 10,
-   "static_ts": "2026-09-05T07:47:00Z",
-   "dynamic_ts": "2026-09-05T07:47:00Z",
+   "live": true,
+   "static_ts": "2026-09-05T07:52:00Z",
+   "dynamic_ts": "2026-09-05T07:52:00Z",
    "locations": 80277,
    "evses": 200915
   }

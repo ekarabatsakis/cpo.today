@@ -1,0 +1,28 @@
+{
+ "static": {
+  "sha256": "766ebd947893360928c2863a014fbf9a090277f0c16ab4704e3316e6a9b5a739",
+  "etag": "\"6a9b8e21-9981804\"",
+  "last_modified": "Sat, 05 Sep 2026 03:36:01 GMT",
+  "body_bytes": 160962564,
+  "json_bytes": 160962564,
+  "structure": "e9aa905617a37d6eda142691d31a82920ad0e6ecb9a3e9f09ab7432c4c0eb4ef",
+  "fetched": "2026-09-05T07:52:42Z",
+  "source_ts": "2026-09-05T03:36:01Z",
+  "locations": 56887,
+  "evses": 227473,
+  "dropped": 814
+ },
+ "dynamic": {
+  "source_ts": null,
+  "note": "inventory-only source"
+ },
+ "country": "FR",
+ "country_name": "France",
+ "source": "IRVE",
+ "source_name": "Base nationale des IRVE (transport.data.gouv.fr)",
+ "source_url": "https://transport.data.gouv.fr/datasets?locale=en&type=charging-stations",
+ "licence": "Licence Ouverte / Open Licence 2.0 (Etalab)",
+ "pipeline_version": "0.1.0",
+ "last_run": "2026-09-05T07:52:42Z",
+ "warnings": []
+}
