@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-05T08:25:40Z",
+ "generated": "2026-09-05T08:29:40Z",
  "countries": [
   {
    "code": "BE",
@@ -10,10 +10,10 @@
    "source_url": "https://transportdata.be/dataset/road-public-charging-network",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-05T08:25:37Z",
-   "dynamic_ts": "2026-09-05T08:25:37Z",
-   "locations": 3400,
-   "evses": 8026
+   "static_ts": "2026-09-05T08:29:43Z",
+   "dynamic_ts": "2026-09-05T08:29:43Z",
+   "locations": 3484,
+   "evses": 10366
   },
   {
    "code": "CY",
@@ -28,6 +28,20 @@
    "dynamic_ts": null,
    "locations": 171,
    "evses": 203
+  },
+  {
+   "code": "DE",
+   "name": "Germany",
+   "path": "de",
+   "source": "BNETZA",
+   "source_name": "Bundesnetzagentur Ladesäulenregister",
+   "source_url": "https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/E-Mobilitaet/Ladesaeulenkarte/start.html",
+   "refresh_minutes": 1440,
+   "live": false,
+   "static_ts": "2026-09-03T07:39:47Z",
+   "dynamic_ts": null,
+   "locations": 71989,
+   "evses": 209130
   },
   {
    "code": "FR",

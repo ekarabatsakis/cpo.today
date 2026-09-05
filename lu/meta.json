@@ -21,8 +21,6 @@
  "source_url": "https://data.public.lu/en/pages/topics/transport-charging-points-points-de-charge/",
  "licence": "Creative Commons Zero (data.public.lu)",
  "pipeline_version": "0.1.0",
- "last_run": "2026-09-05T08:25:40Z",
- "warnings": [
-  "dynamic: only 1863 evses for 2935 known; rejecting tick"
- ]
+ "last_run": "2026-09-05T08:28:42Z",
+ "warnings": []
 }
