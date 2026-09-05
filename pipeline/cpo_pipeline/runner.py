@@ -208,8 +208,9 @@ class Tick:
         wanted = set()
         for name, locs in groups.items():
             wanted.add(f"{name}.json")
+            # No timestamp in the shard: its content must only change when equipment changes.
             self.changed |= write_json(self.store.shard(name), {
-                "country": self.spec.country, "source_ts": iso(source_ts), "shard": name, "locations": locs,
+                "country": self.spec.country, "shard": name, "locations": locs,
             })
         for stale in self.store.shard_dir.glob("*.json"):
             if stale.name not in wanted:

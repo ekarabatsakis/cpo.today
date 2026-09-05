@@ -24,7 +24,7 @@ The layout is the same for a 4,000-location registry (Greece) and a 60,000-locat
 
 Registry EVSE `uid` and connector `id` values are **only unique within a location** (MYFAH reuses `1`, `2`, … across operators).
 The canonical keys are therefore `(location id, evse uid)` and `(location id, evse uid, connector id)`.
-Live status and events refer to an EVSE by its **position** in the location's `evses` array (0-based), which is stable as long as `points.json → ts` / the shard's `source_ts` is unchanged. `status.json` carries the inventory `structure` hash it was encoded against.
+Live status and events refer to an EVSE by its **position** in the location's `evses` array (0-based), which is stable as long as `points.json → ts` is unchanged. `status.json` carries the inventory `structure` hash it was encoded against.
 
 ## Enumerations
 
@@ -57,7 +57,7 @@ Shard of a location id = first 8 hex digits of `sha1(id)` modulo `shards`, zero-
 
 ```jsonc
 {
-  "country": "GR", "source_ts": "…", "shard": "03",
+  "country": "GR", "shard": "03",
   "locations": [
     {
       "id": "GR-PPC-Scs32622-L", "op": "PPC",

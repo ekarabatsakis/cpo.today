@@ -320,7 +320,7 @@ class SingleFeedTests(unittest.TestCase):
             meta1 = json.loads((lt_dir / "meta.json").read_text())
             self.assertEqual(meta0["static"]["structure"], meta1["static"]["structure"])
             locs2 = json.loads((lt_dir / "locations" / "00.json").read_text())
-            self.assertEqual(locs2["source_ts"], locs["source_ts"], "shard rewritten despite unchanged structure")
+            self.assertEqual(locs2, locs, "shard rewritten despite unchanged structure")
             ev = json.loads((lt_dir / "events" / "2026-09-05.jsonl").read_text())
             self.assertEqual(ev["ch"], [["LT-1", 0, "A", "C"]])
             hist = (lt_dir / "history" / "2026-09-05.jsonl").read_text().splitlines()
