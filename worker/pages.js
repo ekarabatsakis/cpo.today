@@ -80,7 +80,8 @@ function notFound() {
   return new Response("Not found", { status: 404, headers: { "Content-Type": "text/plain", "Cache-Control": "public, max-age=60" } });
 }
 
-const modeText = (c) => (c.live === false ? "inventory only (the registry publishes no live status)" : "live status every 10 minutes");
+const THE = new Set(["Netherlands", "United Kingdom", "Czech Republic"]);
+const inName = (name) => (THE.has(name) ? `the ${name}` : name);
 
 export async function countriesIndex(ctx) {
   const index = await getData("index.json", ctx);
@@ -118,18 +119,18 @@ export async function countryPage(cc, ctx) {
   const opRows = ((ops && ops.operators) || []).slice(0, 40).map((o) => `<tr><td>${esc(o.name)}</td><td class="num">${int(o.locations)}</td><td class="num">${int(o.evses)}</td><td class="num">${int(o.dc_evses)}</td>${live ? `<td class="num">${pct(o.avail_pct)}</td><td class="num">${pct(o.charging_pct)}</td><td class="num">${pct(o.down_pct)}</td>` : ""}<td class="num">${o.median_kwh_price != null ? Number(o.median_kwh_price).toFixed(2) : "–"}</td></tr>`).join("");
   const hw = Object.values((t.hardware || {})).filter((h) => h.name !== "Not declared").sort((a, b) => b.n - a.n).slice(0, 8);
   const when = c.dynamic_ts || c.static_ts || index.generated;
-  const body = `<h1>${flag(c.code)} Public EV charging in ${esc(c.name)}</h1>
-<p class="lead">${esc(c.name)} has <strong>${int(t.evses)} public charge points</strong> at ${int(t.locations)} locations, operated by ${int(t.operators)} operators, according to ${esc(c.source_name)}. ${live ? `Right now ${int(st.A)} are available, ${int(st.C)} in use and ${int((st.O || 0) + (st.I || 0))} out of service (${pct(known ? 100 * (st.A || 0) / known : null)} availability among points with a known status).` : "This registry publishes the inventory only; live availability is not available for this country."} Data as of ${esc(String(when).replace("T", " ").replace("Z", " UTC"))}.</p>
+  const body = `<h1>${flag(c.code)} Public EV charging in ${esc(inName(c.name))}</h1>
+<p class="lead">${esc(c.name === "Netherlands" ? "The Netherlands" : c.name)} has <strong>${int(t.evses)} public charge points</strong> at ${int(t.locations)} locations, operated by ${int(t.operators)} operators, according to ${esc(c.source_name)}. ${live ? `Right now ${int(st.A)} are available, ${int(st.C)} in use and ${int((st.O || 0) + (st.I || 0))} out of service (${pct(known ? 100 * (st.A || 0) / known : null)} availability among points with a known status).` : "This registry publishes the inventory only; live availability is not available for this country."} Data as of ${esc(String(when).replace("T", " ").replace("Z", " UTC"))}.</p>
 <div class="kpis"><div><span>Locations</span><strong>${int(t.locations)}</strong></div><div><span>Charge points</span><strong>${int(t.evses)}</strong></div><div><span>DC charge points</span><strong>${int(t.dc_evses)}</strong></div><div><span>Installed capacity</span><strong>${t.kw_total ? `${(t.kw_total / 1000).toFixed(0)} MW` : "–"}</strong></div>${live ? `<div><span>Available now</span><strong>${int(st.A)}</strong></div><div><span>In use now</span><strong>${int(st.C)}</strong></div>` : ""}</div>
 <h2>Operators</h2>
 <table class="t"><thead><tr><th>Operator</th><th class="num">Locations</th><th class="num">Charge points</th><th class="num">DC</th>${live ? `<th class="num">Available</th><th class="num">In use</th><th class="num">Down</th>` : ""}<th class="num">Median price/kWh</th></tr></thead><tbody>${opRows}</tbody></table>
 ${hw.length ? `<h2>Charger hardware declared</h2><ul class="hw">${hw.map((h) => `<li><strong>${esc(h.name)}</strong> ${int(h.n)} charge points${h.models && h.models.length ? ` <span class="muted">(${esc(h.models.slice(0, 4).join(", "))})</span>` : ""}</li>`).join("")}</ul>` : ""}
 <h2>Source and terms</h2>
 <p>Source: <a href="${esc(c.source_url)}" rel="noopener">${esc(c.source_name)}</a>. ${meta && meta.licence ? `Licence: ${esc(meta.licence)}. ` : ""}Refreshed ${live ? "every 10 minutes" : `every ${Math.round((c.refresh_minutes || 1440) / 60)} hours`}. cpo.today does not alter the data; report errors to the operator or the authority. Machine-readable files: <a href="/data/${c.path}/points.json">points</a>, <a href="/data/${c.path}/operators.json">operators</a>${live ? `, <a href="/data/${c.path}/status.json">live status</a>` : ""} (JSON).</p>
-<p><a class="btn" href="/#${c.code.toLowerCase()}">Open ${esc(c.name)} on the live map</a></p>`;
-  const description = `${int(t.evses)} public EV charge points at ${int(t.locations)} locations in ${c.name}, ${int(t.operators)} operators, ${live ? `live availability` : "inventory"} from ${c.source_name}. Refreshed every 10 minutes by cpo.today.`;
+<p><a class="btn" href="/#${c.code.toLowerCase()}">Open ${esc(inName(c.name))} on the live map</a></p>`;
+  const description = `${int(t.evses)} public EV charge points at ${int(t.locations)} locations in ${inName(c.name)}, ${int(t.operators)} operators, ${live ? `live availability` : "inventory"} from ${c.source_name}. Refreshed every 10 minutes by cpo.today.`;
   return page({
-    title: `EV charging in ${c.name}: ${int(t.evses)} charge points, ${int(t.operators)} operators - cpo.today`,
+    title: `EV charging in ${inName(c.name)}: ${int(t.evses)} charge points, ${int(t.operators)} operators - cpo.today`,
     description, canonical: `${SITE}/countries/${cc}/`, body,
     jsonld: {
       "@context": "https://schema.org", "@type": "Dataset",
