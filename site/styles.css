@@ -249,6 +249,8 @@ td.op-name { max-width: 118px; overflow: hidden; text-overflow: ellipsis; font-w
 @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) .maplibregl-ctrl-group button .maplibregl-ctrl-icon { filter: none; } }
 .maplibregl-ctrl-attrib { background: color-mix(in srgb, var(--surface) 92%, transparent); color: var(--ink-2); font-size: 11px; }
 .maplibregl-ctrl-attrib:not(.maplibregl-compact-show) .maplibregl-ctrl-attrib-inner { display: none; }
+.maplibregl-ctrl-attrib.maplibregl-compact { opacity: .35; transition: opacity .2s; }
+.maplibregl-ctrl-attrib.maplibregl-compact:hover, .maplibregl-ctrl-attrib.maplibregl-compact:focus-within, .maplibregl-ctrl-attrib.maplibregl-compact-show { opacity: 1; }
 .maplibregl-ctrl-attrib a { color: var(--ink-2); }
 
 /* About dialog */
