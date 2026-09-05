@@ -1,27 +1,27 @@
 {
  "static": {
-  "sha256": "ea0ce5754e645179474d0e7db0a31d834864733cbbf652f66c19555f9ff2111d",
+  "sha256": "9ef4055f2861949b21cbe90059165cc7183b5fd8c5806d83dbe443d4967c29ad",
   "etag": null,
-  "last_modified": "Sat, 05 Sep 2026 12:57:09 GMT",
-  "body_bytes": 5199700,
-  "json_bytes": 5199700,
-  "structure": "00473f1e0ebc15fc5d2247c1164907735f19a16e9b301b93f1340030856a39d5",
-  "fetched": "2026-09-05T12:57:07Z",
-  "source_ts": "2026-09-05T12:57:09Z",
-  "locations": 3484,
-  "evses": 10366,
+  "last_modified": "Sat, 05 Sep 2026 13:12:24 GMT",
+  "body_bytes": 5201538,
+  "json_bytes": 5201538,
+  "structure": "3b99685dda34904c32751f953a7eebf373094b73c68f959dd65cf07d03e60cfb",
+  "fetched": "2026-09-05T13:12:22Z",
+  "source_ts": "2026-09-05T13:12:24Z",
+  "locations": 3485,
+  "evses": 10369,
   "dropped": 0
  },
  "dynamic": {
-  "sha256": "ea0ce5754e645179474d0e7db0a31d834864733cbbf652f66c19555f9ff2111d",
-  "fetched": "2026-09-05T12:57:07Z",
-  "source_ts": "2026-09-05T12:57:09Z",
-  "evses": 8026,
+  "sha256": "9ef4055f2861949b21cbe90059165cc7183b5fd8c5806d83dbe443d4967c29ad",
+  "fetched": "2026-09-05T13:12:22Z",
+  "source_ts": "2026-09-05T13:12:24Z",
+  "evses": 8029,
   "orphan_evses": 0,
   "missing_evses": 0,
-  "changes": 82,
+  "changes": 97,
   "tariffs": 353,
-  "tariffed_connectors": 7312
+  "tariffed_connectors": 7315
  },
  "country": "BE",
  "country_name": "Belgium",
@@ -30,14 +30,14 @@
  "source_url": "https://transportdata.be/dataset/road-public-charging-network",
  "licence": "Open data (transportdata.be)",
  "pipeline_version": "0.1.0",
- "last_run": "2026-09-05T12:57:07Z",
+ "last_run": "2026-09-05T13:12:22Z",
  "warnings": [],
  "part0": {},
  "tariffs": {
-  "fetched": "2026-09-05T12:57:07Z",
-  "last_modified": "Sat, 05 Sep 2026 12:57:14 GMT",
-  "body_bytes": 5044369,
-  "json_bytes": 5044369,
-  "count": 16884
+  "fetched": "2026-09-05T13:12:22Z",
+  "last_modified": "Sat, 05 Sep 2026 13:12:28 GMT",
+  "body_bytes": 5045256,
+  "json_bytes": 5045256,
+  "count": 16887
  }
 }
