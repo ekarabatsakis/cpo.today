@@ -110,7 +110,7 @@
     const [meta, pts, status, opTable, history] = await Promise.all([
       getJSON(`${c.path}/meta.json`, { revalidate: true }),
       getJSON(`${c.path}/points.json`, { revalidate: true }),
-      state.live ? getJSON(`${c.path}/status.json`, { revalidate: true }) : Promise.resolve({ ts: null, locations: {} }),
+      state.live ? getJSON(`${c.path}/status.json`, { revalidate: true }).catch(() => ({ ts: null, locations: {} })) : Promise.resolve({ ts: null, locations: {} }),
       getJSON(`${c.path}/operators.json`, { revalidate: true }).catch(() => null),
       state.live ? loadHistory(c.path, 48) : Promise.resolve([]),
     ]);
@@ -828,6 +828,10 @@
     $("mode-chip").hidden = cls !== "static";
   }
   function updateFreshness() {
+    if (state.live && state.status && !state.status.ts) {
+      setFreshness("stale", "Live status not received yet from this registry");
+      return;
+    }
     if (!state.live) {
       const when = state.country && state.country.static_ts ? fmtDateTime(state.country.static_ts) : "–";
       setFreshness("static", window.innerWidth <= 860 ? `updated ${fmtDate(state.country.static_ts)}` : `inventory updated ${when} · this registry publishes no live status`);

@@ -168,9 +168,10 @@ class Tick:
 
     def run_static(self) -> bool:
         spec = self.spec
-        if not self.store.points.exists():
-            # First run, or a layout migration: the inventory must be rebuilt even
-            # if upstream reports the file unchanged.
+        if not self.store.points.exists() or (spec.single_feed and spec.has_status and not self.store.status.exists()):
+            # First run, a layout migration, or a single-feed source whose last
+            # status tick was rejected: process the document even if upstream
+            # reports it unchanged.
             self.force_static = True
         doc, source_ts, info = self._acquire("static", spec.static, self.static_file)
         if doc is None:
