@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://tiles.openfreemap.org; worker-src blob:; child-src blob:; font-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="cpo.today: live, open map and analytics of public EV charging networks in Europe, built from official registries. Refreshed every 10 minutes.">
+<meta name="theme-color" content="#f9f9f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d0d0d" media="(prefers-color-scheme: dark)">
+<meta property="og:title" content="cpo.today - live EV charging network map">
+<meta property="og:description" content="Every public charge point from official national registries, one map, refreshed every 10 minutes. Compare operators, watch availability, get a true signal.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://cpo.today/">
+<title>cpo.today - live EV charging network map</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="vendor/maplibre-gl.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip" href="#panel">Skip to data panel</a>
+
+<header class="topbar" role="banner">
+  <a class="brand" href="/" aria-label="cpo.today home">
+    <svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 2 4 13.5h6.5L9.5 22 20 9.5h-6.5z"/></svg>
+    <span class="brand-name">cpo<span class="brand-dot">.</span>today</span>
+  </a>
+  <div class="topbar-center">
+    <label class="country" for="country">
+      <span class="visually-hidden">Country</span>
+      <select id="country" aria-label="Country"></select>
+    </label>
+    <div class="freshness" id="freshness" aria-live="polite">
+      <span class="pulse" aria-hidden="true"></span>
+      <span id="freshness-text">Loading data…</span>
+    </div>
+  </div>
+  <nav class="topbar-links" aria-label="Site">
+    <a href="#about" id="about-link">About</a>
+    <a href="https://github.com/ekarabatsakis/cpo.today" rel="noopener">Data &amp; code</a>
+  </nav>
+  <button class="panel-toggle" id="panel-toggle" aria-controls="panel" aria-expanded="false">
+    <span class="panel-toggle-label">Data</span>
+  </button>
+</header>
+
+<main class="layout">
+  <aside class="panel" id="panel" aria-label="Network data">
+    <section class="kpis" aria-label="Headline figures">
+      <div class="kpi"><span class="kpi-label">Locations</span><strong class="kpi-value" id="kpi-locations">–</strong></div>
+      <div class="kpi"><span class="kpi-label">Charge points</span><strong class="kpi-value" id="kpi-evses">–</strong></div>
+      <div class="kpi"><span class="kpi-label">Available now</span><strong class="kpi-value" id="kpi-available">–</strong><span class="kpi-sub" id="kpi-available-sub"></span></div>
+      <div class="kpi"><span class="kpi-label">Charging now</span><strong class="kpi-value" id="kpi-charging">–</strong><span class="kpi-sub" id="kpi-charging-sub"></span></div>
+      <div class="kpi"><span class="kpi-label">Out of service</span><strong class="kpi-value" id="kpi-down">–</strong><span class="kpi-sub" id="kpi-down-sub"></span></div>
+      <div class="kpi"><span class="kpi-label">Operators</span><strong class="kpi-value" id="kpi-operators">–</strong></div>
+    </section>
+
+    <section class="filters" aria-label="Filters">
+      <div class="filter-row">
+        <label class="filter">
+          <span>Operator</span>
+          <select id="f-operator"><option value="">All operators</option></select>
+        </label>
+        <label class="filter">
+          <span>Status</span>
+          <select id="f-status">
+            <option value="">Any status</option>
+            <option value="A">Available</option>
+            <option value="C">Charging</option>
+            <option value="D">Out of service</option>
+            <option value="U">Unknown</option>
+          </select>
+        </label>
+      </div>
+      <div class="filter-row">
+        <label class="filter">
+          <span>Power</span>
+          <select id="f-power">
+            <option value="">Any power</option>
+            <option value="slow">Below 11 kW</option>
+            <option value="ac">11 to 43 kW</option>
+            <option value="fast">43 to 150 kW</option>
+            <option value="ultra">150 kW and above</option>
+          </select>
+        </label>
+        <label class="filter">
+          <span>Connector</span>
+          <select id="f-connector">
+            <option value="">Any connector</option>
+            <option value="T2">Type 2</option>
+            <option value="CCS2">CCS</option>
+            <option value="CHADEMO">CHAdeMO</option>
+          </select>
+        </label>
+      </div>
+      <div class="filter-row filter-row-search">
+        <label class="filter filter-wide">
+          <span class="visually-hidden">Search</span>
+          <input id="f-search" type="search" placeholder="Search name, address, city or ID" autocomplete="off">
+        </label>
+        <button type="button" class="btn-ghost" id="f-reset">Reset</button>
+      </div>
+      <p class="filter-result" id="filter-result" aria-live="polite"></p>
+    </section>
+
+    <div class="tabs" role="tablist" aria-label="Panel sections">
+      <button role="tab" id="tab-operators" aria-selected="true" aria-controls="view-operators">Operators</button>
+      <button role="tab" id="tab-trends" aria-selected="false" aria-controls="view-trends">Trends</button>
+      <button role="tab" id="tab-location" aria-selected="false" aria-controls="view-location" hidden>Location</button>
+    </div>
+
+    <section class="view" id="view-operators" role="tabpanel" aria-labelledby="tab-operators">
+      <div class="table-wrap">
+        <table class="ops" id="ops-table">
+          <thead>
+            <tr>
+              <th scope="col"><button data-sort="name">Operator</button></th>
+              <th scope="col" class="num"><button data-sort="locations">Sites</button></th>
+              <th scope="col" class="num"><button data-sort="evses">Points</button></th>
+              <th scope="col" class="num"><button data-sort="dc_share" title="Share of charge points with DC output">DC%</button></th>
+              <th scope="col" class="num"><button data-sort="avail_pct" title="Available now, share of points with known status">Avail%</button></th>
+              <th scope="col" class="num"><button data-sort="charging_pct" title="Charging now, share of points with known status">Busy%</button></th>
+              <th scope="col" class="num"><button data-sort="down_pct" title="Out of order or inoperative, share of points with known status">Down%</button></th>
+              <th scope="col" class="num"><button data-sort="median_kwh_price" title="Median published energy price">€/kWh</button></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="hint">Click an operator to focus the map on its network. Percentages exclude points reporting an unknown status.</p>
+    </section>
+
+    <section class="view" id="view-trends" role="tabpanel" aria-labelledby="tab-trends" hidden>
+      <div class="trend-controls">
+        <div class="seg" role="group" aria-label="Time range">
+          <button type="button" data-range="6" aria-pressed="false">6h</button>
+          <button type="button" data-range="24" aria-pressed="true">24h</button>
+          <button type="button" data-range="48" aria-pressed="false">48h</button>
+        </div>
+        <span class="trend-scope" id="trend-scope">National</span>
+      </div>
+      <figure class="chart" id="chart-charging">
+        <figcaption><span class="chart-title">Charge points in use</span><span class="chart-sub">count, every 10 minutes</span></figcaption>
+        <div class="chart-body"></div>
+      </figure>
+      <figure class="chart" id="chart-kw">
+        <figcaption><span class="chart-title">Capacity in use</span><span class="chart-sub">sum of max kW of points in use</span></figcaption>
+        <div class="chart-body"></div>
+      </figure>
+      <figure class="chart" id="chart-down">
+        <figcaption><span class="chart-title">Charge points out of service</span><span class="chart-sub">out of order + inoperative</span></figcaption>
+        <div class="chart-body"></div>
+      </figure>
+      <figure class="chart" id="chart-avail">
+        <figcaption><span class="chart-title">Availability</span><span class="chart-sub">% of points with known status that are free</span></figcaption>
+        <div class="chart-body"></div>
+      </figure>
+      <details class="table-view">
+        <summary>Table view</summary>
+        <div class="table-wrap"><table id="trend-table"><thead><tr><th>Time (UTC)</th><th class="num">In use</th><th class="num">kW</th><th class="num">Down</th><th class="num">Avail%</th></tr></thead><tbody></tbody></table></div>
+      </details>
+    </section>
+
+    <section class="view" id="view-location" role="tabpanel" aria-labelledby="tab-location" hidden>
+      <div id="location-detail"></div>
+    </section>
+
+    <footer class="panel-foot">
+      <p id="source-line">Source: official national registries.</p>
+      <p>Times are UTC. Status as reported by operators to the registry; cpo.today does not alter it.</p>
+    </footer>
+  </aside>
+
+  <div class="map-wrap">
+    <div id="map" role="region" aria-label="Map of charging locations"></div>
+    <div class="legend" aria-label="Map legend">
+      <span class="lg"><i class="dot dot-a"></i>Available</span>
+      <span class="lg"><i class="dot dot-c"></i>In use</span>
+      <span class="lg"><i class="dot dot-d"></i>Out of service</span>
+      <span class="lg"><i class="dot dot-u"></i>Unknown</span>
+    </div>
+    <div class="map-note" id="map-note" hidden></div>
+  </div>
+</main>
+
+<dialog id="about" class="about">
+  <form method="dialog">
+    <h2>About cpo.today</h2>
+    <p>cpo.today puts every public EV charge point from official national registries on one open map and refreshes it every 10 minutes. It exists so that operators, investors, fleets, planners and drivers can see, compare and analyse charging networks from a true signal rather than marketing claims.</p>
+    <h3>Where the data comes from</h3>
+    <p id="about-sources">Greece: MYFAH, the registry of charging infrastructure and e-mobility market operators run by the Hellenic Ministry of Infrastructure and Transport. Operators are legally required to report their locations and live status there.</p>
+    <h3>How it works</h3>
+    <p>A scheduled job downloads the registry files, validates them, normalises them into a compact open format and publishes them to a public GitHub branch. This site reads only those published files. Nothing is edited by hand and no data is stored about you.</p>
+    <h3>Open data</h3>
+    <p>All normalised data is available as JSON under <code>/data/</code>, including 10-minute history and status-change events. See the repository for the schema. Free to use with attribution to cpo.today and the original registry.</p>
+    <p class="about-actions"><button class="btn" value="close">Close</button></p>
+  </form>
+</dialog>
+
+<template id="tpl-location">
+  <article class="loc">
+    <header class="loc-head">
+      <h2 class="loc-name"></h2>
+      <p class="loc-op"></p>
+      <p class="loc-addr"></p>
+    </header>
+    <dl class="loc-meta"></dl>
+    <ul class="evse-list"></ul>
+    <p class="loc-foot"></p>
+  </article>
+</template>
+
+<script src="vendor/maplibre-gl.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+# Refresh Greek charge-point data from MYFAH every 10 minutes and publish it
+# to the `data` branch. The pipeline code lives on `main`; the data branch is
+# an orphan so its history never mixes with the code history.
+#
+# Security posture:
+#   * least-privilege GITHUB_TOKEN (contents:write only, nothing else)
+#   * no third-party actions beyond actions/checkout
+#   * no secrets required; the pipeline is stdlib-only Python
+#   * concurrency group prevents overlapping runs racing on the data branch
+name: Fetch Greece (MYFAH)
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+    inputs:
+      force_static:
+        description: "Re-download the daily static file even if unchanged"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: data-gr
+  cancel-in-progress: false
+
+env:
+  DATA_BRANCH: data
+
+jobs:
+  fetch:
+    name: fetch and publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: true
+
+      - name: Check out data branch (or start it)
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git ls-remote --exit-code --heads origin "$DATA_BRANCH" >/dev/null 2>&1; then
+            git fetch --depth=1 origin "$DATA_BRANCH"
+            git worktree add --detach data FETCH_HEAD
+            git -C data checkout -q -B "$DATA_BRANCH"
+          else
+            echo "::notice::branch $DATA_BRANCH does not exist yet; creating it"
+            git worktree add --detach data
+            git -C data checkout -q --orphan "$DATA_BRANCH"
+            git -C data rm -rfq . || true
+            git -C data clean -fdxq
+          fi
+          git -C data config user.name "cpo-today-bot"
+          git -C data config user.email "bot@cpo.today"
+
+      - name: Run pipeline
+        id: pipeline
+        shell: bash
+        working-directory: pipeline
+        env:
+          FORCE_STATIC: ${{ inputs.force_static && '--force-static' || '' }}
+        run: |
+          set -euo pipefail
+          python3 --version
+          python3 -m cpo_pipeline gr --data-dir ../data $FORCE_STATIC
+
+      - name: Commit and push
+        shell: bash
+        working-directory: data
+        run: |
+          set -euo pipefail
+          git add -A
+          if git diff --cached --quiet; then
+            echo "no data changes"
+            exit 0
+          fi
+          TS=$(python3 -c "import json;print(json.load(open('gr/meta.json'))['dynamic'].get('source_ts','n/a'))")
+          git commit -q -m "gr: ${TS}"
+          for attempt in 1 2 3 4; do
+            if git push origin "HEAD:$DATA_BRANCH"; then
+              exit 0
+            fi
+            echo "push failed (attempt $attempt); rebasing onto remote"
+            git fetch --depth=5 origin "$DATA_BRANCH" || true
+            git rebase FETCH_HEAD || { git rebase --abort; sleep $((attempt * 5)); continue; }
+            sleep $((attempt * 3))
+          done
+          echo "::error::could not push data branch after 4 attempts"
+          exit 1
+
+      - name: Summary
+        if: always()
+        shell: bash
+        run: |
+          if [ -f data/gr/meta.json ]; then
+            {
+              echo '### Greece (MYFAH)'
+              echo '```json'
+              python3 -c "import json;m=json.load(open('data/gr/meta.json'));print(json.dumps({k:m.get(k) for k in ('last_run','static','dynamic','warnings')},indent=1))"
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi

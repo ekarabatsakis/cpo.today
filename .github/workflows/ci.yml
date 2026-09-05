@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+    paths-ignore: ["docs/**", "*.md"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: pipeline tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Unit tests
+        working-directory: pipeline
+        run: python3 -m unittest discover -s tests -v
+      - name: Byte-compile
+        run: python3 -m compileall -q pipeline
+      - name: Site sanity (no build step, so just check the files parse)
+        run: |
+          node --check site/app.js
+          node --check functions/data/[[path]].js
