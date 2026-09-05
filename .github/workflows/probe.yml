@@ -67,7 +67,7 @@ jobs:
             grep -iE "^(HTTP|content-type|content-length|last-modified|etag|cache-control|x-total|x-limit|link|access-control)" "out/$tag.headers" | head -20
             echo "--- size: $(cat "out/$tag.size") bytes; sample:"; head -c "${SAMPLE}" "out/$tag.sample"; echo; echo
           done <<< "$URLS"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: probe
           path: out
