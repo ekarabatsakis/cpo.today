@@ -79,6 +79,22 @@ button, select, input { font: inherit; color: inherit; }
 .topbar-links a { color: var(--ink-2); text-decoration: none; }
 .topbar-links a:hover { color: var(--ink); }
 .panel-toggle { display: none; }
+.icon-btn { background: transparent; border: 1px solid var(--line); border-radius: 8px; width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ink-2); flex: none; }
+.icon-btn:hover { color: var(--ink); border-color: var(--muted); }
+.icon-btn svg { width: 18px; height: 18px; fill: currentColor; stroke: currentColor; }
+.icon-btn.small { width: 28px; height: 28px; }
+.icon-btn.small svg { width: 16px; height: 16px; fill: none; }
+.icon-sun { display: none; }
+:root[data-theme="dark"] .icon-sun { display: block; }
+:root[data-theme="dark"] .icon-moon { display: none; }
+.panel-tools { display: flex; align-items: center; justify-content: space-between; padding: 6px 10px 0; }
+.panel-tools-label { font-size: 11.5px; color: var(--muted); }
+.panel.wide .panel-tools .icon-btn { color: var(--accent); border-color: var(--accent); }
+.splitter { width: 6px; flex: none; cursor: col-resize; background: transparent; position: relative; z-index: 3; margin-left: -3px; }
+.splitter:hover, .splitter.active { background: color-mix(in srgb, var(--accent) 35%, transparent); }
+.splitter:focus-visible { outline: 2px solid var(--accent); }
+.layout.resizing { cursor: col-resize; user-select: none; }
+.layout.resizing .map-wrap { pointer-events: none; }
 
 /* Layout */
 .layout { flex: 1; display: flex; min-height: 0; position: relative; }
@@ -240,8 +256,13 @@ td.op-name { max-width: 118px; overflow: hidden; text-overflow: ellipsis; font-w
 .panel-foot p { margin: 0 0 4px; }
 
 /* Mobile: panel becomes a drawer over the map */
+.hw td.hw-name { font-weight: 500; }
+.hw .bar { background: var(--accent); }
+.hw td.models { max-width: 220px; overflow: hidden; text-overflow: ellipsis; color: var(--muted); font-size: 11.5px; }
+
 @media (max-width: 860px) {
-  :root { --panel-w: 100%; }
+  :root { --panel-w: 100% !important; }
+  .splitter, .panel-tools { display: none; }
   .topbar { gap: 10px; padding: 0 10px; }
   .topbar-links { display: none; }
   .panel-toggle { display: inline-flex; align-items: center; background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 8px; padding: 6px 12px; font-weight: 600; cursor: pointer; }

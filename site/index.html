@@ -37,8 +37,12 @@
   </div>
   <nav class="topbar-links" aria-label="Site">
     <a href="#about" id="about-link">About</a>
-    <a href="https://github.com/ekarabatsakis/cpo.today" rel="noopener">Data &amp; code</a>
+    <a href="mailto:ask@cpo.today">Contact</a>
   </nav>
+  <button class="icon-btn" id="theme-toggle" aria-label="Switch to dark theme" title="Dark theme">
+    <svg viewBox="0 0 24 24" aria-hidden="true" class="icon-moon"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    <svg viewBox="0 0 24 24" aria-hidden="true" class="icon-sun"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
   <button class="panel-toggle" id="panel-toggle" aria-controls="panel" aria-expanded="false">
     <span class="panel-toggle-label">Data</span>
   </button>
@@ -46,6 +50,12 @@
 
 <main class="layout">
   <aside class="panel" id="panel" aria-label="Network data">
+    <div class="panel-tools">
+      <span class="panel-tools-label" id="panel-tools-label"></span>
+      <button class="icon-btn small" id="panel-wide" aria-pressed="false" title="Wider data panel" aria-label="Wider data panel">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4z" fill="none" stroke-width="2"/><path d="M10 5v14" stroke-width="2"/><path d="m14 9 3 3-3 3" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
     <section class="kpis" aria-label="Headline figures">
       <div class="kpi"><span class="kpi-label">Locations</span><strong class="kpi-value" id="kpi-locations">–</strong></div>
       <div class="kpi"><span class="kpi-label">Charge points</span><strong class="kpi-value" id="kpi-evses">–</strong></div>
@@ -106,6 +116,7 @@
     <div class="tabs" role="tablist" aria-label="Panel sections">
       <button role="tab" id="tab-operators" aria-selected="true" aria-controls="view-operators">Operators</button>
       <button role="tab" id="tab-trends" aria-selected="false" aria-controls="view-trends">Trends</button>
+      <button role="tab" id="tab-hardware" aria-selected="false" aria-controls="view-hardware">Hardware</button>
       <button role="tab" id="tab-coverage" aria-selected="false" aria-controls="view-coverage">Coverage</button>
       <button role="tab" id="tab-location" aria-selected="false" aria-controls="view-location" hidden>Location</button>
     </div>
@@ -162,6 +173,17 @@
       </details>
     </section>
 
+    <section class="view" id="view-hardware" role="tabpanel" aria-labelledby="tab-hardware" hidden>
+      <p class="coverage-intro" id="hardware-intro"></p>
+      <div class="table-wrap">
+        <table class="hw" id="hw-table">
+          <thead><tr><th scope="col">Manufacturer</th><th scope="col" class="num">Charge points</th><th scope="col" class="num">Share</th><th scope="col">Models seen</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="hint">Manufacturer and model are what operators declare in the registry. Registries that omit this field show as "Not declared".</p>
+    </section>
+
     <section class="view" id="view-coverage" role="tabpanel" aria-labelledby="tab-coverage" hidden>
       <p class="coverage-intro" id="coverage-summary"></p>
       <ul class="coverage-list" id="coverage-list"></ul>
@@ -174,10 +196,11 @@
 
     <footer class="panel-foot">
       <p id="source-line">Source: official national registries.</p>
-      <p>Times are UTC. Status as reported by operators to the registry; cpo.today does not alter it.</p>
+      <p>Times are shown in your local time zone. Status is exactly what operators report to their registry; cpo.today does not alter it.</p>
     </footer>
   </aside>
 
+  <div class="splitter" id="splitter" role="separator" aria-orientation="vertical" aria-label="Resize data panel" tabindex="0"></div>
   <div class="map-wrap">
     <div id="map" role="region" aria-label="Map of charging locations"></div>
     <div class="legend" aria-label="Map legend">
@@ -193,13 +216,15 @@
 <dialog id="about" class="about">
   <form method="dialog">
     <h2>About cpo.today</h2>
-    <p>cpo.today puts every public EV charge point from official national registries on one open map and refreshes it every 10 minutes. It exists so that operators, investors, fleets, planners and drivers can see, compare and analyse charging networks from a true signal rather than marketing claims.</p>
+    <p>cpo.today puts every public EV charge point from official national registries on one open map and refreshes it every 10 minutes. It exists so that operators, investors, fleets, planners and drivers can see, compare and analyse charging networks from a true signal.</p>
     <h3>Where the data comes from</h3>
-    <p id="about-sources">Greece: MYFAH, the registry of charging infrastructure and e-mobility market operators run by the Hellenic Ministry of Infrastructure and Transport. Operators are legally required to report their locations and live status there.</p>
-    <h3>How it works</h3>
-    <p>A scheduled job downloads the registry files, validates them, normalises them into a compact open format and publishes them to a public GitHub branch. This site reads only those published files. Nothing is edited by hand and no data is stored about you.</p>
-    <h3>Open data</h3>
-    <p>All normalised data is available as JSON under <code>/data/</code>, including 10-minute history and status-change events. See the repository for the schema. Free to use with attribution to cpo.today and the original registry.</p>
+    <p id="about-sources">Everything shown here is pulled, unchanged, from official public sources: the national charging registries and national access points that operators are legally required to report to (for Greece, MYFAH of the Ministry of Infrastructure and Transport; for Lithuania, Via Lietuva; for the Netherlands, NDW; for France, the national IRVE base). The Coverage tab lists every source and its status.</p>
+    <h3>Accuracy and responsibility</h3>
+    <p>We collect this data every 10 minutes for statistical and analytical purposes only. We do not verify, correct or edit it. If a location, status, price or any other detail is wrong, the error is in what the operator reported to the registry: please contact the operator or the responsible authority directly. cpo.today accepts no responsibility for the accuracy, completeness or timeliness of registry data, or for decisions taken on the basis of it.</p>
+    <h3>Prices</h3>
+    <p>Prices are the ad-hoc tariffs operators publish in the registry, in the registry's currency. The per-kWh figure is the energy component of the tariff attached to each connector; an operator's "€/kWh" in the table is the median across its priced connectors. Session fees, time-based and parking components are shown on the location card when published. Many connectors publish no tariff at all.</p>
+    <h3>Questions</h3>
+    <p>For any question, correction request about this site, or data partnership, email <a href="mailto:ask@cpo.today">ask@cpo.today</a>.</p>
     <p class="about-actions"><button class="btn" value="close">Close</button></p>
   </form>
 </dialog>

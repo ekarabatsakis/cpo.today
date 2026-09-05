@@ -30,9 +30,15 @@
   const fmtInt = (n) => n == null ? "–" : new Intl.NumberFormat("en-GB").format(n);
   const fmtPct = (n) => n == null ? "–" : `${n.toFixed(n < 10 ? 1 : 0)}%`;
   const fmtKw = (kw) => kw == null ? "–" : kw >= 1000 ? `${(kw / 1000).toFixed(1)} MW` : `${Math.round(kw)} kW`;
-  const fmtTime = (iso) => iso ? iso.slice(11, 16) : "–";
-  const fmtDateTime = (iso) => iso ? `${iso.slice(0, 10)} ${iso.slice(11, 16)} UTC` : "–";
-  const isDark = () => window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const TZ = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone; } catch (e) { return "local"; } })();
+  const parseIso = (iso) => { const t = Date.parse(iso && !/[Zz]|[+-]\d\d:?\d\d$/.test(iso) ? iso + "Z" : iso); return Number.isFinite(t) ? new Date(t) : null; };
+  const pad2 = (n) => String(n).padStart(2, "0");
+  const fmtTime = (iso) => { const d = parseIso(iso); return d ? `${pad2(d.getHours())}:${pad2(d.getMinutes())}` : "–"; };
+  const fmtDate = (iso) => { const d = parseIso(iso); return d ? `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}` : "–"; };
+  const fmtDateTime = (iso) => { const d = parseIso(iso); return d ? `${fmtDate(iso)} ${fmtTime(iso)}` : "–"; };
+  const fmtShort = (iso) => { const d = parseIso(iso); return d ? `${pad2(d.getDate())}/${pad2(d.getMonth() + 1)} ${fmtTime(iso)}` : "–"; };
+  const themeSetting = () => { try { return localStorage.getItem("cpo.theme") || ""; } catch (e) { return ""; } };
+  const isDark = () => { const t = themeSetting(); return t ? t === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches; };
   const cssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
   const state = {
@@ -216,6 +222,7 @@
     renderKpis();
     renderOperators();
     renderTrends();
+    if (!$("view-hardware").hidden) renderHardware();
     renderMapData();
     updateFreshness();
     writeHash();
@@ -362,7 +369,7 @@
     for (let i = pts.length - 1; i >= 0; i--) {
       const p = pts[i];
       const tr = el("tr");
-      tr.append(el("td", null, `${p.iso.slice(5, 10)} ${fmtTime(p.iso)}`), el("td", "num", fmtInt(p.charging)), el("td", "num", fmtInt(Math.round(p.kw))), el("td", "num", fmtInt(p.down)), el("td", "num", p.avail == null ? "–" : p.avail.toFixed(1)));
+      tr.append(el("td", null, fmtShort(p.iso)), el("td", "num", fmtInt(p.charging)), el("td", "num", fmtInt(Math.round(p.kw))), el("td", "num", fmtInt(p.down)), el("td", "num", p.avail == null ? "–" : p.avail.toFixed(1)));
       tbody.append(tr);
     }
   }
@@ -405,9 +412,9 @@
     // x ticks: pick an hour step so labels don't collide
     const spanH = (x1 - x0) / 3600000;
     const stepH = spanH <= 7 ? 1 : spanH <= 26 ? 4 : 8;
-    const first = new Date(x0); first.setUTCMinutes(0, 0, 0);
+    const first = new Date(x0); first.setMinutes(0, 0, 0);
     for (let d = first.getTime(); d <= x1; d += 3600000) {
-      const hh = new Date(d).getUTCHours();
+      const hh = new Date(d).getHours();
       if (hh % stepH !== 0 || d < x0) continue;
       const t = svgEl("text", { x: sx(d), y: H - 4, "text-anchor": "middle" });
       t.textContent = `${String(hh).padStart(2, "0")}:00`;
@@ -445,7 +452,7 @@
       const X = sx(best.ts), Y = sy(best[key]);
       cross.setAttribute("x1", X); cross.setAttribute("x2", X); cross.setAttribute("visibility", "visible");
       dot.setAttribute("cx", X); dot.setAttribute("cy", Y); dot.setAttribute("visibility", "visible");
-      tip.replaceChildren(el("strong", null, opt.fmt(best[key])), el("span", "tt-time", `${best.iso.slice(5, 10)} ${fmtTime(best.iso)} UTC`));
+      tip.replaceChildren(el("strong", null, opt.fmt(best[key])), el("span", "tt-time", fmtShort(best.iso)));
       tip.hidden = false;
       tip.style.left = `${X * rect.width / W}px`;
       tip.style.top = `${Y * rect.height / H}px`;
@@ -498,16 +505,17 @@
     map.addControl(new maplibregl.AttributionControl({ compact: true, customAttribution: "Data: national registries via cpo.today" }), "bottom-right");
 
     const FALLBACK_MSG = "Basemap tiles unavailable, showing charge points only.";
-    let pending = chain.slice(1);
+    state.pendingStyles = chain.slice(1);
     let styleTimer = null;
     const arm = () => { clearTimeout(styleTimer); styleTimer = setTimeout(nextStyle, CONFIG.styleTimeoutMs); };
     const nextStyle = () => {
       if (state.styleOk) return;
       clearTimeout(styleTimer); styleTimer = null;
-      if (pending.length) { map.setStyle(pending.shift()); arm(); return; }
+      if (state.pendingStyles.length) { map.setStyle(state.pendingStyles.shift()); arm(); return; }
       note(FALLBACK_MSG);
       map.setStyle(fallbackStyle());
     };
+    state.armStyle = arm;
     arm();
     map.on("error", (e) => {
       const m = (e && e.error && e.error.message) || "";
@@ -538,14 +546,7 @@
       map.on("mouseenter", layer, () => { map.getCanvas().style.cursor = "pointer"; });
       map.on("mouseleave", layer, () => { map.getCanvas().style.cursor = ""; });
     }
-    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
-      if (!state.styleOk) return;
-      state.styleOk = false;
-      const c = styleChain();
-      pending = c.slice(1);
-      map.setStyle(c[0]);
-      arm();
-    });
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { if (!themeSetting()) applyTheme(); });
   }
 
   function addDataLayers() {
@@ -555,9 +556,13 @@
       type: "geojson",
       data: { type: "FeatureCollection", features: [] },
       cluster: true,
-      clusterRadius: 42,
-      clusterMaxZoom: 12,
-      clusterProperties: { n: ["+", ["get", "n"]], a: ["+", ["get", "a"]], c: ["+", ["get", "c"]], d: ["+", ["get", "d"]] },
+      clusterRadius: 48,
+      clusterMaxZoom: 11,
+      clusterMinPoints: 3,
+      maxzoom: 14,
+      buffer: 0,
+      tolerance: 0.6,
+      generateId: true,
     });
     const colorA = cssVar("--st-a"), colorC = cssVar("--st-c"), colorD = cssVar("--st-d"), colorB = cssVar("--st-b"), colorU = cssVar("--st-u");
     const ink = cssVar("--ink"), surface = cssVar("--surface"), accent = cssVar("--accent");
@@ -593,12 +598,18 @@
   function renderMapData() {
     const map = state.map;
     if (!map || !map.getSource("locations")) return;
-    const features = state.filtered.map((l) => ({
-      type: "Feature",
-      geometry: { type: "Point", coordinates: [l.lon, l.lat] },
-      properties: { id: l.id, st: l.st, n: l.cnt.n, a: l.cnt.a, c: l.cnt.c, d: l.cnt.d, op: l.op },
-    }));
-    map.getSource("locations").setData({ type: "FeatureCollection", features });
+    // Features are built once per status refresh and reused across filter changes;
+    // the map only receives the filtered subset. setData is debounced so rapid
+    // typing in the search box does not re-cluster 80k points on every key.
+    clearTimeout(state._mapTimer);
+    state._mapTimer = setTimeout(() => {
+      if (state._featStamp !== state.status.ts) {
+        for (const l of state.points) l.feat = { type: "Feature", geometry: { type: "Point", coordinates: [l.lon, l.lat] }, properties: { id: l.id, st: l.st } };
+        state._featStamp = state.status.ts;
+      }
+      const features = state.filtered.length === state.points.length ? state.points.map((l) => l.feat) : state.filtered.map((l) => l.feat);
+      map.getSource("locations").setData({ type: "FeatureCollection", features });
+    }, 60);
   }
 
   function boundsOf(locs) {
@@ -765,8 +776,8 @@
       li.append(src);
       const stat = el("span", "cov-stat");
       if (r.live) stat.textContent = r.live.live === false
-        ? `${fmtInt(r.live.locations)} locations · ${fmtInt(r.live.evses)} charge points · inventory ${(r.live.static_ts || "").slice(0, 10)}`
-        : `${fmtInt(r.live.locations)} locations · ${fmtInt(r.live.evses)} charge points · status ${fmtTime(r.live.dynamic_ts)} UTC`;
+        ? `${fmtInt(r.live.locations)} locations · ${fmtInt(r.live.evses)} charge points · inventory ${fmtDate(r.live.static_ts)}`
+        : `${fmtInt(r.live.locations)} locations · ${fmtInt(r.live.evses)} charge points · status ${fmtTime(r.live.dynamic_ts)}`;
       else stat.textContent = r.note || (cov.statuses[r.status] || "");
       li.append(stat);
       if (r.live) {
@@ -779,6 +790,36 @@
     }
   }
 
+  // ----------------------------------------------------------- hardware ----
+  function renderHardware() {
+    const ot = state.opTable;
+    const tbody = $("hw-table").querySelector("tbody");
+    tbody.replaceChildren();
+    if (!ot) { $("hardware-intro").textContent = "No hardware data for this country yet."; return; }
+    const op = state.filters.op;
+    const src = op ? (ot.operators.find((o) => o.id === op) || {}) : ot.totals;
+    const hw = (src && src.hardware) || {};
+    const rows = Object.entries(hw).map(([k, v]) => ({ name: v.name || k, n: v.n, models: v.models || [] })).sort((a, b) => b.n - a.n);
+    const total = rows.reduce((s, r) => s + r.n, 0);
+    const declared = rows.filter((r) => r.name !== "Not declared").reduce((s, r) => s + r.n, 0);
+    $("hardware-intro").textContent = op
+      ? `${(state.operators[op] || {}).name || op}: ${fmtInt(declared)} of ${fmtInt(src.evses || total)} charge points declare a manufacturer.`
+      : `${fmtInt(declared)} of ${fmtInt(ot.totals.evses)} charge points in this registry declare a manufacturer. Select an operator to see its hardware mix.`;
+    const max = Math.max(1, ...rows.map((r) => r.n));
+    for (const r of rows) {
+      const tr = el("tr");
+      tr.append(el("td", "hw-name", r.name));
+      const n = el("td", "num");
+      const bar = el("i", "bar"); bar.style.width = `${Math.max(2, Math.round(40 * r.n / max))}px`;
+      n.append(bar, document.createTextNode(fmtInt(r.n)));
+      tr.append(n);
+      tr.append(el("td", "num", total ? fmtPct(100 * r.n / total) : "–"));
+      const m = el("td", "models", r.models.join(", ")); m.title = r.models.join(", ");
+      tr.append(m);
+      tbody.append(tr);
+    }
+  }
+
   // ---------------------------------------------------------- freshness ----
   function setFreshness(cls, text) {
     const f = $("freshness");
@@ -788,18 +829,18 @@
   function updateFreshness() {
     if (!state.live) {
       const when = state.country && state.country.static_ts ? fmtDateTime(state.country.static_ts) : "–";
-      setFreshness("ok", window.innerWidth <= 860 ? `Inventory · ${when.slice(0, 10)}` : `Inventory only · updated ${when} · no live status in this registry`);
+      setFreshness("ok", window.innerWidth <= 860 ? `Inventory · ${fmtDate(state.country.static_ts)}` : `Inventory only · updated ${when} · no live status in this registry`);
       $("freshness").title = "This national registry publishes locations and equipment but no live availability.";
       return;
     }
     if (!state.status) return;
     const age = Date.now() - Date.parse(state.status.ts);
     const mins = Math.max(0, Math.round(age / 60000));
-    const when = `${fmtTime(state.status.ts)} UTC`;
+    const when = fmtTime(state.status.ts);
     const narrow = window.innerWidth <= 860;
     if (age > CONFIG.staleAfterMs) setFreshness("stale", narrow ? `Stale · ${when}` : `Registry feed stale · last status ${when} (${mins} min ago)`);
     else setFreshness("ok", narrow ? `Live · ${when}` : `Live · status ${when} · ${mins} min ago · refreshes every 10 min`);
-    $("freshness").title = `Registry status timestamp ${fmtDateTime(state.status.ts)}; page refreshes every 5 minutes.`;
+    $("freshness").title = `Registry status timestamp ${fmtDateTime(state.status.ts)} (${TZ}); page refreshes every 5 minutes.`;
   }
 
   // ------------------------------------------------------------- ui glue ----
@@ -822,6 +863,7 @@
     }
     if (name === "trends") renderTrends();
     if (name === "coverage") renderCoverage();
+    if (name === "hardware") renderHardware();
   }
   function readHash() {
     const h = location.hash.replace(/^#/, "");
@@ -875,9 +917,66 @@
       p.classList.toggle("open", open); $("panel-toggle").setAttribute("aria-expanded", String(open));
     });
     document.addEventListener("visibilitychange", () => { if (!document.hidden && Date.now() - state.lastFetch > 60000) refreshDynamic(); });
+    $("theme-toggle").addEventListener("click", () => setTheme(isDark() ? "light" : "dark"));
+    bindPanelSizing();
     let rt;
     window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(renderTrends, 150); });
     setInterval(updateFreshness, 30000);
+  }
+
+  // ------------------------------------------------ theme + panel sizing ----
+  function setTheme(mode) {
+    try { localStorage.setItem("cpo.theme", mode); } catch (e) { /* private mode */ }
+    applyTheme();
+  }
+  function applyTheme() {
+    const dark = isDark();
+    document.documentElement.dataset.theme = dark ? "dark" : "light";
+    const b = $("theme-toggle");
+    b.setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
+    b.title = dark ? "Light theme" : "Dark theme";
+    if (state.map && state.styleOk !== undefined) restyleMap();
+  }
+  function restyleMap() {
+    const map = state.map;
+    if (!map) return;
+    state.styleOk = false;
+    state.pendingStyles = styleChain();
+    map.setStyle(state.pendingStyles.shift());
+    state.armStyle();
+  }
+  function bindPanelSizing() {
+    const layout = document.querySelector(".layout");
+    const panel = $("panel");
+    const root = document.documentElement;
+    const DEFAULT = 440;
+    let saved = 0;
+    try { saved = Number(localStorage.getItem("cpo.panelw")) || 0; } catch (e) { /* ignore */ }
+    const clamp = (w) => Math.max(320, Math.min(window.innerWidth - 320, Math.round(w)));
+    const apply = (w, persist) => {
+      w = clamp(w);
+      root.style.setProperty("--panel-w", `${w}px`);
+      panel.classList.toggle("wide", w > DEFAULT + 80);
+      $("panel-wide").setAttribute("aria-pressed", String(w > DEFAULT + 80));
+      if (persist) { try { localStorage.setItem("cpo.panelw", String(w)); } catch (e) { /* ignore */ } }
+      clearTimeout(state._rt); state._rt = setTimeout(renderTrends, 120);
+    };
+    if (saved && window.innerWidth > 860) apply(saved, false);
+    $("panel-wide").addEventListener("click", () => {
+      const cur = panel.getBoundingClientRect().width;
+      apply(cur > DEFAULT + 80 ? DEFAULT : Math.min(window.innerWidth * 0.62, 1100), true);
+    });
+    const sp = $("splitter");
+    let dragging = false;
+    sp.addEventListener("pointerdown", (e) => { dragging = true; sp.setPointerCapture(e.pointerId); sp.classList.add("active"); layout.classList.add("resizing"); });
+    sp.addEventListener("pointermove", (e) => { if (dragging) apply(e.clientX, false); });
+    const stop = (e) => { if (!dragging) return; dragging = false; sp.classList.remove("active"); layout.classList.remove("resizing"); apply(e.clientX || panel.getBoundingClientRect().width, true); };
+    sp.addEventListener("pointerup", stop); sp.addEventListener("pointercancel", stop);
+    sp.addEventListener("keydown", (e) => {
+      const cur = panel.getBoundingClientRect().width;
+      if (e.key === "ArrowLeft") { apply(cur - 40, true); e.preventDefault(); }
+      if (e.key === "ArrowRight") { apply(cur + 40, true); e.preventDefault(); }
+    });
   }
 
   function fail(e) {
@@ -888,6 +987,7 @@
 
   async function boot() {
     bindUi();
+    applyTheme();
     initMap();
     const h = readHash();
     Object.assign(state.filters, { op: h.op || "", st: h.st || "", pw: h.pw || "", cn: h.cn || "", q: h.q || "" });

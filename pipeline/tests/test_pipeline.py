@@ -204,6 +204,15 @@ class AggregateTests(unittest.TestCase):
         self.assertEqual(row["avail_pct"], 50.0)
         self.assertEqual(row["median_kwh_price"], 0.54)
         self.assertEqual(table["totals"]["kw_total"], 72)
+        self.assertEqual(table["totals"]["hardware"]["none"]["n"], 2)
+
+    def test_hardware_mix_normalises_spellings(self):
+        mix = aggregate.hardware_mix([{"mfr": "ABB"}, {"mfr": "Abb "}, {"mfr": "ABB E-mobility", "model": "Terra 184"}, {"mfr": "alpitronic GmbH", "model": "HYC300"}, {}])
+        self.assertEqual(mix["abb"]["n"], 3)
+        self.assertEqual(mix["abb"]["name"], "ABB")
+        self.assertEqual(mix["abb"]["models"], ["Terra 184"])
+        self.assertEqual(mix["alpitronic"]["n"], 1)
+        self.assertEqual(mix["none"]["name"], "Not declared")
 
     def test_tick_summary(self):
         static = gr.normalize_static(envelope([location()]))

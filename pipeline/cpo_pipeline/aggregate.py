@@ -157,6 +157,33 @@ def diff_statuses(prev: dict | None, cur: dict):
     return changes
 
 
+def _hw_key(mfr):
+    """Normalise manufacturer spellings ('ABB', 'Abb ', 'ABB E-mobility') to one key."""
+    k = (mfr or "").strip().lower()
+    k = k.replace("gmbh", "").replace("b.v.", "").replace("bv", "").replace("s.a.", "").replace("ltd", "").replace("e-mobility", "").replace("emobility", "")
+    k = "".join(ch for ch in k if ch.isalnum())
+    return k or "none"
+
+
+def hardware_mix(evses_iter):
+    """{key: {name, n, models}} from EVSE manufacturer/model declarations."""
+    mix: dict = {}
+    for e in evses_iter:
+        mfr = (e.get("mfr") or "").strip()
+        k = _hw_key(mfr)
+        h = mix.setdefault(k, {"name": mfr or "Not declared", "n": 0, "_names": Counter(), "_models": Counter()})
+        h["n"] += 1
+        if mfr:
+            h["_names"][mfr] += 1
+        if e.get("model"):
+            h["_models"][e["model"].strip()] += 1
+    out = {}
+    for k, h in sorted(mix.items(), key=lambda kv: -kv[1]["n"])[:40]:
+        out[k] = {"name": h["_names"].most_common(1)[0][0] if h["_names"] else "Not declared",
+                  "n": h["n"], "models": [m for m, _ in h["_models"].most_common(6)]}
+    return out
+
+
 def operator_table(static, statuses, tariffs, connector_tariffs, ts):
     """Per-operator comparison table + national totals."""
     rows = {}
@@ -170,7 +197,7 @@ def operator_table(static, statuses, tariffs, connector_tariffs, ts):
             "dc_evses": 0, "ac_evses": 0, "kw_total": 0.0, "max_kw": 0.0,
             "classes": Counter(), "connector_types": Counter(),
             "cities": set(), "status": _empty_status(), "kwh_prices": [],
-            "h24": 0, "green": 0,
+            "h24": 0, "green": 0, "evse_objs": [],
         })
         r["locations"] += 1
         r["cities"].add(loc.get("city", "").lower())
@@ -180,6 +207,7 @@ def operator_table(static, statuses, tariffs, connector_tariffs, ts):
             r["green"] += 1
         for e in loc["evses"]:
             r["evses"] += 1
+            r["evse_objs"].append(e)
             r["connectors"] += len(e.get("conns", []))
             kw = evse_max_kw(e)
             if kw:
@@ -226,6 +254,7 @@ def operator_table(static, statuses, tariffs, connector_tariffs, ts):
             "unknown_pct": round(100.0 * st.get("U", 0) / r["evses"], 1) if r["evses"] else None,
             "median_kwh_price": round(median(r["kwh_prices"]), 3) if r["kwh_prices"] else None,
             "priced_connectors": len(r["kwh_prices"]),
+            "hardware": hardware_mix(r["evse_objs"]),
         })
     out.sort(key=lambda r: (-r["evses"], r["id"]))
 
@@ -243,6 +272,7 @@ def operator_table(static, statuses, tariffs, connector_tariffs, ts):
             totals["status"][k] = totals["status"].get(k, 0) + v
     known = totals["evses"] - totals["status"].get("U", 0)
     totals["avail_pct"] = round(100.0 * totals["status"].get("A", 0) / known, 1) if known else None
+    totals["hardware"] = hardware_mix(e for loc in static["locations"] for e in loc["evses"])
     return {"ts": ts, "status_names": STATUS_NAMES, "totals": totals, "operators": out}
 
 
