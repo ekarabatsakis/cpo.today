@@ -160,6 +160,9 @@ class Tick:
             return False
         self._static_doc, self._static_ts, self._static_info = doc, source_ts, info
         norm = spec.parse_static(doc, spec)
+        # Upstream files are not guaranteed to keep their order between generations;
+        # sort so fingerprints, shards and points only change when content changes.
+        norm["locations"].sort(key=lambda l: l["id"])
         n_loc = len(norm["locations"])
         n_evse = sum(len(l["evses"]) for l in norm["locations"])
         prev = self.meta["static"]
