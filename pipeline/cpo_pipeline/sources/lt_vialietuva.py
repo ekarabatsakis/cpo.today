@@ -3,7 +3,7 @@
 https://ev.vialietuva.lt/en/data-provision
 
 Public OCPI 2.3.0 endpoints (no credentials):
-  * /ocpi/2.3.0/locations  - paginated (offset/limit, X-Total-Count), EVSE status inline
+  * /ocpi/2.3.0/locations  - offset/limit paging with X-Total-Count; limit=5000 returns everything in one page (~4 MB). Empty pages occur mid-range (unpublished rows), so paging must run to the total.
   * /ocpi/2.3.0/tariffs    - tariff objects referenced by connector tariff_ids
 A DATEX II export exists as well but OCPI is complete and simpler.
 """
@@ -36,7 +36,7 @@ SPEC = SourceSpec(
     source_name="Via Lietuva - national EV charging data service",
     source_url="https://ev.vialietuva.lt/en/data-provision",
     bbox=(53.8, 20.8, 56.6, 27.0),
-    static=Feed(f"{BASE}/locations", "ocpi-pages", page_size=100, max_pages=200, max_bytes=20 << 20),
+    static=Feed(f"{BASE}/locations", "ocpi-pages", page_size=5000, max_pages=10, max_bytes=60 << 20),
     dynamic=None,
     tariffs=Feed(f"{BASE}/tariffs", "json", max_bytes=40 << 20),
     parse_static=parse_static,
