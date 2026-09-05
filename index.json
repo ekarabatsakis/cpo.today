@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-05T07:55:18Z",
+ "generated": "2026-09-05T07:57:39Z",
  "countries": [
   {
    "code": "FR",
@@ -25,7 +25,7 @@
    "refresh_minutes": 10,
    "live": true,
    "static_ts": "2026-09-05T01:37:54Z",
-   "dynamic_ts": "2026-09-05T07:46:48Z",
+   "dynamic_ts": "2026-09-05T07:56:46Z",
    "locations": 4180,
    "evses": 9825
   },
@@ -38,8 +38,8 @@
    "source_url": "https://ev.vialietuva.lt/en/data-provision",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-05T07:55:18Z",
-   "dynamic_ts": "2026-09-05T07:55:18Z",
+   "static_ts": "2026-09-05T07:57:01Z",
+   "dynamic_ts": "2026-09-05T07:57:01Z",
    "locations": 2054,
    "evses": 5695
   },
@@ -52,8 +52,8 @@
    "source_url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-05T07:52:00Z",
-   "dynamic_ts": "2026-09-05T07:52:00Z",
+   "static_ts": "2026-09-05T07:57:00Z",
+   "dynamic_ts": "2026-09-05T07:57:00Z",
    "locations": 80277,
    "evses": 200915
   }
