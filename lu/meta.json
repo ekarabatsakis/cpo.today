@@ -1,0 +1,28 @@
+{
+ "static": {
+  "sha256": "4b8b824df06c33c132a6ae28f1c851caacb3fbad76f8d8be40811d4a13d5d88b",
+  "etag": null,
+  "last_modified": null,
+  "body_bytes": 692171,
+  "json_bytes": 692171,
+  "structure": "fde5b72845bc66f3ef01583cd882158764301d39ded90e3d305d2717412c0330",
+  "fetched": "2026-09-05T08:25:40Z",
+  "source_ts": "2026-09-05T08:25:40Z",
+  "locations": 734,
+  "evses": 2935,
+  "dropped": 0
+ },
+ "dynamic": {},
+ "part0": {},
+ "country": "LU",
+ "country_name": "Luxembourg",
+ "source": "DATAPUBLICLU",
+ "source_name": "data.public.lu - Chargy network + Eco-Movement inventory",
+ "source_url": "https://data.public.lu/en/pages/topics/transport-charging-points-points-de-charge/",
+ "licence": "Creative Commons Zero (data.public.lu)",
+ "pipeline_version": "0.1.0",
+ "last_run": "2026-09-05T08:25:40Z",
+ "warnings": [
+  "dynamic: only 1863 evses for 2935 known; rejecting tick"
+ ]
+}

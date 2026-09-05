@@ -1,6 +1,34 @@
 {
- "generated": "2026-09-05T08:12:59Z",
+ "generated": "2026-09-05T08:25:40Z",
  "countries": [
+  {
+   "code": "BE",
+   "name": "Belgium",
+   "path": "be",
+   "source": "TRANSPORTDATA_BE",
+   "source_name": "transportdata.be - Road public charging network (OCPI)",
+   "source_url": "https://transportdata.be/dataset/road-public-charging-network",
+   "refresh_minutes": 10,
+   "live": true,
+   "static_ts": "2026-09-05T08:25:37Z",
+   "dynamic_ts": "2026-09-05T08:25:37Z",
+   "locations": 3400,
+   "evses": 8026
+  },
+  {
+   "code": "CY",
+   "name": "Cyprus",
+   "path": "cy",
+   "source": "EMS",
+   "source_name": "Department of Electrical and Mechanical Services (traffic4cyprus NAP)",
+   "source_url": "https://www.traffic4cyprus.org.cy/en_AU/dataset/electricvehiclecharges",
+   "refresh_minutes": 1440,
+   "live": false,
+   "static_ts": "2026-09-05T08:25:38Z",
+   "dynamic_ts": null,
+   "locations": 171,
+   "evses": 203
+  },
   {
    "code": "FR",
    "name": "France",
@@ -42,6 +70,20 @@
    "dynamic_ts": "2026-09-05T08:12:23Z",
    "locations": 2054,
    "evses": 5695
+  },
+  {
+   "code": "LU",
+   "name": "Luxembourg",
+   "path": "lu",
+   "source": "DATAPUBLICLU",
+   "source_name": "data.public.lu - Chargy network + Eco-Movement inventory",
+   "source_url": "https://data.public.lu/en/pages/topics/transport-charging-points-points-de-charge/",
+   "refresh_minutes": 10,
+   "live": true,
+   "static_ts": "2026-09-05T08:25:40Z",
+   "dynamic_ts": null,
+   "locations": 734,
+   "evses": 2935
   },
   {
    "code": "NL",
