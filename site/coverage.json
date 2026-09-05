@@ -12,34 +12,481 @@
     "cpo_api": "No central national feed; operator APIs must be integrated individually"
   },
   "countries": [
-    {"code": "AT", "name": "Austria", "status": "registration", "source": "E-Control Ladestellenverzeichnis", "url": "https://www.e-control.at/ladestellenverzeichnis-technische-informationen", "data": ["location", "operator", "price", "technical", "availability"], "formats": ["REST API", "AMQP over TLS for dynamic data"], "note": "Public API key and domain registration may be required."},
-    {"code": "BE", "name": "Belgium", "status": "partial", "source": "transportdata.be (National Access Point)", "url": "https://transportdata.be/dataset/?_format_uri_limit=0&_mobility_theme_uri_limit=0", "data": ["location", "connectors", "availability", "ad-hoc price"], "formats": ["DATEX II v3 JSON", "DATEX II XML", "operator JSON", "CKAN API"], "note": "Not necessarily a complete national feed for every operator."},
-    {"code": "BG", "name": "Bulgaria", "status": "pending", "source": "Ministry of Transport information platforms", "url": "https://www.mtc.government.bg/en/category/281/information-platforms", "data": [], "formats": [], "note": "National Access Point exists; EV charging endpoint not publicly verified."},
-    {"code": "HR", "name": "Croatia", "status": "pending", "source": "Hrvatske ceste National Access Point", "url": "https://hrvatske-ceste.hr/en/pages/traffic-and-safety/documents/76-national-access-point", "data": [], "formats": [], "note": "General transport NAP; EV charging feed not publicly verified."},
-    {"code": "CY", "name": "Cyprus", "status": "public_static", "source": "traffic4cyprus", "url": "https://www.traffic4cyprus.org.cy/en_AU/dataset/electricvehiclecharges", "data": ["location", "technical"], "formats": ["DATEX II v3", "GML/XML"], "update": "Infrequent", "note": "Static dataset only."},
-    {"code": "CZ", "name": "Czechia", "status": "pending", "source": "Registr dopravních informací / MPO register", "url": "https://mpo.gov.cz/en/energy/statistics/filling-stations-and-recharging-points-statistics-and-register/", "data": ["static register"], "formats": [], "note": "Official register exists; public API or export not verified."},
-    {"code": "DK", "name": "Denmark", "status": "registration", "source": "Vejdirektoratet National Access Point", "url": "https://nap.vd.dk/", "data": ["location", "evse", "connectors", "tariffs", "availability"], "formats": ["OCPI 2.2.1 / 2.3.0 intake", "DATEX II output"], "note": "Registration required for NAP output."},
-    {"code": "EE", "name": "Estonia", "status": "pending", "source": "Transpordiamet", "url": "https://www.transpordiamet.ee/uudised/transpordiamet-hakkab-registreerima-ja-valjastama-alternatiivkutuste-taristu-tunnuskoodide", "data": ["location", "price", "technical", "access", "availability"], "formats": [], "note": "Provider API links published through the NAP; public format not stated."},
-    {"code": "FI", "name": "Finland", "status": "registration", "source": "Fintraffic AFIR service", "url": "https://www.fintraffic.fi/en/digitalservices/afir", "data": ["static", "availability", "aggregated database"], "formats": ["OCPI intake", "JSON output", "DATEX II output"], "note": "Registration required."},
-    {"code": "FR", "name": "France", "status": "static", "source": "transport.data.gouv.fr (IRVE consolidated base)", "url": "https://transport.data.gouv.fr/datasets?locale=en&type=charging-stations", "data": ["location", "operator", "connectors", "power", "opening hours", "access"], "formats": ["CSV", "GeoJSON", "catalogue API"], "update": "Daily consolidation", "note": "National base is static; live data is handled by operators separately."},
-    {"code": "DE", "name": "Germany", "status": "public_static", "source": "Bundesnetzagentur Ladesäulenregister", "url": "https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/E-Mobilitaet/start.html", "data": ["location", "operator", "connectors", "power", "commissioning date"], "formats": ["CSV", "XLSX", "web service", "DATEX II (AFIR)"], "note": "Static register public; dynamic data via operator APIs or NAP requires access."},
-    {"code": "GR", "name": "Greece", "status": "live", "source": "MYFAH, Ministry of Infrastructure and Transport", "url": "https://electrokinisi.yme.gov.gr/public/HelpMyfah/PublicData/", "data": ["location", "evse", "connectors", "tariffs", "availability"], "formats": ["ZIP/JSON (OCPI 2.2)"], "update": "Static daily, dynamic every 10 minutes"},
-    {"code": "HU", "name": "Hungary", "status": "pending", "source": "MEKH operator register / NAP portal", "url": "https://napportal.kozut.hu/", "data": ["operator register"], "formats": [], "note": "EV charging data feed not publicly verified."},
-    {"code": "IE", "name": "Ireland", "status": "registration", "source": "TII Data Exchange Platform (IDRO DXP)", "url": "https://www.tii.ie/en/roads-tolling/alt-fuel-projects-unit/alt-fuels-data-office/register-dxp/", "data": ["static", "availability"], "formats": ["OCPI 2.2.1", "REST/JSON"], "contact": "AFIRdata@tii.ie", "note": "Registration required."},
-    {"code": "IT", "name": "Italy", "status": "web_only", "source": "GSE Piattaforma Unica Nazionale (PUN)", "url": "https://www.gse.it/servizi-per-te/rinnovabili-per-i-trasporti/pun", "data": ["location", "supply type", "max power", "operator", "status"], "formats": ["web portal"], "note": "Public machine-readable API not clearly documented."},
-    {"code": "LV", "name": "Latvia", "status": "partial", "source": "transportdata.gov.lv / CSDD e-mobi", "url": "https://transportdata.gov.lv/", "data": ["location", "connectors", "capacity", "network status"], "formats": ["web/app"], "note": "Complete national API not publicly verified."},
-    {"code": "LT", "name": "Lithuania", "status": "live", "source": "Via Lietuva EV data service", "url": "https://ev.vialietuva.lt/en/data-provision", "data": ["location", "evse", "connectors", "tariffs", "availability"], "formats": ["OCPI 2.3.0 JSON", "OCPI 2.2.1", "DATEX II"], "update": "Real time"},
-    {"code": "LU", "name": "Luxembourg", "status": "partial", "source": "data.public.lu", "url": "https://data.public.lu/en/pages/topics/transport-charging-points-points-de-charge/", "data": ["location", "connectors", "tariffs", "availability"], "formats": ["DATEX II", "dataset downloads"], "note": "Coverage and update frequency differ between datasets (Chargy, Eco-Movement)."},
-    {"code": "MT", "name": "Malta", "status": "pending", "source": "Transport Malta GIS services", "url": "https://geoservices.transport.gov.mt/egis", "data": ["location", "basic attributes"], "formats": ["GIS web service"], "note": "Exact public endpoint and format to be verified."},
-    {"code": "NL", "name": "Netherlands", "status": "live", "source": "NDW (Nationaal Dataportaal Wegverkeer)", "url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/", "data": ["location", "operator", "evse", "connectors", "tariffs", "availability"], "formats": ["OCPI JSON (gzip)", "GeoJSON"], "update": "Near real time"},
-    {"code": "PL", "name": "Poland", "status": "pending", "source": "UDT EIPA register / dane.gov.pl NAP", "url": "https://eipa.udt.gov.pl/operator/register/en", "data": ["operator register", "location register"], "formats": ["web register"], "note": "JSON endpoints reported; to be confirmed with UDT before integration."},
-    {"code": "PT", "name": "Portugal", "status": "registration", "source": "MOBI.E MOBI.Data", "url": "https://www.mobie.pt/en/mobility/mobi.data", "data": ["location", "evse", "connectors", "availability", "ad-hoc tariffs"], "formats": ["DATEX II XML API", "OCPI 2.2 / 2.2.1"], "update": "Static up to 24 h, dynamic up to 1 min", "note": "Registration or endpoint access required."},
-    {"code": "RO", "name": "Romania", "status": "pending", "source": "CESTRIN National Access Point", "url": "https://pna.cestrin.ro/", "data": [], "formats": [], "note": "Public EV charging feed not verified."},
-    {"code": "SK", "name": "Slovakia", "status": "registration", "source": "MetaIS national service", "url": "https://metais.slovensko.sk/ci/AS/49373955-2460-425d-89ae-38ff4a7e9f4f", "data": ["static", "availability"], "formats": ["DATEX II", "secured API"], "update": "Static up to 24 h, dynamic up to 1 min", "note": "Credentials required."},
-    {"code": "SI", "name": "Slovenia", "status": "pending", "source": "NAP Slovenia", "url": "https://www.nap.si/", "data": ["static", "availability"], "formats": ["OCPI or REST intake", "DATEX II expected"], "note": "Public output format to be verified."},
-    {"code": "ES", "name": "Spain", "status": "web_only", "source": "REVE (Red Eléctrica)", "url": "https://www.mapareve.es/en-detalle", "data": ["location", "max power", "connector type", "availability", "tariffs"], "formats": ["web/app"], "note": "Public API or download not clearly documented; API access on request."},
-    {"code": "SE", "name": "Sweden", "status": "public", "source": "NOBIL via trafficdata.se / Energimyndigheten", "url": "https://trafficdata.se/dataset/charging-points-for-electric-vehicles-nobil", "data": ["location", "operator", "connectors", "availability where reported"], "formats": ["NOBIL API JSON"], "update": "Daily registry plus dynamic where available", "note": "API endpoint and key requirements to be verified."},
-    {"code": "GB", "name": "United Kingdom", "status": "cpo_api", "source": "Public Charge Point Regulations 2023 (operator APIs)", "url": "https://www.gov.uk/government/publications/the-public-charge-point-regulations-2023-guidance/public-charge-point-regulations-2023-guidance", "data": ["location", "evse", "connectors", "opening hours", "payment", "pricing", "availability"], "formats": ["OCPI 2.2.1", "REST/JSON per operator"], "update": "Status within 30 seconds of change", "note": "No single central live feed; integrate operator APIs individually or via an aggregator."}
+    {
+      "code": "AT",
+      "name": "Austria",
+      "status": "registration",
+      "source": "E-Control Ladestellenverzeichnis",
+      "url": "https://www.e-control.at/ladestellenverzeichnis-technische-informationen",
+      "data": [
+        "location",
+        "operator",
+        "price",
+        "technical",
+        "availability"
+      ],
+      "formats": [
+        "REST API",
+        "AMQP over TLS for dynamic data"
+      ],
+      "note": "Public API key and domain registration may be required."
+    },
+    {
+      "code": "BE",
+      "name": "Belgium",
+      "status": "live",
+      "source": "transportdata.be (Road OCPI feed + INDIGO DATEX II)",
+      "url": "https://transportdata.be/dataset/?_format_uri_limit=0&_mobility_theme_uri_limit=0",
+      "data": [
+        "location",
+        "connectors",
+        "availability",
+        "ad-hoc price"
+      ],
+      "formats": [
+        "DATEX II v3 JSON",
+        "DATEX II XML",
+        "operator JSON",
+        "CKAN API"
+      ],
+      "note": "Live for the Road/E-Flux network plus INDIGO car parks; other operators publish behind keys (Eco-Movement NAP feed, Tesla, Monta)."
+    },
+    {
+      "code": "BG",
+      "name": "Bulgaria",
+      "status": "pending",
+      "source": "Ministry of Transport information platforms",
+      "url": "https://www.mtc.government.bg/en/category/281/information-platforms",
+      "data": [],
+      "formats": [],
+      "note": "National Access Point exists; EV charging endpoint not publicly verified."
+    },
+    {
+      "code": "HR",
+      "name": "Croatia",
+      "status": "pending",
+      "source": "Hrvatske ceste National Access Point",
+      "url": "https://hrvatske-ceste.hr/en/pages/traffic-and-safety/documents/76-national-access-point",
+      "data": [],
+      "formats": [],
+      "note": "General transport NAP; EV charging feed not publicly verified."
+    },
+    {
+      "code": "CY",
+      "name": "Cyprus",
+      "status": "static",
+      "source": "Department of Electrical and Mechanical Services via traffic4cyprus NAP",
+      "url": "https://www.traffic4cyprus.org.cy/en_AU/dataset/electricvehiclecharges",
+      "data": [
+        "location",
+        "technical"
+      ],
+      "formats": [
+        "DATEX II v3",
+        "GML/XML"
+      ],
+      "update": "Infrequent",
+      "note": "Inventory only; the national dataset is updated infrequently."
+    },
+    {
+      "code": "CZ",
+      "name": "Czechia",
+      "status": "pending",
+      "source": "Registr dopravních informací / MPO register",
+      "url": "https://mpo.gov.cz/en/energy/statistics/filling-stations-and-recharging-points-statistics-and-register/",
+      "data": [
+        "static register"
+      ],
+      "formats": [],
+      "note": "Official register exists; public API or export not verified."
+    },
+    {
+      "code": "DK",
+      "name": "Denmark",
+      "status": "registration",
+      "source": "Vejdirektoratet National Access Point",
+      "url": "https://nap.vd.dk/",
+      "data": [
+        "location",
+        "evse",
+        "connectors",
+        "tariffs",
+        "availability"
+      ],
+      "formats": [
+        "OCPI 2.2.1 / 2.3.0 intake",
+        "DATEX II output"
+      ],
+      "note": "Registration required for NAP output."
+    },
+    {
+      "code": "EE",
+      "name": "Estonia",
+      "status": "pending",
+      "source": "Transpordiamet",
+      "url": "https://www.transpordiamet.ee/uudised/transpordiamet-hakkab-registreerima-ja-valjastama-alternatiivkutuste-taristu-tunnuskoodide",
+      "data": [
+        "location",
+        "price",
+        "technical",
+        "access",
+        "availability"
+      ],
+      "formats": [],
+      "note": "Provider API links published through the NAP; public format not stated."
+    },
+    {
+      "code": "FI",
+      "name": "Finland",
+      "status": "registration",
+      "source": "Fintraffic AFIR service",
+      "url": "https://www.fintraffic.fi/en/digitalservices/afir",
+      "data": [
+        "static",
+        "availability",
+        "aggregated database"
+      ],
+      "formats": [
+        "OCPI intake",
+        "JSON output",
+        "DATEX II output"
+      ],
+      "note": "Registration required."
+    },
+    {
+      "code": "FR",
+      "name": "France",
+      "status": "static",
+      "source": "transport.data.gouv.fr (IRVE consolidated base)",
+      "url": "https://transport.data.gouv.fr/datasets?locale=en&type=charging-stations",
+      "data": [
+        "location",
+        "operator",
+        "connectors",
+        "power",
+        "opening hours",
+        "access"
+      ],
+      "formats": [
+        "CSV",
+        "GeoJSON",
+        "catalogue API"
+      ],
+      "update": "Daily consolidation",
+      "note": "National base is static; live data is handled by operators separately."
+    },
+    {
+      "code": "DE",
+      "name": "Germany",
+      "status": "static",
+      "source": "Bundesnetzagentur Ladesäulenregister (CSV)",
+      "url": "https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/E-Mobilitaet/start.html",
+      "data": [
+        "location",
+        "operator",
+        "connectors",
+        "power",
+        "commissioning date"
+      ],
+      "formats": [
+        "CSV",
+        "XLSX",
+        "web service",
+        "DATEX II (AFIR)"
+      ],
+      "note": "Inventory only, refreshed about monthly by the Bundesnetzagentur; operators still in the notification procedure are missing."
+    },
+    {
+      "code": "GR",
+      "name": "Greece",
+      "status": "live",
+      "source": "MYFAH, Ministry of Infrastructure and Transport",
+      "url": "https://electrokinisi.yme.gov.gr/public/HelpMyfah/PublicData/",
+      "data": [
+        "location",
+        "evse",
+        "connectors",
+        "tariffs",
+        "availability"
+      ],
+      "formats": [
+        "ZIP/JSON (OCPI 2.2)"
+      ],
+      "update": "Static daily, dynamic every 10 minutes"
+    },
+    {
+      "code": "HU",
+      "name": "Hungary",
+      "status": "pending",
+      "source": "MEKH operator register / NAP portal",
+      "url": "https://napportal.kozut.hu/",
+      "data": [
+        "operator register"
+      ],
+      "formats": [],
+      "note": "EV charging data feed not publicly verified."
+    },
+    {
+      "code": "IE",
+      "name": "Ireland",
+      "status": "registration",
+      "source": "TII Data Exchange Platform (IDRO DXP)",
+      "url": "https://www.tii.ie/en/roads-tolling/alt-fuel-projects-unit/alt-fuels-data-office/register-dxp/",
+      "data": [
+        "static",
+        "availability"
+      ],
+      "formats": [
+        "OCPI 2.2.1",
+        "REST/JSON"
+      ],
+      "contact": "AFIRdata@tii.ie",
+      "note": "Registration required."
+    },
+    {
+      "code": "IT",
+      "name": "Italy",
+      "status": "web_only",
+      "source": "GSE Piattaforma Unica Nazionale (PUN)",
+      "url": "https://www.gse.it/servizi-per-te/rinnovabili-per-i-trasporti/pun",
+      "data": [
+        "location",
+        "supply type",
+        "max power",
+        "operator",
+        "status"
+      ],
+      "formats": [
+        "web portal"
+      ],
+      "note": "Public machine-readable API not clearly documented."
+    },
+    {
+      "code": "LV",
+      "name": "Latvia",
+      "status": "partial",
+      "source": "transportdata.gov.lv / CSDD e-mobi",
+      "url": "https://transportdata.gov.lv/",
+      "data": [
+        "location",
+        "connectors",
+        "capacity",
+        "network status"
+      ],
+      "formats": [
+        "web/app"
+      ],
+      "note": "Complete national API not publicly verified."
+    },
+    {
+      "code": "LT",
+      "name": "Lithuania",
+      "status": "live",
+      "source": "Via Lietuva EV data service",
+      "url": "https://ev.vialietuva.lt/en/data-provision",
+      "data": [
+        "location",
+        "evse",
+        "connectors",
+        "tariffs",
+        "availability"
+      ],
+      "formats": [
+        "OCPI 2.3.0 JSON",
+        "OCPI 2.2.1",
+        "DATEX II"
+      ],
+      "update": "Real time"
+    },
+    {
+      "code": "LU",
+      "name": "Luxembourg",
+      "status": "live",
+      "source": "data.public.lu (Chargy KML + Eco-Movement DATEX II)",
+      "url": "https://data.public.lu/en/pages/topics/transport-charging-points-points-de-charge/",
+      "data": [
+        "location",
+        "connectors",
+        "tariffs",
+        "availability"
+      ],
+      "formats": [
+        "DATEX II",
+        "dataset downloads"
+      ],
+      "note": "Chargy and SuperChargy stations carry live status; other operators come from the Eco-Movement inventory without status."
+    },
+    {
+      "code": "MT",
+      "name": "Malta",
+      "status": "pending",
+      "source": "Transport Malta GIS services",
+      "url": "https://geoservices.transport.gov.mt/egis",
+      "data": [
+        "location",
+        "basic attributes"
+      ],
+      "formats": [
+        "GIS web service"
+      ],
+      "note": "Exact public endpoint and format to be verified."
+    },
+    {
+      "code": "NL",
+      "name": "Netherlands",
+      "status": "live",
+      "source": "NDW (Nationaal Dataportaal Wegverkeer)",
+      "url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
+      "data": [
+        "location",
+        "operator",
+        "evse",
+        "connectors",
+        "tariffs",
+        "availability"
+      ],
+      "formats": [
+        "OCPI JSON (gzip)",
+        "GeoJSON"
+      ],
+      "update": "Near real time"
+    },
+    {
+      "code": "PL",
+      "name": "Poland",
+      "status": "pending",
+      "source": "UDT EIPA register / dane.gov.pl NAP",
+      "url": "https://eipa.udt.gov.pl/operator/register/en",
+      "data": [
+        "operator register",
+        "location register"
+      ],
+      "formats": [
+        "web register"
+      ],
+      "note": "JSON endpoints reported; to be confirmed with UDT before integration."
+    },
+    {
+      "code": "PT",
+      "name": "Portugal",
+      "status": "registration",
+      "source": "MOBI.E MOBI.Data",
+      "url": "https://www.mobie.pt/en/mobility/mobi.data",
+      "data": [
+        "location",
+        "evse",
+        "connectors",
+        "availability",
+        "ad-hoc tariffs"
+      ],
+      "formats": [
+        "DATEX II XML API",
+        "OCPI 2.2 / 2.2.1"
+      ],
+      "update": "Static up to 24 h, dynamic up to 1 min",
+      "note": "Registration or endpoint access required."
+    },
+    {
+      "code": "RO",
+      "name": "Romania",
+      "status": "pending",
+      "source": "CESTRIN National Access Point",
+      "url": "https://pna.cestrin.ro/",
+      "data": [],
+      "formats": [],
+      "note": "Public EV charging feed not verified."
+    },
+    {
+      "code": "SK",
+      "name": "Slovakia",
+      "status": "registration",
+      "source": "MetaIS national service",
+      "url": "https://metais.slovensko.sk/ci/AS/49373955-2460-425d-89ae-38ff4a7e9f4f",
+      "data": [
+        "static",
+        "availability"
+      ],
+      "formats": [
+        "DATEX II",
+        "secured API"
+      ],
+      "update": "Static up to 24 h, dynamic up to 1 min",
+      "note": "Credentials required."
+    },
+    {
+      "code": "SI",
+      "name": "Slovenia",
+      "status": "pending",
+      "source": "NAP Slovenia",
+      "url": "https://www.nap.si/",
+      "data": [
+        "static",
+        "availability"
+      ],
+      "formats": [
+        "OCPI or REST intake",
+        "DATEX II expected"
+      ],
+      "note": "Public output format to be verified."
+    },
+    {
+      "code": "ES",
+      "name": "Spain",
+      "status": "web_only",
+      "source": "REVE (Red Eléctrica)",
+      "url": "https://www.mapareve.es/en-detalle",
+      "data": [
+        "location",
+        "max power",
+        "connector type",
+        "availability",
+        "tariffs"
+      ],
+      "formats": [
+        "web/app"
+      ],
+      "note": "Public API or download not clearly documented; API access on request."
+    },
+    {
+      "code": "SE",
+      "name": "Sweden",
+      "status": "public",
+      "source": "NOBIL via trafficdata.se / Energimyndigheten",
+      "url": "https://trafficdata.se/dataset/charging-points-for-electric-vehicles-nobil",
+      "data": [
+        "location",
+        "operator",
+        "connectors",
+        "availability where reported"
+      ],
+      "formats": [
+        "NOBIL API JSON"
+      ],
+      "update": "Daily registry plus dynamic where available",
+      "note": "API endpoint and key requirements to be verified."
+    },
+    {
+      "code": "GB",
+      "name": "United Kingdom",
+      "status": "cpo_api",
+      "source": "Public Charge Point Regulations 2023 (operator APIs)",
+      "url": "https://www.gov.uk/government/publications/the-public-charge-point-regulations-2023-guidance/public-charge-point-regulations-2023-guidance",
+      "data": [
+        "location",
+        "evse",
+        "connectors",
+        "opening hours",
+        "payment",
+        "pricing",
+        "availability"
+      ],
+      "formats": [
+        "OCPI 2.2.1",
+        "REST/JSON per operator"
+      ],
+      "update": "Status within 30 seconds of change",
+      "note": "No single central live feed; integrate operator APIs individually or via an aggregator."
+    }
   ],
   "reference": "https://transport.ec.europa.eu/document/download/963c997d-efd9-40ae-a38b-5d4b935bdfcf_en?filename=its-national-access-points.pdf"
 }

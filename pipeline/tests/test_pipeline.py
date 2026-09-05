@@ -580,3 +580,55 @@ class NewSourcesTests(unittest.TestCase):
             st = json.loads((root / "data" / "lu" / "status.json").read_text())
             self.assertEqual(st["locations"]["LU-CHARGY-10644"], "AC")
             self.assertEqual(st["locations"]["LU-CHARGY-20001"], "O")
+
+
+DE_CSV = """\ufeffLadesäulenregister Bundesnetzagentur;;;;
+;;;;
+Letzte Aktualisierung vom: 01.09.2026;;;;
+Ladeeinrichtungs-ID;Betreiber;Anzeigename (Karte);Status;Art der Ladeeinrichtung;Anzahl Ladepunkte;Nennleistung Ladeeinrichtung [kW];Inbetriebnahmedatum;Straße;Hausnummer;Adresszusatz;Postleitzahl;Ort;Kreis/kreisfreie Stadt;Bundesland;Breitengrad;Längengrad;Standortbezeichnung;Informationen zum Parkraum;Bezahlsysteme;Öffnungszeiten;Öffnungszeiten: Wochentage;Öffnungszeiten: Tageszeiten;Steckertypen1;Nennleistung Stecker1;EVSE-ID1;Public Key1;Steckertypen2;Nennleistung Stecker2;EVSE-ID2;Public Key2
+1010338;Albwerk GmbH;Albwerk;In Betrieb;Normalladeeinrichtung;2;22;11.01.2020;Am Berg;1;;72535;Heroldstatt;Alb-Donau;BW;48,442398;9,659075;;;"RFID-Karte;Onlinezahlungsverfahren";247;;;AC Typ 2 Steckdose;22;DEAEWE002501;KEY;AC Typ 2 Steckdose;22;DEAEWE002502;KEY
+1010339;Albwerk GmbH;Albwerk;In Betrieb;Schnellladeeinrichtung;1;150;11.01.2021;Am Berg;1;;72535;Heroldstatt;Alb-Donau;BW;48,442398;9,659075;;;Kreditkarte;247;;;DC Fahrzeugkupplung Typ Combo (CCS);150;DEAEWE002601;KEY;;;;
+"""
+
+
+class GermanyTests(unittest.TestCase):
+    def test_groups_devices_into_locations(self):
+        from cpo_pipeline.sources import de_bnetza as de
+        norm = de.parse_static(DE_CSV, de.SPEC)
+        self.assertEqual(len(norm["locations"]), 1, "same operator + address + coords must merge")
+        loc = norm["locations"][0]
+        self.assertEqual(loc["addr"], "Am Berg 1")
+        self.assertEqual(loc["lat"], 48.442398)
+        self.assertEqual([e["uid"] for e in loc["evses"]], ["DEAEWE002501", "DEAEWE002502", "DEAEWE002601"])
+        self.assertEqual(loc["evses"][0]["conns"][0]["std"], "T2")
+        self.assertEqual(loc["evses"][2]["conns"][0], {"std": "CCS2", "fmt": "CABLE", "pt": "DC", "kw": 150.0, "id": "1"})
+        self.assertIn("CREDIT_CARD_PAYABLE", loc["evses"][2]["caps"])
+        self.assertTrue(loc["h24"])
+        self.assertEqual(loc["upd"], "2021-01-11")
+        self.assertEqual(next(iter(norm["operators"].values()))["name"], "Albwerk GmbH")
+
+    def test_discover_regex(self):
+        from cpo_pipeline.sources import de_bnetza as de
+        import re
+        html = 'x href="https://data.bundesnetzagentur.de/Bundesnetzagentur/DE/Fachthemen/ElektrizitaetundGas/E-Mobilitaet/Ladesaeulenregister_BNetzA_2026-09-01.csv" y'
+        self.assertTrue(re.search(de.DISCOVER, html))
+
+
+class EcoMovementRenditionTests(unittest.TestCase):
+    def test_address_and_external_id(self):
+        from cpo_pipeline.sources import datex2, lu_chargy as lu
+        xml = """<d2:payload xmlns:d2="http://datex2.eu/schema/3/d2Payload" xmlns:com="http://datex2.eu/schema/3/common" xmlns:loc="http://datex2.eu/schema/3/locationReferencing" xmlns:egi="http://datex2.eu/schema/3/energyInfrastructure" xmlns:fac="http://datex2.eu/schema/3/facilities" xmlns:locx="http://datex2.eu/schema/3/locationExtension">
+<egi:energyInfrastructureTable><egi:energyInfrastructureSite id="SWIO-1"><fac:name><com:values><com:value lang="en">Mondorf</com:value></com:values></fac:name>
+<fac:locationReference><loc:pointByCoordinates><loc:pointCoordinates><loc:latitude>49.5057</loc:latitude><loc:longitude>6.2750</loc:longitude></loc:pointCoordinates></loc:pointByCoordinates>
+<loc:_pointLocationExtension><locx:facilityLocation><locx:address><locx:postcode>5627</locx:postcode><locx:city>Mondorf-les-Bains</locx:city><locx:addressLine order="0"><locx:type>street</locx:type><locx:text>1, Place des Villes Jumelees</locx:text></locx:addressLine></locx:address></locx:facilityLocation></loc:_pointLocationExtension></fac:locationReference>
+<fac:operator><fac:name><com:values><com:value lang="en">SWIO</com:value></com:values></fac:name></fac:operator>
+<egi:energyInfrastructureStation id="1"><egi:refillPoint id="c62c"><fac:externalIdentifier>LU*SWO*E100422</fac:externalIdentifier><egi:connector><egi:connectorType>iec62196T2</egi:connectorType><egi:chargingMode>mode3AC3p</egi:chargingMode><egi:maxPowerAtSocket>22000</egi:maxPowerAtSocket></egi:connector></egi:refillPoint></egi:energyInfrastructureStation>
+</egi:energyInfrastructureSite></egi:energyInfrastructureTable></d2:payload>"""
+        norm = datex2.parse_table(xml.encode(), lu.SPEC)
+        loc = norm["locations"][0]
+        self.assertEqual(loc["addr"], "1, Place des Villes Jumelees")
+        self.assertEqual(loc["city"], "Mondorf-les-Bains")
+        self.assertEqual(loc["pc"], "5627")
+        self.assertEqual(norm["operators"][loc["op"]]["name"], "SWIO")
+        self.assertEqual(loc["evses"][0]["id"], "LU*SWO*E100422")
+        self.assertEqual(loc["evses"][0]["conns"][0]["kw"], 22.0)

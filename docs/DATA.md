@@ -125,4 +125,4 @@ One 10-minute tick adds roughly 10 KB to the packed repository for Greece (statu
 
 ## Terms
 
-Data is republished from official public registries under their public-data terms. Attribute **cpo.today** and the registry (Greece: *MYFAH, Hellenic Ministry of Infrastructure and Transport*; Lithuania: *Via Lietuva*; Netherlands: *NDW*). No warranty: status is exactly what operators report.
+Data is republished from official public registries under their public-data terms. Attribute **cpo.today** and the registry (Greece: *MYFAH, Hellenic Ministry of Infrastructure and Transport*; Lithuania: *Via Lietuva*; Netherlands: *NDW*; France: *transport.data.gouv.fr / Etalab*; Belgium: *transportdata.be*; Luxembourg: *data.public.lu*; Germany: *Bundesnetzagentur*; Cyprus: *EMS / traffic4cyprus*). Each country's `meta.json` names its source and licence. No warranty: status is exactly what operators report.

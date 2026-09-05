@@ -102,6 +102,7 @@ class Tick:
         self._inventory = None
         self._part_statuses: dict = {}
         self._part_cache: dict = {}
+        self._primary_ids: set | None = None
 
     # -- acquisition -------------------------------------------------------
 
@@ -177,6 +178,7 @@ class Tick:
         self._static_doc, self._static_ts, self._static_info = doc, source_ts, info
         norm = spec.parse_static(doc, spec)
         self._part_statuses = dict(norm.get("statuses") or {})
+        self._primary_ids = {l["id"] for l in norm["locations"]}
         for k, (feed, parser) in enumerate(spec.parts):
             try:
                 pdoc, _pts, pinfo = self._acquire(f"part{k}", feed, None)
@@ -321,7 +323,11 @@ class Tick:
         statuses = norm["statuses"]
         for lid, ev in self._part_statuses.items():
             statuses.setdefault(lid, {}).update(ev)
-        known = {(l["id"], e["uid"]) for l in static["locations"] for e in l["evses"]}
+        # The shrink guard compares against the locations the live feed(s) are
+        # responsible for; inventory-only parts (no status publisher) are excluded.
+        primary = self._primary_ids
+        known = {(l["id"], e["uid"]) for l in static["locations"] for e in l["evses"]
+                 if primary is None or l["id"] in primary or l["id"] in self._part_statuses}
         got = {(lid, uid) for lid, evs in statuses.items() for uid in evs}
         orphan = len(got - known)
         missing = len(known - got)

@@ -17,7 +17,7 @@ on:
     inputs:
       countries:
         description: "Space-separated country codes to refresh (default: all)"
-        default: "gr lt nl fr"
+        default: "gr lt nl be lu fr de cy"
         type: string
       force_static:
         description: "Re-process static inventories even if unchanged"
@@ -38,7 +38,7 @@ jobs:
   fetch:
     name: fetch and publish
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 20
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v5
@@ -69,7 +69,7 @@ jobs:
         working-directory: pipeline
         env:
           FORCE_STATIC: ${{ inputs.force_static && '--force-static' || '' }}
-          COUNTRIES: ${{ inputs.countries || 'gr lt nl fr' }}
+          COUNTRIES: ${{ inputs.countries || 'gr lt nl be lu fr de cy' }}
         run: |
           set -uo pipefail
           python3 --version

@@ -153,7 +153,11 @@ def parse_table(raw: bytes, spec) -> dict:
         names = [v for v in _values(site, "name") if v] or [v for st in stations for v in _values(st, "name")]
         name = (names[0] if names else "")[:120]
         addr_parts = []
-        for tag in ("addressLine", "streetName", "houseNumber"):
+        for al in _descendants(site, "addressLine"):
+            t = _text(al, "text") or (al.text or "").strip()
+            if t:
+                addr_parts.append(t)
+        for tag in ("streetName", "houseNumber"):
             addr_parts += [_t for _t in [_text(site, tag)] if _t]
         city = _text(site, "city") or _text(site, "cityName") or _text(site, "town")
         pc = _text(site, "postcode") or _text(site, "postalCode")
@@ -176,7 +180,8 @@ def parse_table(raw: bytes, spec) -> dict:
                                   "kw": round(kw, 1) if kw else None})
                 if not conns:
                     conns.append({"id": "1", "std": "OTHER", "fmt": "SOCKET", "pt": "NA", "kw": None})
-                evses.append({"uid": rid[:80], "id": rid[:80], "conns": conns})
+                ext = _text(rp, "externalIdentifier")
+                evses.append({"uid": rid[:80], "id": (ext or rid)[:80], "conns": conns})
         if not evses:
             evses.append({"uid": f"{sid}#0", "id": f"{sid}#0", "conns": [{"id": "1", "std": "OTHER", "fmt": "SOCKET", "pt": "NA", "kw": None}]})
 

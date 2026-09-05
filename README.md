@@ -17,6 +17,10 @@ cpo.today exists so that charge point operators (CPOs), investors, fleets, plann
 | Lithuania | [Via Lietuva](https://ev.vialietuva.lt/en/data-provision) | OCPI 2.3.0 API | every 10 min | every 10 min | 2026-09 |
 | Netherlands | [NDW](https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/) | OCPI JSON (gzip) | every 10 min | every 10 min | 2026-09 |
 | France | [Base nationale des IRVE](https://transport.data.gouv.fr/datasets?locale=en&type=charging-stations), transport.data.gouv.fr | CSV (IRVE schema) | daily | none published | 2026-09 |
+| Belgium | [transportdata.be](https://transportdata.be/dataset/road-public-charging-network): Road network OCPI + INDIGO DATEX II | OCPI JSON, DATEX II XML | every 10 min | every 10 min (Road network) | 2026-09 |
+| Luxembourg | [data.public.lu](https://data.public.lu/en/pages/topics/transport-charging-points-points-de-charge/): Chargy KML + Eco-Movement DATEX II | KML, DATEX II XML | every 10 min | every 10 min (Chargy) | 2026-09 |
+| Germany | [Bundesnetzagentur Ladesäulenregister](https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/E-Mobilitaet/Ladesaeulenkarte/start.html) | CSV | monthly | none published | 2026-09 |
+| Cyprus | [EMS via traffic4cyprus NAP](https://www.traffic4cyprus.org.cy/en_AU/dataset/electricvehiclecharges) | DATEX II-style XML | infrequent | none published | 2026-09 |
 
 All 28 EU/UK registries and their current status are listed in `site/coverage.json` and on the site's **Coverage** tab. Adding a country is one module under `pipeline/cpo_pipeline/sources/` (see [docs/ADDING_A_COUNTRY.md](docs/ADDING_A_COUNTRY.md)).
 
@@ -67,4 +71,4 @@ cd .. && npm install && npm run dev
 ## Licence
 
 Code: MIT (see [LICENSE](LICENSE)). MapLibre GL JS is BSD-3 (see `site/vendor/LICENSE-maplibre-gl.txt`).
-Data: republished from official public registries; attribute both cpo.today and the originating registry.
+Data: republished from official public registries and national access points under their own open licences; attribute both cpo.today and the originating registry.

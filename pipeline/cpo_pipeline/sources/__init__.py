@@ -1,10 +1,11 @@
 """Registry of implemented national sources, keyed by lower-case country code."""
 
-from . import be_road, cy_ems, fr_irve, gr_myfah, lt_vialietuva, lu_chargy, nl_ndw
+from . import be_road, cy_ems, de_bnetza, fr_irve, gr_myfah, lt_vialietuva, lu_chargy, nl_ndw
 
 SPECS = {
     "be": be_road.SPEC,
     "cy": cy_ems.SPEC,
+    "de": de_bnetza.SPEC,
     "fr": fr_irve.SPEC,
     "gr": gr_myfah.SPEC,
     "lt": lt_vialietuva.SPEC,
