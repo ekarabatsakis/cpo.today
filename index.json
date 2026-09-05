@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-05T07:43:18Z",
+ "generated": "2026-09-05T07:47:48Z",
  "countries": [
   {
    "code": "GR",
@@ -10,22 +10,9 @@
    "source_url": "https://electrokinisi.yme.gov.gr/public/HelpMyfah/PublicData/",
    "refresh_minutes": 10,
    "static_ts": "2026-09-05T01:37:54Z",
-   "dynamic_ts": "2026-09-05T07:36:45Z",
+   "dynamic_ts": "2026-09-05T07:46:48Z",
    "locations": 4180,
    "evses": 9825
-  },
-  {
-   "code": "LT",
-   "name": "Lithuania",
-   "path": "lt",
-   "source": "VIALIETUVA",
-   "source_name": "Via Lietuva - national EV charging data service",
-   "source_url": "https://ev.vialietuva.lt/en/data-provision",
-   "refresh_minutes": 10,
-   "static_ts": null,
-   "dynamic_ts": null,
-   "locations": null,
-   "evses": null
   },
   {
    "code": "NL",
@@ -35,10 +22,10 @@
    "source_name": "NDW - Nationaal Dataportaal Wegverkeer",
    "source_url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
    "refresh_minutes": 10,
-   "static_ts": "2026-09-05T07:43:00Z",
-   "dynamic_ts": "2026-09-05T07:43:00Z",
-   "locations": 80276,
-   "evses": 200902
+   "static_ts": "2026-09-05T07:47:00Z",
+   "dynamic_ts": "2026-09-05T07:47:00Z",
+   "locations": 80277,
+   "evses": 200915
   }
  ]
 }
