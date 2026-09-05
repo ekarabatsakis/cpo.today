@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-05T04:54:49Z",
+ "generated": "2026-09-05T05:07:10Z",
  "countries": [
   {
    "code": "GR",
@@ -10,7 +10,7 @@
    "source_url": "https://electrokinisi.yme.gov.gr/public/HelpMyfah/PublicData/",
    "refresh_minutes": 10,
    "static_ts": "2026-09-05T01:37:54Z",
-   "dynamic_ts": "2026-09-05T04:46:48Z"
+   "dynamic_ts": "2026-09-05T05:06:48Z"
   }
  ]
 }
