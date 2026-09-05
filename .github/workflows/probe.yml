@@ -29,7 +29,7 @@ jobs:
           URLS: ${{ inputs.urls }}
           SAMPLE: ${{ inputs.sample_bytes }}
         run: |
-          set -uo pipefail
+          set -u
           mkdir -p out
           if [ -z "${URLS:-}" ]; then
             URLS=$(cat <<'LIST'
@@ -59,7 +59,7 @@ jobs:
               -D "out/$tag.headers" -o "out/$tag.body" -w "status=%{http_code} type=%{content_type} bytes=%{size_download} time=%{time_total}s final=%{url_effective}\n" "$url" \
               | tee "out/$tag.meta" || echo "curl failed" | tee -a "out/$tag.meta"
             echo "$url" > "out/$tag.url"
-            if file "out/$tag.body" | grep -qi gzip; then gunzip -c "out/$tag.body" | head -c "$SAMPLE" > "out/$tag.sample"; gunzip -c "out/$tag.body" | wc -c > "out/$tag.size"; else head -c "$SAMPLE" "out/$tag.body" > "out/$tag.sample"; wc -c < "out/$tag.body" > "out/$tag.size"; fi
+            if file "out/$tag.body" | grep -qi gzip; then gunzip -c "out/$tag.body" > "out/$tag.full" 2>/dev/null; head -c "$SAMPLE" "out/$tag.full" > "out/$tag.sample"; wc -c < "out/$tag.full" > "out/$tag.size"; rm -f "out/$tag.full"; else head -c "$SAMPLE" "out/$tag.body" > "out/$tag.sample"; wc -c < "out/$tag.body" > "out/$tag.size"; fi
             rm -f "out/$tag.body"
             grep -iE "^(HTTP|content-type|content-length|last-modified|etag|cache-control|x-total|x-limit|link|access-control)" "out/$tag.headers" | head -20
             echo "--- sample:"; head -c 600 "out/$tag.sample"; echo; echo
