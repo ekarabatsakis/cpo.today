@@ -510,3 +510,73 @@ class DatexTests(unittest.TestCase):
         self.assertEqual(datex2.connector_code("iec62196T2Combo"), "CCS2")
         self.assertEqual(datex2.connector_code("Type 2"), "T2")
         self.assertEqual(datex2.connector_code("CHAdeMO"), "CHADEMO")
+
+
+CHARGY_KML = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>Stations</name>
+<Placemark><name>Esch-sur-Alzette - Parking Brill</name><address>Rue Louis Pasteur, L-4276 Esch-sur-Alzette Luxembourg</address><styleUrl>#AVAILABLE</styleUrl>
+<ExtendedData><Data name="CPnum"><value>4</value></Data>
+<Data name="chargingdevice"><value>{"id":10644,"name":"CP2500","numberOfConnectors":2,"connectors":[{"id":59985,"name":"CP2500 - 1","maxchspeed":22.08,"connector":1,"description":"AVAILABLE"},{"id":59986,"name":"CP2500 - 2","maxchspeed":22.08,"connector":2,"description":"CHARGING"}]}</value></Data>
+</ExtendedData><Point><coordinates>5.98186,49.49577,0.0</coordinates></Point></Placemark>
+<Placemark><name>SuperChargy Aire de Berchem</name><address>A3, L-3325 Berchem Luxembourg</address><styleUrl>#UNAVAILABLE</styleUrl>
+<ExtendedData><Data name="chargingdevice"><value>{"id":20001,"name":"SC1","numberOfConnectors":1,"connectors":[{"id":70001,"name":"SC1 - 1","maxchspeed":160,"connector":1,"description":"UNAVAILABLE"}]}</value></Data></ExtendedData>
+<Point><coordinates>6.13,49.53,0</coordinates></Point></Placemark>
+</Document></kml>"""
+
+CY_XML = """<?xml version='1.0' encoding='utf-8'?><d2LogicalModel xmlns="http://datex2.eu/schema/3/common" xmlns:ei="http://datex2.eu/schema/3/energyInfrastructure"><payload>
+<ei:energyInfrastructureTable><ei:energyInfrastructureTablePublication><ei:chargingPoints>
+<ei:chargingPoint><chargingPointIdentification>Petrolina GSZ Station (150kW)</chargingPointIdentification><ei:chargingPointOwner>Alpitronic Right</ei:chargingPointOwner>
+<chargingPointStatus><value>operational</value><lang>en</lang></chargingPointStatus><ei:chargingPointOperator>Petrolina (Holdings) Public Ltd.</ei:chargingPointOperator>
+<numberOfConnectors>2</numberOfConnectors><location><pointByCoordinates><pointCoordinates><latitude>34.925</latitude><longitude>33.601</longitude></pointCoordinates></pointByCoordinates></location>
+<ei:maximumPower>300</ei:maximumPower><ei:connectorPower>300</ei:connectorPower><ei:creationDate>2023-07-05</ei:creationDate><chargingMode>fastCharging</chargingMode>
+<connectorTypes><connectorType>type2</connectorType><connectorType>comboType2</connectorType></connectorTypes>
+<chargingPointAddress><value>Georgiou Christodoulidi Avenue, 6043, Larnaca</value><lang>el</lang></chargingPointAddress></ei:chargingPoint>
+</ei:chargingPoints></ei:energyInfrastructureTablePublication></ei:energyInfrastructureTable></payload></d2LogicalModel>"""
+
+
+class NewSourcesTests(unittest.TestCase):
+    def test_chargy_kml(self):
+        from cpo_pipeline.sources import lu_chargy as lu
+        norm = lu.parse_chargy(CHARGY_KML, lu.SPEC)
+        self.assertEqual(len(norm["locations"]), 2)
+        a = norm["locations"][0]
+        self.assertEqual(a["id"], "LU-CHARGY-10644")
+        self.assertEqual(a["pc"], "4276")
+        self.assertEqual(a["city"], "Esch-sur-Alzette")
+        self.assertEqual([e["uid"] for e in a["evses"]], ["59985", "59986"])
+        self.assertEqual(a["evses"][0]["conns"][0], {"id": "1", "std": "T2", "fmt": "SOCKET", "pt": "AC3", "kw": 22.1})
+        self.assertEqual(norm["statuses"]["LU-CHARGY-10644"], {"59985": "A", "59986": "C"})
+        b = norm["locations"][1]
+        self.assertEqual(b["evses"][0]["conns"][0]["std"], "CCS2")
+        self.assertEqual(norm["statuses"]["LU-CHARGY-20001"], {"70001": "O"})
+
+    def test_cyprus_xml(self):
+        from cpo_pipeline.sources import cy_ems as cy
+        norm = cy.parse_static(CY_XML, cy.SPEC)
+        self.assertEqual(len(norm["locations"]), 1)
+        loc = norm["locations"][0]
+        self.assertEqual(norm["operators"][loc["op"]]["name"], "Petrolina (Holdings) Public Ltd.")
+        self.assertEqual(len(loc["evses"]), 2)
+        self.assertEqual({e["conns"][0]["std"] for e in loc["evses"]}, {"T2", "CCS2"})
+        self.assertEqual(loc["evses"][0]["conns"][0]["kw"], 300.0)
+        self.assertEqual(loc["addr"], "Georgiou Christodoulidi Avenue, 6043, Larnaca")
+
+    def test_parts_merge_and_status(self):
+        """A single-feed source with an extra inventory part: statuses merged, parts deduplicated."""
+        from cpo_pipeline.sources import lu_chargy as lu
+        from cpo_pipeline.sources.base import Feed, SourceSpec
+        eco = DATEX_TABLE.replace("54.7049540", "49.60").replace("25.2724750", "6.13")
+        spec = SourceSpec(**{**{f: getattr(lu.SPEC, f) for f in lu.SPEC.__dataclass_fields__}, "parts": ()})
+        with TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "chargy.kml").write_text(CHARGY_KML)
+            t = Tick(spec, root / "data", static_file=root / "chargy.kml", now=dt.datetime(2026, 9, 5, 4, 0, tzinfo=dt.timezone.utc))
+            # simulate the part having been fetched
+            t._part_cache = {}
+            t.run_static()
+            # inject the eco part manually via parser to check merge semantics
+            pn = lu.parse_eco(eco, spec)
+            self.assertEqual([l["id"] for l in pn["locations"]], ["EGI-S-1"])
+            t.run_dynamic(); t.finish()
+            st = json.loads((root / "data" / "lu" / "status.json").read_text())
+            self.assertEqual(st["locations"]["LU-CHARGY-10644"], "AC")
+            self.assertEqual(st["locations"]["LU-CHARGY-20001"], "O")

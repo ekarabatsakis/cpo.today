@@ -18,6 +18,8 @@ import gzip
 import hashlib
 import json
 import logging
+import re
+import urllib.parse
 from pathlib import Path
 
 from . import __version__
@@ -98,12 +100,14 @@ class Tick:
         self._static_info = None
         self.tariff_lookup: dict = {}
         self._inventory = None
+        self._part_statuses: dict = {}
+        self._part_cache: dict = {}
 
     # -- acquisition -------------------------------------------------------
 
     def _acquire(self, kind: str, feed: Feed, local: Path | None):
         """Return (doc, source_ts, info) or (None, None, None) when unchanged."""
-        m = self.meta[kind]
+        m = self.meta.setdefault(kind, {})
         skip_unchanged = not (self.force_static and kind == "static")
         if local is not None:
             raw = local.read_bytes()
@@ -124,7 +128,19 @@ class Tick:
                 log.info("%s: identical content (sha256 match)", kind)
                 return None, None, None
             return docs, self.now, {"sha256": fp, **info}
-        res = http_get(feed.url, etag=m.get("etag") if skip_unchanged else None,
+        url = feed.url
+        if feed.discover:
+            page = http_get(feed.url, max_bytes=8 << 20, headers=feed.headers)
+            html = page.body.decode("utf-8", errors="replace").replace("&amp;", "&")
+            mt = re.search(feed.discover, html)
+            if not mt:
+                raise FetchError(f"{feed.url}: no link matching {feed.discover!r}")
+            url = urllib.parse.urljoin(feed.url, mt.group(1) if mt.groups() else mt.group(0))
+            if url != m.get("discovered_url"):
+                skip_unchanged = False       # a new file name is a new file
+            m["discovered_url"] = url
+            log.info("%s: discovered %s", kind, url)
+        res = http_get(url, etag=m.get("etag") if skip_unchanged else None,
                        last_modified=m.get("last_modified") if skip_unchanged else None,
                        max_bytes=feed.max_bytes, headers=feed.headers)
         if res.status == 304:
@@ -160,6 +176,26 @@ class Tick:
             return False
         self._static_doc, self._static_ts, self._static_info = doc, source_ts, info
         norm = spec.parse_static(doc, spec)
+        self._part_statuses = dict(norm.get("statuses") or {})
+        for k, (feed, parser) in enumerate(spec.parts):
+            try:
+                pdoc, _pts, pinfo = self._acquire(f"part{k}", feed, None)
+            except (FetchError, SourceError, ValueError) as e:
+                log.warning("part %d (%s): %s; skipped this tick", k, feed.url.split("?")[0], e)
+                self.warnings.append(f"part{k}: {e}")
+                continue
+            if pdoc is None:
+                pdoc = self._part_cache.get(k)
+                if pdoc is None:
+                    continue
+            self._part_cache[k] = pdoc
+            pn = parser(pdoc, spec)
+            ids = {l["id"] for l in norm["locations"]}
+            norm["locations"].extend(l for l in pn["locations"] if l["id"] not in ids)
+            for oid, o in pn["operators"].items():
+                norm["operators"].setdefault(oid, o)
+            norm["dropped"].extend(pn.get("dropped", []))
+            self._part_statuses.update(pn.get("statuses") or {})
         # Upstream files are not guaranteed to keep their order between generations;
         # sort so fingerprints, shards and points only change when content changes.
         norm["locations"].sort(key=lambda l: l["id"])
@@ -283,6 +319,8 @@ class Tick:
                 return False
         norm = spec.parse_dynamic(doc, spec, self.tariff_lookup) if spec.tariffs else spec.parse_dynamic(doc, spec)
         statuses = norm["statuses"]
+        for lid, ev in self._part_statuses.items():
+            statuses.setdefault(lid, {}).update(ev)
         known = {(l["id"], e["uid"]) for l in static["locations"] for e in l["evses"]}
         got = {(lid, uid) for lid, evs in statuses.items() for uid in evs}
         orphan = len(got - known)

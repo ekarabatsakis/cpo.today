@@ -24,6 +24,10 @@ class Feed:
     page_size: int = 1000              # ocpi-pages only
     max_pages: int = 200               # ocpi-pages only
     headers: dict = field(default_factory=dict)
+    # Optional discovery: fetch `url` (an HTML page), find the real download link
+    # with this regex (first group or whole match), then download that link.
+    # Used where publishers put the date in the file name.
+    discover: str | None = None
 
 
 @dataclass(frozen=True)
@@ -40,6 +44,10 @@ class SourceSpec:
     dynamic: Feed | None = None        # None: status comes from the static feed every tick
     tariffs: Feed | None = None        # optional OCPI tariffs feed, resolved via connector tariff_ids
     parse_tariffs: Callable[[Any, "SourceSpec"], dict] | None = None   # doc -> {tariff id: OCPI tariff}
+    # Additional inventory parts from other publishers in the same country, each
+    # (feed, parser) where parser(doc, spec) returns the normalised model and may
+    # carry "statuses" when that publisher also reports live status.
+    parts: tuple = ()
     refresh_minutes: int = 10
     licence: str = ""
     notes: str = ""
