@@ -368,8 +368,8 @@ class Tick:
             tariffs, conn_tariffs = prev_t.get("tariffs", []), prev_t.get("locations", {})
         else:
             self.changed |= write_json(self.store.tariffs, {
-                "country": spec.country, "ts": ts,
-                "tariffs": tariffs,
+                "country": spec.country,
+                "tariffs": dict(sorted(tariffs.items())) if isinstance(tariffs, dict) else tariffs,
                 "locations": {lid: ev for lid, ev in sorted(conn_tariffs.items())},
             })
         self.changed |= write_json(self.store.operators,

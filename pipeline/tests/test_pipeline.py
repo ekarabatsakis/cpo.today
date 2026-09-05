@@ -167,10 +167,11 @@ class NormalizeTests(unittest.TestCase):
         self.assertEqual(dyn["statuses"]["GR-OPY-S1-L"]["2"], "C")
         self.assertEqual(dyn["evse_count"], 4)
         self.assertEqual(len(dyn["tariffs"]), 1)  # de-duplicated
-        t = dyn["tariffs"][0]
+        key, t = next(iter(dyn["tariffs"].items()))
+        self.assertEqual(len(key), 8)
         self.assertEqual(t["kwh"], 0.54)
         self.assertEqual(t["cur"], "EUR")
-        self.assertEqual(dyn["connector_tariffs"]["GR-OPX-S1-L"]["1"]["10"], 0)
+        self.assertEqual(dyn["connector_tariffs"]["GR-OPX-S1-L"]["1"]["10"], key)
 
 
 class AggregateTests(unittest.TestCase):
@@ -332,8 +333,8 @@ class SingleFeedTests(unittest.TestCase):
             st = json.loads((lt_dir / "status.json").read_text())
             self.assertEqual(st["locations"]["LT-1"], "A")
             tf = json.loads((lt_dir / "tariffs.json").read_text())
-            self.assertEqual(tf["tariffs"][0]["kwh"], 0.38)
-            self.assertEqual(tf["locations"]["LT-1"]["535"]["650306"], 0)
+            key = tf["locations"]["LT-1"]["535"]["650306"]
+            self.assertEqual(tf["tariffs"][key]["kwh"], 0.38)
             locs = json.loads((lt_dir / "locations" / "00.json").read_text())
             self.assertNotIn("st", locs["locations"][0]["evses"][0], "live status must not be stored in shards")
             meta0 = json.loads((lt_dir / "meta.json").read_text())

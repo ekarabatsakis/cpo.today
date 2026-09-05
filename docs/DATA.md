@@ -91,9 +91,9 @@ Shard of a location id = first 8 hex digits of `sha1(id)` modulo `shards`, zero-
 ## `tariffs.json`
 
 ```jsonc
-{ "country": "GR", "ts": "…",
-  "tariffs": [ { "cur": "EUR", "type": "AD_HOC_PAYMENT", "kwh": 0.54, "hour": 0, "flat": 0, "park_hour": 0, "vat": 24 }, … ],
-  "locations": { "<location id>": { "<evse uid>": { "<connector id>": 0 } } } }   // index into "tariffs"
+{ "country": "GR",
+  "tariffs": { "3f9a1c2e": { "cur": "EUR", "type": "AD_HOC_PAYMENT", "kwh": 0.54, "hour": 0, "flat": 0, "park_hour": 0, "vat": 24 }, … },
+  "locations": { "<location id>": { "<evse uid>": { "<connector id>": "3f9a1c2e" } } } }   // key into "tariffs" (content hash, stable)
 ```
 
 Prices are as published by the operator (EUR). `kwh` per kWh, `hour` per hour of charging, `flat` session fee, `park_hour` per hour of parking. Where several tariffs are attached, the one with the lowest energy price is kept.

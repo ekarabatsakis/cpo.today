@@ -222,7 +222,7 @@ def operator_table(static, statuses, tariffs, connector_tariffs, ts):
             for c in e.get("conns", []):
                 r["connector_types"][c.get("std", "OTHER")] += 1
                 idx = evse_tariffs.get(c.get("id"))
-                t = tariffs[idx] if idx is not None and idx < len(tariffs) else None
+                t = tariffs.get(idx) if isinstance(tariffs, dict) else (tariffs[idx] if idx is not None and isinstance(idx, int) and idx < len(tariffs) else None)
                 if t and t.get("kwh") is not None and t["kwh"] > 0:
                     r["kwh_prices"].append(t["kwh"])
             s = loc_status.get(e["uid"], "U")

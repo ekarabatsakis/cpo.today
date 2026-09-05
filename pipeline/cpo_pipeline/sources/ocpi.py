@@ -7,6 +7,7 @@ list of raw OCPI locations into the compact model documented in docs/DATA.md.
 
 from __future__ import annotations
 
+import hashlib
 import json
 
 from ..schema import connector_code, power_type_code, status_code
@@ -204,14 +205,15 @@ def extract_dynamic(raw_locs, *, tariff_keys=("_openapiTariffs", "tariffs"), tar
 
     EVSE uids and connector ids are only guaranteed unique within a location,
     so everything is keyed location id -> evse uid (-> connector id).
-    Tariffs are de-duplicated into a list; connectors reference them by index.
+    Tariffs are de-duplicated into a map keyed by a short content hash;
+    connectors reference that key, so entries only change when a price does.
     """
     if not isinstance(raw_locs, list) or not raw_locs:
         raise SourceError("locations list missing or empty")
     statuses: dict[str, dict[str, str]] = {}
-    tariff_list: list[dict] = []
-    tariff_index: dict[str, int] = {}
-    conn_tariffs: dict[str, dict[str, dict[str, int]]] = {}
+    tariff_list: dict[str, dict] = {}          # content hash -> summary (stable across ticks)
+    tariff_index: dict[str, str] = {}
+    conn_tariffs: dict[str, dict[str, dict[str, str]]] = {}
     n = 0
     for raw in raw_locs:
         if not isinstance(raw, dict):
@@ -241,8 +243,8 @@ def extract_dynamic(raw_locs, *, tariff_keys=("_openapiTariffs", "tariffs"), tar
                 key = json.dumps(t, sort_keys=True)
                 idx = tariff_index.get(key)
                 if idx is None:
-                    idx = len(tariff_list)
-                    tariff_list.append(t)
+                    idx = hashlib.sha1(key.encode("utf-8")).hexdigest()[:8]
+                    tariff_list[idx] = t
                     tariff_index[key] = idx
                 conn_tariffs.setdefault(lid, {}).setdefault(uid, {})[_s(c.get("id"), 60) or f"#{j}"] = idx
     return {"statuses": statuses, "evse_count": n, "tariffs": tariff_list, "connector_tariffs": conn_tariffs}
