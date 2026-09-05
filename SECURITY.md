@@ -11,7 +11,7 @@ Please do not open public issues for security reports.
 ## Scope
 
 - The data pipeline (`pipeline/`) and its GitHub Actions workflows
-- The website (`site/`) and the `/data/*` edge function (`functions/`)
+- The website (`site/`) and the `/data/*` edge proxy (`worker/`)
 - The published data on the `data` branch (for example, a way to inject content into it)
 
 Out of scope: the upstream registries themselves (report those to the operating ministry), and denial of service against public CDNs.

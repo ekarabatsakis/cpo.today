@@ -1,0 +1,14 @@
+{
+  "name": "cpo-today",
+  "private": true,
+  "description": "cpo.today: live, open map of public EV charging networks from official registries",
+  "license": "MIT",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "check": "node --check worker/index.js && node --check worker/data-proxy.js && node --check site/app.js"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

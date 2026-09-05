@@ -26,4 +26,4 @@ jobs:
       - name: Site sanity (no build step, so just check the files parse)
         run: |
           node --check site/app.js
-          node --check functions/data/[[path]].js
+          node --check worker/index.js && node --check worker/data-proxy.js

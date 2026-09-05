@@ -1,5 +1,5 @@
-// Cloudflare Pages Function: serves the `data` branch of the GitHub repo from
-// cpo.today/data/* so the site stays same-origin (strict CSP, no CORS).
+// Serves the `data` branch of the GitHub repo from cpo.today/data/* so the
+// site stays same-origin (strict CSP, no CORS).
 //
 // Only a tight allow-list of paths is proxied; responses are cached at the
 // edge for 60 seconds, which is well inside the 10-minute refresh cadence.
@@ -8,8 +8,7 @@ const UPSTREAM = "https://raw.githubusercontent.com/ekarabatsakis/cpo.today/data
 const SAFE_PATH = /^[a-z0-9][a-z0-9_\-]*(?:\/[a-z0-9][a-z0-9_\-]*)*\.(?:json|jsonl)$/;
 const EDGE_TTL = 60;
 
-export async function onRequestGet({ params, request, waitUntil }) {
-  const path = Array.isArray(params.path) ? params.path.join("/") : String(params.path || "");
+export async function handleDataGet(request, ctx, path) {
   if (path.length > 120 || !SAFE_PATH.test(path)) {
     return new Response("Not found", { status: 404, headers: baseHeaders("text/plain") });
   }
@@ -38,11 +37,11 @@ export async function onRequestGet({ params, request, waitUntil }) {
   const lm = upstream.headers.get("Last-Modified");
   if (lm) headers.set("Last-Modified", lm);
   const res = new Response(upstream.body, { status: 200, headers });
-  waitUntil(cache.put(cacheKey, res.clone()));
+  ctx.waitUntil(cache.put(cacheKey, res.clone()));
   return res;
 }
 
-export async function onRequestOptions() {
+export function handleDataOptions() {
   return new Response(null, {
     status: 204,
     headers: {
@@ -54,7 +53,7 @@ export async function onRequestOptions() {
   });
 }
 
-export async function onRequest({ request }) {
+export function methodNotAllowed() {
   return new Response("Method not allowed", { status: 405, headers: { Allow: "GET, OPTIONS" } });
 }
 
