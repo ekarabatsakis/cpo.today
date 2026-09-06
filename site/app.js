@@ -847,7 +847,7 @@
     }
     if (!state.live) {
       const when = state.country && state.country.static_ts ? fmtDateTime(state.country.static_ts) : "–";
-      setFreshness("static", window.innerWidth <= 860 ? `updated ${fmtDate(state.country.static_ts)}` : `inventory updated ${when} · this registry publishes no live status`);
+      setFreshness("static", window.innerWidth <= 860 ? `Inventory / last update: ${fmtDate(state.country.static_ts)}` : `Inventory / last update: ${when} · this registry publishes no live status`);
       $("freshness").title = "This national registry publishes locations and equipment but no live availability.";
       return;
     }
@@ -856,8 +856,8 @@
     const mins = Math.max(0, Math.round(age / 60000));
     const when = fmtTime(state.status.ts);
     const narrow = window.innerWidth <= 860;
-    if (age > CONFIG.staleAfterMs) setFreshness("stale", narrow ? `Stale · ${when}` : `Registry feed stale · last status ${when} (${mins} min ago)`);
-    else setFreshness("ok", narrow ? `Live · ${when}` : `Live · status ${when} · ${mins} min ago · refreshes every 10 min`);
+    if (age > CONFIG.staleAfterMs) setFreshness("stale", narrow ? `Stale / last update: ${when}` : `Registry feed stale / last update: ${when} (${mins} min ago)`);
+    else setFreshness("ok", narrow ? `Live / last update: ${when}` : `Live / last update: ${when} · ${mins} min ago · refreshes every 10 min`);
     $("freshness").title = `Registry status timestamp ${fmtDateTime(state.status.ts)} (${TZ}); page refreshes every 5 minutes.`;
   }
 
