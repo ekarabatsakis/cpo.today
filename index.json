@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-07T20:12:56Z",
+ "generated": "2026-09-07T20:34:23Z",
  "countries": [
   {
    "code": "BE",
@@ -10,8 +10,8 @@
    "source_url": "https://transportdata.be/dataset/road-public-charging-network",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-07T20:11:52Z",
-   "dynamic_ts": "2026-09-07T20:11:52Z",
+   "static_ts": "2026-09-07T20:32:03Z",
+   "dynamic_ts": "2026-09-07T20:32:03Z",
    "locations": 3488,
    "evses": 10376
   },
@@ -24,7 +24,7 @@
    "source_url": "https://www.traffic4cyprus.org.cy/en_AU/dataset/electricvehiclecharges",
    "refresh_minutes": 1440,
    "live": false,
-   "static_ts": "2026-09-06T20:33:51Z",
+   "static_ts": "2026-09-07T20:34:23Z",
    "dynamic_ts": null,
    "locations": 171,
    "evses": 203
@@ -67,7 +67,7 @@
    "refresh_minutes": 10,
    "live": true,
    "static_ts": "2026-09-07T01:38:03Z",
-   "dynamic_ts": "2026-09-07T20:06:48Z",
+   "dynamic_ts": "2026-09-07T20:26:46Z",
    "locations": 4197,
    "evses": 9851
   },
@@ -80,8 +80,8 @@
    "source_url": "https://ev.vialietuva.lt/en/data-provision",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-07T20:11:14Z",
-   "dynamic_ts": "2026-09-07T20:11:14Z",
+   "static_ts": "2026-09-07T20:31:26Z",
+   "dynamic_ts": "2026-09-07T20:31:26Z",
    "locations": 2056,
    "evses": 5654
   },
@@ -108,8 +108,8 @@
    "source_url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-07T20:11:00Z",
-   "dynamic_ts": "2026-09-07T20:11:00Z",
+   "static_ts": "2026-09-07T20:31:00Z",
+   "dynamic_ts": "2026-09-07T20:31:00Z",
    "locations": 80266,
    "evses": 200953
   }
