@@ -1,27 +1,27 @@
 {
  "static": {
-  "sha256": "6ef2769dc757d1ffe02278febf9ce3e44ec2e5c56ff4a67a1c34cdba9a1d34fd",
+  "sha256": "b1facee3f250307d7778038907af281e9f9754cc7bf524126d18760e0053e66d",
   "etag": null,
-  "last_modified": "Mon, 07 Sep 2026 12:01:09 GMT",
-  "body_bytes": 5201790,
-  "json_bytes": 5201790,
-  "structure": "3d4fe4f74f1ee9f50b4717366985577f352592a20d0aa31215e0c22ab081ee68",
-  "fetched": "2026-09-07T12:01:06Z",
-  "source_ts": "2026-09-07T12:01:09Z",
-  "locations": 3485,
-  "evses": 10373,
+  "last_modified": "Mon, 07 Sep 2026 12:26:00 GMT",
+  "body_bytes": 5203045,
+  "json_bytes": 5203045,
+  "structure": "e91c5976afc7d35eedb085c3113b3ec961fc816b896d7f68006d4d0d8ed45951",
+  "fetched": "2026-09-07T12:25:57Z",
+  "source_ts": "2026-09-07T12:26:00Z",
+  "locations": 3486,
+  "evses": 10374,
   "dropped": 0
  },
  "dynamic": {
-  "sha256": "6ef2769dc757d1ffe02278febf9ce3e44ec2e5c56ff4a67a1c34cdba9a1d34fd",
-  "fetched": "2026-09-07T12:01:06Z",
-  "source_ts": "2026-09-07T12:01:09Z",
-  "evses": 8033,
+  "sha256": "b1facee3f250307d7778038907af281e9f9754cc7bf524126d18760e0053e66d",
+  "fetched": "2026-09-07T12:25:57Z",
+  "source_ts": "2026-09-07T12:26:00Z",
+  "evses": 8034,
   "orphan_evses": 0,
   "missing_evses": 0,
-  "changes": 783,
+  "changes": 537,
   "tariffs": 352,
-  "tariffed_connectors": 7319
+  "tariffed_connectors": 7320
  },
  "country": "BE",
  "country_name": "Belgium",
@@ -30,14 +30,14 @@
  "source_url": "https://transportdata.be/dataset/road-public-charging-network",
  "licence": "Open data (transportdata.be)",
  "pipeline_version": "0.1.0",
- "last_run": "2026-09-07T12:01:06Z",
+ "last_run": "2026-09-07T12:25:57Z",
  "warnings": [],
  "part0": {},
  "tariffs": {
-  "fetched": "2026-09-07T12:01:06Z",
-  "last_modified": "Mon, 07 Sep 2026 12:01:15 GMT",
-  "body_bytes": 5053444,
-  "json_bytes": 5053444,
+  "fetched": "2026-09-07T12:25:57Z",
+  "last_modified": "Mon, 07 Sep 2026 12:26:06 GMT",
+  "body_bytes": 5053427,
+  "json_bytes": 5053427,
   "count": 16900
  }
 }
