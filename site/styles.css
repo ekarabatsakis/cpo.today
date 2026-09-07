@@ -170,6 +170,16 @@ td.op-name { max-width: 118px; overflow: hidden; text-overflow: ellipsis; font-w
 .seg button + button { border-left: 1px solid var(--line); }
 .seg button[aria-pressed="true"] { background: var(--surface-2); color: var(--ink); font-weight: 600; }
 .trend-scope { font-size: 12px; color: var(--muted); }
+.gross { margin: 0 0 16px; padding: 10px 12px; border: 1px dashed var(--line); border-radius: 10px; background: var(--surface); }
+.gross h3 { margin: 0 0 8px; font-size: 13px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+.gross-sub { font-weight: 400; font-size: 11.5px; color: var(--muted); }
+.gross-figs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.gross-fig strong { display: block; font-size: 20px; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+.gross-fig span { font-size: 11.5px; color: var(--muted); }
+.gross-table td, .gross-table th { font-variant-numeric: tabular-nums; }
+.gross-table tr.active td { font-weight: 600; }
+.gross .hint { margin-top: 8px; }
+body.no-live .gross { display: none; }
 .chart { margin: 0 0 14px; background: var(--surface); }
 .chart figcaption { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 4px; }
 .chart-title { font-weight: 600; font-size: 13px; white-space: nowrap; }

@@ -238,6 +238,10 @@ class AggregateTests(unittest.TestCase):
         summ = aggregate.tick_summary(static, {"GR-OPX-S1-L": {"1": "A", "2": "C"}}, "t")
         self.assertEqual(summ["n"], {"A": 1, "C": 1})
         self.assertEqual(summ["kwc"], 50)
+        self.assertEqual(summ["kwd"], 50)          # the charging EVSE is the DC one
+        self.assertEqual(summ["ops"]["OPX"]["kwd"], 50)
+        summ = aggregate.tick_summary(static, {"GR-OPX-S1-L": {"1": "C", "2": "A"}}, "t")
+        self.assertEqual((summ["kwc"], summ["kwd"]), (22, 0))
 
 
 class TickTests(unittest.TestCase):

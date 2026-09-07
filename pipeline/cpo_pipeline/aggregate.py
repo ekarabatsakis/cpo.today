@@ -109,9 +109,10 @@ def tick_summary(static, statuses, ts):
     """One history line: national + per-operator status counts and charging power."""
     nat = _empty_status()
     nat_kw = 0.0
+    nat_kw_dc = 0.0
     ops = {}
     for loc in static["locations"]:
-        op = ops.setdefault(loc["op"], {"s": _empty_status(), "kwc": 0.0})
+        op = ops.setdefault(loc["op"], {"s": _empty_status(), "kwc": 0.0, "kwd": 0.0})
         loc_status = statuses.get(loc["id"], {})
         for e in loc["evses"]:
             s = loc_status.get(e["uid"], "U")
@@ -121,12 +122,18 @@ def tick_summary(static, statuses, ts):
                 kw = evse_max_kw(e) or 0
                 nat_kw += kw
                 op["kwc"] += kw
+                if evse_is_dc(e):
+                    nat_kw_dc += kw
+                    op["kwd"] += kw
+    # kwc: max kW of every EVSE in charging status; kwd: the DC part of it.
+    # Integrated over time this bounds the energy an operator could have sold.
     return {
         "ts": ts,
         "n": {k: v for k, v in nat.items() if v},
         "kwc": round(nat_kw),
+        "kwd": round(nat_kw_dc),
         "ops": {
-            k: {"s": {sk: sv for sk, sv in v["s"].items() if sv}, "kwc": round(v["kwc"])}
+            k: {"s": {sk: sv for sk, sv in v["s"].items() if sv}, "kwc": round(v["kwc"]), "kwd": round(v["kwd"])}
             for k, v in sorted(ops.items())
         },
     }

@@ -163,7 +163,7 @@
           <tbody></tbody>
         </table>
       </div>
-      <p class="hint">Click an operator to focus the map on its network. Percentages exclude points reporting an unknown status.</p>
+      <p class="hint">Click an operator to focus the map on its network. Percentages exclude points reporting an unknown status. Estimated daily sales volume per operator is under Trends.</p>
     </section>
 
     <section class="view" id="view-trends" role="tabpanel" aria-labelledby="tab-trends" hidden>
@@ -175,6 +175,20 @@
         </div>
         <span class="trend-scope" id="trend-scope">National</span>
       </div>
+      <section class="gross" id="gross" hidden aria-labelledby="gross-title">
+        <h3 id="gross-title">Gross charging value <span class="gross-sub" id="gross-scope">last 24 h · national</span></h3>
+        <div class="gross-figs">
+          <div class="gross-fig"><strong id="gross-kwh">–</strong><span>~kWh/day ± that could have been sold</span></div>
+          <div class="gross-fig"><strong id="gross-eur">–</strong><span id="gross-eur-sub">~€/day ± at published median prices</span></div>
+        </div>
+        <div class="table-wrap">
+          <table class="ops gross-table" id="gross-table">
+            <thead><tr><th scope="col">Operator</th><th scope="col" class="num">~kWh/day ±</th><th scope="col" class="num">~€/day ±</th><th scope="col" class="num" title="Share of the estimated kWh on DC points">DC share</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p class="hint" id="gross-note">Estimate: max kW of every point × time it reported charging over the last 24 h, then × the operator's median AC and DC price. An upper bound, not a meter reading: real energy sold is lower. See About.</p>
+      </section>
       <figure class="chart" id="chart-charging">
         <figcaption><span class="chart-title">Charge points in use</span><span class="chart-sub">count, every 10 minutes</span></figcaption>
         <div class="chart-body"></div>
@@ -250,6 +264,8 @@
     <p>We collect this data every 10 minutes for statistical and analytical purposes only. We do not verify, correct or edit it. If a location, status, price or any other detail is wrong, the error is in what the operator reported to the registry: please contact the operator or the responsible authority directly. cpo.today accepts no responsibility for the accuracy, completeness or timeliness of registry data, or for decisions taken on the basis of it.</p>
     <h3>Prices</h3>
     <p>Prices are the ad-hoc tariffs operators publish in the registry, in the registry's currency. The per-kWh figure is the energy component of the tariff attached to each connector; an operator's "AC €/kWh" and "DC €/kWh" in the table are the medians across its priced AC and DC connectors, kept apart because most operators price DC charging higher than AC. Hover a price to see how many connectors it rests on. Session fees, time-based and parking components are shown on the location card when published. Many connectors publish no tariff at all.</p>
+    <h3>Gross charging value (~ ±)</h3>
+    <p>For live countries the site estimates what each operator could have sold over the last 24 hours. Every 10 minutes the registry tells us which charge points are charging; we take each charging point's maximum rated power, multiply by the time it stayed in that state, and add it up. That is the gross charging value in kWh. Multiplying the AC and DC parts by the operator's median AC and DC price gives the gross value in EUR. Both are upper-bound estimates, not meter readings: a car arriving at 60% state of charge, a vehicle limited to 11 kW on a 22 kW socket, or a shared power cabinet all deliver less than the rated power. Where an operator publishes no price, the EUR figure is left blank. The ~ and ± are there to make the uncertainty visible.</p>
     <h3>Questions</h3>
     <p>For any question, correction request about this site, or data partnership, email <a href="mailto:ask@cpo.today">ask@cpo.today</a>.</p>
     <p class="about-small">Base map: OpenFreeMap, © OpenStreetMap contributors. Charge point data comes only from the official registries.</p>

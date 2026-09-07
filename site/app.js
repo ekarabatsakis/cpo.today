@@ -285,6 +285,7 @@
       r.median_kwh_dc = po.median_kwh_dc != null ? po.median_kwh_dc : null;
       r.priced_ac = po.priced_ac || 0;
       r.priced_dc = po.priced_dc || 0;
+
       out.push(r);
     }
     return out;
@@ -326,6 +327,7 @@
         td.title = price != null ? `Median of ${fmtInt(n)} priced ${kind} connector${n === 1 ? "" : "s"}` : `No ${kind} tariff published`;
         tr.append(td);
       }
+
       tr.addEventListener("click", () => {
         $("f-operator").value = state.filters.op === r.id ? "" : r.id;
         state.filters.op = $("f-operator").value;
@@ -338,6 +340,99 @@
       const b = th.querySelector("button");
       th.classList.toggle("sorted", b && b.dataset.sort === key);
       th.classList.toggle("asc", b && b.dataset.sort === key && dir === 1);
+    }
+  }
+
+  // ------------------------------------------------- gross charging value ----
+  // Upper-bound estimate of energy that could have been sold over the last
+  // `hours`: each tick's charging capacity (max kW of every EVSE reporting
+  // "charging") held until the next tick. Gaps longer than 30 minutes are not
+  // counted as charging. Scaled to a full window when coverage is partial.
+  const GROSS_HOURS = 24;
+  const MAX_GAP_H = 0.5;
+  function grossValues() {
+    const cutoff = Date.now() - GROSS_HOURS * 3600000;
+    const ticks = state.history.filter((t) => Date.parse(t.ts) >= cutoff);
+    const acc = { "": { kwh: 0, dc: 0, split: true } };
+    let covered = 0;
+    for (let i = 0; i + 1 < ticks.length; i++) {
+      const dt = Math.min(MAX_GAP_H, (Date.parse(ticks[i + 1].ts) - Date.parse(ticks[i].ts)) / 3600000);
+      if (!(dt > 0)) continue;
+      covered += dt;
+      const t = ticks[i];
+      const add = (key, src) => {
+        if (!src) return;
+        const a = acc[key] || (acc[key] = { kwh: 0, dc: 0, split: true });
+        a.kwh += (src.kwc || 0) * dt;
+        if (src.kwd == null) a.split = false; else a.dc += src.kwd * dt;
+      };
+      add("", { kwc: t.kwc, kwd: t.kwd });
+      for (const op in t.ops || {}) add(op, t.ops[op]);
+    }
+    if (covered < GROSS_HOURS * 0.25) return { covered: 0, byOp: {} };
+    const scale = GROSS_HOURS / Math.min(GROSS_HOURS, covered);
+    const priceOf = {};
+    if (state.opTable) for (const o of state.opTable.operators) priceOf[o.id] = o;
+    const byOp = {};
+    for (const key in acc) {
+      const a = acc[key];
+      const kwh = a.kwh * scale, dc = a.split ? a.dc * scale : null;
+      let eur = null;
+      if (key) {
+        const p = priceOf[key] || {};
+        const ac = p.median_kwh_ac != null ? p.median_kwh_ac : p.median_kwh_price;
+        const dcp = p.median_kwh_dc != null ? p.median_kwh_dc : p.median_kwh_price;
+        if (dc != null && ac != null && dcp != null) eur = (kwh - dc) * ac + dc * dcp;
+        else if (p.median_kwh_price != null) eur = kwh * p.median_kwh_price;
+        else if (ac != null || dcp != null) eur = kwh * (ac != null ? ac : dcp);
+      }
+      byOp[key] = { kwh, dc, eur };
+    }
+    // National EUR: sum of operators that have a price, kWh of those operators for the tooltip.
+    let eur = 0, pricedKwh = 0;
+    for (const key in byOp) if (key && byOp[key].eur != null) { eur += byOp[key].eur; pricedKwh += byOp[key].kwh; }
+    byOp[""].eur = pricedKwh > 0 ? eur : null;
+    byOp[""].pricedKwh = pricedKwh;
+    return { covered: Math.min(GROSS_HOURS, covered), byOp };
+  }
+  const fmtEnergy = (v) => v == null ? "–" : v >= 100000 ? `${(v / 1000).toFixed(v >= 1e6 ? 0 : 1)} MWh` : `${fmtInt(Math.round(v))} kWh`;
+  const fmtEst = (v, unit) => v == null ? "–" : `~${unit === "€" ? `€${fmtInt(Math.round(v))}` : fmtEnergy(v)} ±`;
+
+  function renderGross() {
+    const box = $("gross");
+    if (!state.live) { box.hidden = true; return; }
+    const g = grossValues();
+    const key = state.filters.op || "";
+    const v = g.byOp[key];
+    if (!v) { box.hidden = true; return; }
+    box.hidden = false;
+    const who = state.filters.op ? ((state.operators[state.filters.op] || {}).name || state.filters.op) : "national";
+    const cov = g.covered < GROSS_HOURS - 0.5 ? ` · ${g.covered.toFixed(1)} h of history, scaled to 24 h` : "";
+    $("gross-scope").textContent = `last 24 h · ${who}${cov}`;
+    $("gross-kwh").textContent = fmtEst(v.kwh, "kWh");
+    $("gross-kwh").title = `≈ ${fmtInt(Math.round(v.kwh))} kWh`;
+    $("gross-eur").textContent = v.eur != null ? fmtEst(v.eur, "€") : "–";
+    $("gross-eur-sub").textContent = v.eur == null ? "no published price" : (!state.filters.op && v.pricedKwh < v.kwh * 0.98)
+      ? `~€/day ± at published median prices (operators with a price, ${fmtPct(100 * v.pricedKwh / v.kwh)} of the kWh)` : "~€/day ± at published median AC and DC prices";
+    const rows = Object.keys(g.byOp).filter((k) => k && g.byOp[k].kwh > 0).map((k) => ({ id: k, name: (state.operators[k] || {}).name || k, ...g.byOp[k] }));
+    rows.sort((a, b) => b.kwh - a.kwh);
+    const tbody = $("gross-table").querySelector("tbody");
+    tbody.replaceChildren();
+    for (const r of rows) {
+      const tr = el("tr");
+      tr.dataset.op = r.id;
+      if (state.filters.op === r.id) tr.classList.add("active");
+      const name = el("td", "op-name", r.name); name.title = `${r.name} (${r.id})`;
+      const kwh = el("td", "num", fmtEst(r.kwh, "kWh")); kwh.title = `≈ ${fmtInt(Math.round(r.kwh))} kWh that could have been sold in the last 24 h`;
+      const eur = el("td", "num", r.eur != null ? fmtEst(r.eur, "€") : "–"); eur.title = r.eur != null ? "Estimated kWh × this operator's median AC and DC price" : "No published price for this operator";
+      tr.append(name, kwh, eur, el("td", "num", r.dc != null && r.kwh > 0 ? fmtPct(100 * r.dc / r.kwh) : "–"));
+      tr.addEventListener("click", () => {
+        $("f-operator").value = state.filters.op === r.id ? "" : r.id;
+        state.filters.op = $("f-operator").value;
+        applyFilters();
+        if (state.filters.op) fitFiltered();
+      });
+      tbody.append(tr);
     }
   }
 
@@ -368,6 +463,7 @@
   function renderTrends() {
     const pts = trendSeries();
     $("trend-scope").textContent = state.filters.op ? `${(state.operators[state.filters.op] || {}).name || state.filters.op}` : "National";
+    renderGross();
     drawChart($("chart-charging"), pts, "charging", { color: "var(--st-c)", fmt: fmtInt });
     drawChart($("chart-kw"), pts, "kw", { color: "var(--accent)", fmt: fmtKw });
     drawChart($("chart-down"), pts, "down", { color: "var(--st-d)", fmt: fmtInt });

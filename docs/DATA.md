@@ -101,11 +101,11 @@ Prices are as published by the operator (EUR). `kwh` per kWh, `hour` per hour of
 ## `history/YYYY-MM-DD.jsonl`
 
 ```jsonc
-{ "ts": "…", "n": { "A": 8480, "C": 441, "O": 293, … }, "kwc": 11866,
-  "ops": { "PPC": { "s": { "A": 3312, "C": 120, … }, "kwc": 3774 }, … } }
+{ "ts": "…", "n": { "A": 8480, "C": 441, "O": 293, … }, "kwc": 11866, "kwd": 9800,
+  "ops": { "PPC": { "s": { "A": 3312, "C": 120, … }, "kwc": 3774, "kwd": 3000 }, … } }
 ```
 
-`kwc` is the sum of the maximum connector power of EVSEs currently charging (an upper bound on instantaneous load).
+`kwc` is the sum of the maximum connector power of EVSEs currently charging (an upper bound on instantaneous load); `kwd` is the DC part of it. Integrating `kwc` over the ticks of a day gives the *gross charging value* shown on the site: the energy an operator could at most have sold that day if every charging point drew its full rated power the whole time. Real energy delivered is lower (state of charge, vehicle limits, shared power cabinets), so treat it as a relative indicator, not a meter reading. Multiplied by the operator's median AC and DC prices it gives the gross value in EUR.
 
 ## `events/YYYY-MM-DD.jsonl`
 
