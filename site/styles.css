@@ -175,7 +175,8 @@ td.op-name { max-width: 118px; overflow: hidden; text-overflow: ellipsis; font-w
 .gross-sub { font-weight: 400; font-size: 11.5px; color: var(--muted); }
 .gross-figs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
 .gross-fig strong { display: block; font-size: 20px; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
-.gross-fig span { font-size: 11.5px; color: var(--muted); }
+.gross-fig span { display: block; font-size: 11.5px; color: var(--muted); }
+.gross-max { font-size: 11px; }
 .gross-table td, .gross-table th { font-variant-numeric: tabular-nums; }
 .gross-table tr.active td { font-weight: 600; }
 .gross .hint { margin-top: 8px; }

@@ -101,11 +101,13 @@ Prices are as published by the operator (EUR). `kwh` per kWh, `hour` per hour of
 ## `history/YYYY-MM-DD.jsonl`
 
 ```jsonc
-{ "ts": "…", "n": { "A": 8480, "C": 441, "O": 293, … }, "kwc": 11866, "kwd": 9800,
-  "ops": { "PPC": { "s": { "A": 3312, "C": 120, … }, "kwc": 3774, "kwd": 3000 }, … } }
+{ "ts": "…", "n": { "A": 8480, "C": 441, "O": 293, … }, "kwc": 11866, "kwd": 9800, "cc": { "a22": 300, "d50": 40, "d150": 25, "dx": 10 },
+  "ops": { "PPC": { "s": { "A": 3312, "C": 120, … }, "kwc": 3774, "kwd": 3000, "cc": { … } }, … } }
 ```
 
-`kwc` is the sum of the maximum connector power of EVSEs currently charging (an upper bound on instantaneous load); `kwd` is the DC part of it. Integrating `kwc` over the ticks of a day gives the *gross charging value* shown on the site: the energy an operator could at most have sold that day if every charging point drew its full rated power the whole time. Real energy delivered is lower (state of charge, vehicle limits, shared power cabinets), so treat it as a relative indicator, not a meter reading. Multiplied by the operator's median AC and DC prices it gives the gross value in EUR.
+`kwc` is the sum of the maximum connector power of EVSEs currently charging (an upper bound on instantaneous load); `kwd` is the DC part of it. `cc` counts the charging EVSEs by bucket: `a7` AC below 11 kW, `a11` AC 11–21 kW, `a22` AC 22 kW and above, `d50` DC below 75 kW, `d150` DC 75–149 kW, `dx` DC 150 kW and above.
+
+The site's *gross charging value* integrates `cc` over the last 24 hours with a typical delivered power per bucket (a7 2 kW, a11 3 kW, a22 3 kW, d50 25 kW, d150 45 kW, dx 65 kW): a charging point in the registry is "charging" for the whole time a car is plugged in, while the car draws its rated power only briefly and is often limited by its own on-board charger. The model is an estimate, shown with ~ and ±, and a range of 0.6× to 1.5× the central value. Integrating `kwc` gives the theoretical maximum at rated power, shown alongside as an upper bound. Multiplying the AC and DC parts by the operator's median AC and DC prices gives the gross value in EUR.
 
 ## `events/YYYY-MM-DD.jsonl`
 

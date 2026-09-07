@@ -105,14 +105,32 @@ def evse_is_dc(evse):
     return any(c.get("pt") == "DC" for c in evse.get("conns", []))
 
 
+# Buckets of charging EVSEs recorded in each history tick, by current type and
+# rated power. The site turns them into energy with typical delivered power per
+# bucket; keeping counts (not a modelled kW) lets that model change later
+# without losing history.
+CHARGE_BUCKETS = (("a7", False, 11), ("a11", False, 22), ("a22", False, None),
+                  ("d50", True, 75), ("d150", True, 150), ("dx", True, None))
+
+
+def charge_bucket(evse):
+    kw = evse_max_kw(evse) or 0
+    dc = evse_is_dc(evse)
+    for name, is_dc, hi in CHARGE_BUCKETS:
+        if is_dc == dc and (hi is None or kw < hi):
+            return name
+    return "dx" if dc else "a22"
+
+
 def tick_summary(static, statuses, ts):
     """One history line: national + per-operator status counts and charging power."""
     nat = _empty_status()
     nat_kw = 0.0
     nat_kw_dc = 0.0
+    nat_cc = Counter()
     ops = {}
     for loc in static["locations"]:
-        op = ops.setdefault(loc["op"], {"s": _empty_status(), "kwc": 0.0, "kwd": 0.0})
+        op = ops.setdefault(loc["op"], {"s": _empty_status(), "kwc": 0.0, "kwd": 0.0, "cc": Counter()})
         loc_status = statuses.get(loc["id"], {})
         for e in loc["evses"]:
             s = loc_status.get(e["uid"], "U")
@@ -125,15 +143,20 @@ def tick_summary(static, statuses, ts):
                 if evse_is_dc(e):
                     nat_kw_dc += kw
                     op["kwd"] += kw
-    # kwc: max kW of every EVSE in charging status; kwd: the DC part of it.
-    # Integrated over time this bounds the energy an operator could have sold.
+                b = charge_bucket(e)
+                nat_cc[b] += 1
+                op["cc"][b] += 1
+    # kwc: max kW of every EVSE in charging status; kwd: the DC part of it;
+    # cc: charging EVSEs by bucket. Integrated over time, kwc bounds the energy
+    # an operator could have sold and cc gives a realistic estimate of it.
     return {
         "ts": ts,
         "n": {k: v for k, v in nat.items() if v},
         "kwc": round(nat_kw),
         "kwd": round(nat_kw_dc),
+        "cc": dict(nat_cc),
         "ops": {
-            k: {"s": {sk: sv for sk, sv in v["s"].items() if sv}, "kwc": round(v["kwc"]), "kwd": round(v["kwd"])}
+            k: {"s": {sk: sv for sk, sv in v["s"].items() if sv}, "kwc": round(v["kwc"]), "kwd": round(v["kwd"]), "cc": dict(v["cc"])}
             for k, v in sorted(ops.items())
         },
     }

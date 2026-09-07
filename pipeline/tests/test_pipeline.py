@@ -240,6 +240,11 @@ class AggregateTests(unittest.TestCase):
         self.assertEqual(summ["kwc"], 50)
         self.assertEqual(summ["kwd"], 50)          # the charging EVSE is the DC one
         self.assertEqual(summ["ops"]["OPX"]["kwd"], 50)
+        self.assertEqual(summ["cc"], {"d50": 1})
+        self.assertEqual(aggregate.charge_bucket({"conns": [{"pt": "AC3", "kw": 22}]}), "a22")
+        self.assertEqual(aggregate.charge_bucket({"conns": [{"pt": "AC1", "kw": 7.4}]}), "a7")
+        self.assertEqual(aggregate.charge_bucket({"conns": [{"pt": "DC", "kw": 300}]}), "dx")
+        self.assertEqual(aggregate.charge_bucket({"conns": [{"pt": "DC", "kw": 120}]}), "d150")
         summ = aggregate.tick_summary(static, {"GR-OPX-S1-L": {"1": "C", "2": "A"}}, "t")
         self.assertEqual((summ["kwc"], summ["kwd"]), (22, 0))
 

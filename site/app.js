@@ -344,30 +344,49 @@
   }
 
   // ------------------------------------------------- gross charging value ----
-  // Upper-bound estimate of energy that could have been sold over the last
-  // `hours`: each tick's charging capacity (max kW of every EVSE reporting
-  // "charging") held until the next tick. Gaps longer than 30 minutes are not
-  // counted as charging. Scaled to a full window when coverage is partial.
+  // Estimate of the energy that could have been sold over the last `hours`.
+  // Each tick counts the charging EVSEs by bucket (cc); a bucket's typical
+  // delivered power (EFF_KW) is held until the next tick. "Charging" in a
+  // registry lasts as long as a car is plugged in, while the car draws its
+  // rated power only briefly, so the typical values sit well below rated.
+  // Ticks without cc (older history) are derated from rated kW instead.
+  // The rated-power integral is kept as a theoretical upper bound.
   const GROSS_HOURS = 24;
   const MAX_GAP_H = 0.5;
+  const EFF_KW = { a7: 2, a11: 3, a22: 3, d50: 25, d150: 45, dx: 65 };
+  const DC_BUCKETS = new Set(["d50", "d150", "dx"]);
+  const DERATE = { ac: 0.14, dc: 0.4, mixed: 0.22 };
+  const RANGE = [0.6, 1.5];
+  function effectiveKw(src) {
+    if (src.cc) {
+      let ac = 0, dc = 0;
+      for (const b in src.cc) { const kw = (EFF_KW[b] || 0) * src.cc[b]; if (DC_BUCKETS.has(b)) dc += kw; else ac += kw; }
+      return { ac, dc, split: true };
+    }
+    if (src.kwd != null) return { ac: (src.kwc - src.kwd) * DERATE.ac, dc: src.kwd * DERATE.dc, split: true };
+    return { ac: (src.kwc || 0) * DERATE.mixed, dc: 0, split: false };
+  }
   function grossValues() {
     const cutoff = Date.now() - GROSS_HOURS * 3600000;
     const ticks = state.history.filter((t) => Date.parse(t.ts) >= cutoff);
-    const acc = { "": { kwh: 0, dc: 0, split: true } };
+    const acc = {};
     let covered = 0;
+    const bump = (key, src, dt) => {
+      if (!src) return;
+      const a = acc[key] || (acc[key] = { kwh: 0, dc: 0, rated: 0, split: true });
+      const e = effectiveKw(src);
+      a.kwh += (e.ac + e.dc) * dt;
+      a.dc += e.dc * dt;
+      if (!e.split) a.split = false;
+      a.rated += (src.kwc || 0) * dt;
+    };
     for (let i = 0; i + 1 < ticks.length; i++) {
       const dt = Math.min(MAX_GAP_H, (Date.parse(ticks[i + 1].ts) - Date.parse(ticks[i].ts)) / 3600000);
       if (!(dt > 0)) continue;
       covered += dt;
       const t = ticks[i];
-      const add = (key, src) => {
-        if (!src) return;
-        const a = acc[key] || (acc[key] = { kwh: 0, dc: 0, split: true });
-        a.kwh += (src.kwc || 0) * dt;
-        if (src.kwd == null) a.split = false; else a.dc += src.kwd * dt;
-      };
-      add("", { kwc: t.kwc, kwd: t.kwd });
-      for (const op in t.ops || {}) add(op, t.ops[op]);
+      bump("", t, dt);
+      for (const op in t.ops || {}) bump(op, t.ops[op], dt);
     }
     if (covered < GROSS_HOURS * 0.25) return { covered: 0, byOp: {} };
     const scale = GROSS_HOURS / Math.min(GROSS_HOURS, covered);
@@ -376,7 +395,7 @@
     const byOp = {};
     for (const key in acc) {
       const a = acc[key];
-      const kwh = a.kwh * scale, dc = a.split ? a.dc * scale : null;
+      const kwh = a.kwh * scale, dc = a.split ? a.dc * scale : null, rated = a.rated * scale;
       let eur = null;
       if (key) {
         const p = priceOf[key] || {};
@@ -386,9 +405,10 @@
         else if (p.median_kwh_price != null) eur = kwh * p.median_kwh_price;
         else if (ac != null || dcp != null) eur = kwh * (ac != null ? ac : dcp);
       }
-      byOp[key] = { kwh, dc, eur };
+      byOp[key] = { kwh, dc, rated, eur };
     }
-    // National EUR: sum of operators that have a price, kWh of those operators for the tooltip.
+    if (!byOp[""]) return { covered: 0, byOp: {} };
+    // National EUR: sum of operators that have a price, with the kWh they cover.
     let eur = 0, pricedKwh = 0;
     for (const key in byOp) if (key && byOp[key].eur != null) { eur += byOp[key].eur; pricedKwh += byOp[key].kwh; }
     byOp[""].eur = pricedKwh > 0 ? eur : null;
@@ -396,6 +416,7 @@
     return { covered: Math.min(GROSS_HOURS, covered), byOp };
   }
   const fmtEnergy = (v) => v == null ? "–" : v >= 100000 ? `${(v / 1000).toFixed(v >= 1e6 ? 0 : 1)} MWh` : `${fmtInt(Math.round(v))} kWh`;
+  const fmtRange = (lo, hi) => hi >= 100000 ? `${(lo / 1000).toFixed(1)}–${(hi / 1000).toFixed(1)} MWh` : `${fmtInt(Math.round(lo))}–${fmtInt(Math.round(hi))} kWh`;
   const fmtEst = (v, unit) => v == null ? "–" : `~${unit === "€" ? `€${fmtInt(Math.round(v))}` : fmtEnergy(v)} ±`;
 
   function renderGross() {
@@ -410,8 +431,10 @@
     const cov = g.covered < GROSS_HOURS - 0.5 ? ` · ${g.covered.toFixed(1)} h of history, scaled to 24 h` : "";
     $("gross-scope").textContent = `last 24 h · ${who}${cov}`;
     $("gross-kwh").textContent = fmtEst(v.kwh, "kWh");
-    $("gross-kwh").title = `≈ ${fmtInt(Math.round(v.kwh))} kWh`;
+    $("gross-kwh").title = `Likely range ${fmtRange(v.kwh * RANGE[0], v.kwh * RANGE[1])}. Theoretical maximum at rated power: ${fmtEnergy(v.rated)}.`;
+    $("gross-max").textContent = `likely ${fmtRange(v.kwh * RANGE[0], v.kwh * RANGE[1])} · ceiling at rated power ${fmtEnergy(v.rated)}`;
     $("gross-eur").textContent = v.eur != null ? fmtEst(v.eur, "€") : "–";
+    $("gross-eur").title = v.eur != null ? `Likely range €${fmtInt(Math.round(v.eur * RANGE[0]))} to €${fmtInt(Math.round(v.eur * RANGE[1]))}` : "";
     $("gross-eur-sub").textContent = v.eur == null ? "no published price" : (!state.filters.op && v.pricedKwh < v.kwh * 0.98)
       ? `~€/day ± at published median prices (operators with a price, ${fmtPct(100 * v.pricedKwh / v.kwh)} of the kWh)` : "~€/day ± at published median AC and DC prices";
     const rows = Object.keys(g.byOp).filter((k) => k && g.byOp[k].kwh > 0).map((k) => ({ id: k, name: (state.operators[k] || {}).name || k, ...g.byOp[k] }));
@@ -423,8 +446,8 @@
       tr.dataset.op = r.id;
       if (state.filters.op === r.id) tr.classList.add("active");
       const name = el("td", "op-name", r.name); name.title = `${r.name} (${r.id})`;
-      const kwh = el("td", "num", fmtEst(r.kwh, "kWh")); kwh.title = `≈ ${fmtInt(Math.round(r.kwh))} kWh that could have been sold in the last 24 h`;
-      const eur = el("td", "num", r.eur != null ? fmtEst(r.eur, "€") : "–"); eur.title = r.eur != null ? "Estimated kWh × this operator's median AC and DC price" : "No published price for this operator";
+      const kwh = el("td", "num", fmtEst(r.kwh, "kWh")); kwh.title = `Likely ${fmtRange(r.kwh * RANGE[0], r.kwh * RANGE[1])} sold in the last 24 h; at most ${fmtEnergy(r.rated)} at rated power`;
+      const eur = el("td", "num", r.eur != null ? fmtEst(r.eur, "€") : "–"); eur.title = r.eur != null ? `Likely €${fmtInt(Math.round(r.eur * RANGE[0]))} to €${fmtInt(Math.round(r.eur * RANGE[1]))}, at this operator's median AC and DC price` : "No published price for this operator";
       tr.append(name, kwh, eur, el("td", "num", r.dc != null && r.kwh > 0 ? fmtPct(100 * r.dc / r.kwh) : "–"));
       tr.addEventListener("click", () => {
         $("f-operator").value = state.filters.op === r.id ? "" : r.id;
@@ -711,9 +734,10 @@
     // typing in the search box does not re-cluster 80k points on every key.
     clearTimeout(state._mapTimer);
     state._mapTimer = setTimeout(() => {
-      if (state._featStamp !== state.status.ts) {
+      const stamp = state.status && state.status.ts ? state.status.ts : "none";
+      if (state._featStamp !== stamp) {
         for (const l of state.points) l.feat = { type: "Feature", geometry: { type: "Point", coordinates: [l.lon, l.lat] }, properties: { id: l.id, st: l.st } };
-        state._featStamp = state.status.ts;
+        state._featStamp = stamp;
       }
       const features = state.filtered.length === state.points.length ? state.points.map((l) => l.feat) : state.filtered.map((l) => l.feat);
       map.getSource("locations").setData({ type: "FeatureCollection", features });
