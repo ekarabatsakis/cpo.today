@@ -1,29 +1,29 @@
 {
  "static": {
-  "sha256": "b5575477162ac980df6ba582597fc3b22700077ef1a629485d81e43859015475",
+  "sha256": "1cb7af9459bacaeb3d8fbad5dca4985e57c08d4c188095a8dc23ac7060435358",
   "pages": 1,
-  "body_bytes": 4282547,
+  "body_bytes": 4282538,
   "total_count": 3236,
-  "structure": "d4f85048848d57b08030e59625b354fea972779b3f7880c1a5eda776d76d1b41",
-  "fetched": "2026-09-09T10:24:03Z",
-  "source_ts": "2026-09-09T10:24:03Z",
+  "structure": "47c19a9c03134e0a028aa3fbdefe3f47f937d3d6b887603b78b4d7045e120a77",
+  "fetched": "2026-09-09T10:41:54Z",
+  "source_ts": "2026-09-09T10:41:54Z",
   "locations": 2023,
   "evses": 5612,
   "dropped": 0
  },
  "dynamic": {
-  "sha256": "b5575477162ac980df6ba582597fc3b22700077ef1a629485d81e43859015475",
-  "fetched": "2026-09-09T10:24:03Z",
-  "source_ts": "2026-09-09T10:24:03Z",
+  "sha256": "1cb7af9459bacaeb3d8fbad5dca4985e57c08d4c188095a8dc23ac7060435358",
+  "fetched": "2026-09-09T10:41:54Z",
+  "source_ts": "2026-09-09T10:41:54Z",
   "evses": 5612,
   "orphan_evses": 0,
   "missing_evses": 0,
-  "changes": 128,
+  "changes": 95,
   "tariffs": 107,
   "tariffed_connectors": 5585
  },
  "tariffs": {
-  "fetched": "2026-09-09T10:24:03Z",
+  "fetched": "2026-09-09T10:41:54Z",
   "last_modified": null,
   "body_bytes": 1577408,
   "json_bytes": 1577408,
@@ -36,6 +36,6 @@
  "source_url": "https://ev.vialietuva.lt/en/data-provision",
  "licence": "Open data of Via Lietuva (Lithuanian Road Administration)",
  "pipeline_version": "0.1.0",
- "last_run": "2026-09-09T10:24:03Z",
+ "last_run": "2026-09-09T10:41:54Z",
  "warnings": []
 }
