@@ -30,8 +30,11 @@
  "source_url": "https://transportdata.be/dataset/road-public-charging-network",
  "licence": "Open data (transportdata.be)",
  "pipeline_version": "0.1.0",
- "last_run": "2026-09-10T17:31:21Z",
- "warnings": [],
+ "last_run": "2026-09-10T17:47:44Z",
+ "warnings": [
+  "run_static: https://roaming.road.io/files/9ef09c78-2666-418a-aa45-4f2261e2e305/locations.json?force=true: HTTP 502",
+  "tariffs: https://roaming.road.io/files/9ef09c78-2666-418a-aa45-4f2261e2e305/tariffs.json?force=true: HTTP 502"
+ ],
  "part0": {},
  "tariffs": {
   "fetched": "2026-09-10T17:31:21Z",
