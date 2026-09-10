@@ -1,27 +1,27 @@
 {
  "static": {
-  "sha256": "ec044caa84c2c36664e30acbdc5202064dacaa23dc193de8f7da28f22c664f08",
+  "sha256": "cb68315fb666ecb7e0a20a1ee25642d2c77fb3bb98cad093f0e0da2a28455428",
   "etag": null,
-  "last_modified": "Thu, 10 Sep 2026 08:01:05 GMT",
-  "body_bytes": 5221220,
-  "json_bytes": 5221220,
-  "structure": "6f6eb26d7e1566a753bfc08989c0c1e11f409a6c5bc3a4038a840db802155f7b",
-  "fetched": "2026-09-10T08:01:02Z",
-  "source_ts": "2026-09-10T08:01:05Z",
-  "locations": 3496,
-  "evses": 10398,
+  "last_modified": "Thu, 10 Sep 2026 08:21:51 GMT",
+  "body_bytes": 5223436,
+  "json_bytes": 5223436,
+  "structure": "c1a72af31762e03068a8f511f369c58f99fa83f375a9d01283a9917cbb60d84d",
+  "fetched": "2026-09-10T08:21:49Z",
+  "source_ts": "2026-09-10T08:21:51Z",
+  "locations": 3497,
+  "evses": 10402,
   "dropped": 1
  },
  "dynamic": {
-  "sha256": "ec044caa84c2c36664e30acbdc5202064dacaa23dc193de8f7da28f22c664f08",
-  "fetched": "2026-09-10T08:01:02Z",
-  "source_ts": "2026-09-10T08:01:05Z",
-  "evses": 8060,
+  "sha256": "cb68315fb666ecb7e0a20a1ee25642d2c77fb3bb98cad093f0e0da2a28455428",
+  "fetched": "2026-09-10T08:21:49Z",
+  "source_ts": "2026-09-10T08:21:51Z",
+  "evses": 8064,
   "orphan_evses": 2,
   "missing_evses": 0,
-  "changes": 77,
+  "changes": 144,
   "tariffs": 352,
-  "tariffed_connectors": 7346
+  "tariffed_connectors": 7350
  },
  "country": "BE",
  "country_name": "Belgium",
@@ -30,14 +30,14 @@
  "source_url": "https://transportdata.be/dataset/road-public-charging-network",
  "licence": "Open data (transportdata.be)",
  "pipeline_version": "0.1.0",
- "last_run": "2026-09-10T08:01:02Z",
+ "last_run": "2026-09-10T08:21:49Z",
  "warnings": [],
  "part0": {},
  "tariffs": {
-  "fetched": "2026-09-10T08:01:02Z",
-  "last_modified": "Thu, 10 Sep 2026 08:01:11 GMT",
-  "body_bytes": 5069566,
-  "json_bytes": 5069566,
-  "count": 16947
+  "fetched": "2026-09-10T08:21:49Z",
+  "last_modified": "Thu, 10 Sep 2026 08:21:57 GMT",
+  "body_bytes": 5071046,
+  "json_bytes": 5071046,
+  "count": 16952
  }
 }
