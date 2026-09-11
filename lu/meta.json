@@ -1,25 +1,25 @@
 {
  "static": {
-  "sha256": "d0af1be0c1a2a02cd9c103fcdc7c5409cd739dffac94d466d2ce86f9c00e3d15",
+  "sha256": "757f2870ccff40d483e9dabf4fa646fd5e4fb13dd7ba507288cda45aa5d1c3b8",
   "etag": null,
   "last_modified": null,
-  "body_bytes": 694917,
-  "json_bytes": 694917,
+  "body_bytes": 694903,
+  "json_bytes": 694903,
   "structure": "fb564539b360dd8aacc0b1e7977950a72bc350389f70075538c2dd4dfcf946e8",
-  "fetched": "2026-09-11T04:49:32Z",
-  "source_ts": "2026-09-11T04:49:32Z",
+  "fetched": "2026-09-11T04:59:54Z",
+  "source_ts": "2026-09-11T04:59:54Z",
   "locations": 736,
   "evses": 2950,
   "dropped": 0
  },
  "dynamic": {
-  "sha256": "d0af1be0c1a2a02cd9c103fcdc7c5409cd739dffac94d466d2ce86f9c00e3d15",
-  "fetched": "2026-09-11T04:49:32Z",
-  "source_ts": "2026-09-11T04:49:32Z",
+  "sha256": "757f2870ccff40d483e9dabf4fa646fd5e4fb13dd7ba507288cda45aa5d1c3b8",
+  "fetched": "2026-09-11T04:59:54Z",
+  "source_ts": "2026-09-11T04:59:54Z",
   "evses": 1875,
   "orphan_evses": 0,
   "missing_evses": 0,
-  "changes": 37,
+  "changes": 34,
   "tariffs": 0,
   "tariffed_connectors": 0
  },
@@ -31,6 +31,6 @@
  "source_url": "https://data.public.lu/en/pages/topics/transport-charging-points-points-de-charge/",
  "licence": "Creative Commons Zero (data.public.lu)",
  "pipeline_version": "0.1.0",
- "last_run": "2026-09-11T04:49:32Z",
+ "last_run": "2026-09-11T04:59:54Z",
  "warnings": []
 }
