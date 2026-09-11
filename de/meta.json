@@ -23,6 +23,8 @@
  "source_url": "https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/E-Mobilitaet/Ladesaeulenkarte/start.html",
  "licence": "Datenlizenz Deutschland Namensnennung 2.0",
  "pipeline_version": "0.1.0",
- "last_run": "2026-09-11T05:49:10Z",
- "warnings": []
+ "last_run": "2026-09-11T05:59:36Z",
+ "warnings": [
+  "run_static: https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/E-Mobilitaet/Ladesaeulenkarte/start.html: no link matching 'href=\"(https://data\\\\.bundesnetzagentur\\\\.de/[^\"]*Ladesaeulenregister[^\"]*\\\\.csv)\"'"
+ ]
 }
