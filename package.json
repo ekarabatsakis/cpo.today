@@ -9,6 +9,6 @@
     "check": "node --check worker/index.js && node --check worker/data-proxy.js && node --check site/app.js"
   },
   "devDependencies": {
-    "wrangler": "^4.0.0"
+    "wrangler": "^4.130.0"
   }
 }
