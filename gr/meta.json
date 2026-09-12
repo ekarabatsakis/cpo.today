@@ -13,17 +13,17 @@
   "dropped": 0
  },
  "dynamic": {
-  "sha256": "a91de733b8c5b6985f575448d7970f3035651a0ca7d118d3d9549058625a4e32",
-  "etag": "\"eb55efeb6e42dd1:0\"",
-  "last_modified": "Sat, 12 Sep 2026 04:26:46 GMT",
-  "body_bytes": 705001,
-  "json_bytes": 25996017,
-  "fetched": "2026-09-12T04:30:51Z",
-  "source_ts": "2026-09-12T04:26:46Z",
+  "sha256": "263856dd3961ac1154f96b5b53170fa34f04e6ce55ee7922f7f7072459f494e7",
+  "etag": "\"2a8ba8b87142dd1:0\"",
+  "last_modified": "Sat, 12 Sep 2026 04:46:48 GMT",
+  "body_bytes": 705016,
+  "json_bytes": 25996083,
+  "fetched": "2026-09-12T04:48:12Z",
+  "source_ts": "2026-09-12T04:46:48Z",
   "evses": 9922,
   "orphan_evses": 0,
   "missing_evses": 0,
-  "changes": 37,
+  "changes": 71,
   "tariffs": 92,
   "tariffed_connectors": 4668
  },
@@ -33,7 +33,7 @@
  "source_name": "MYFAH - Hellenic Ministry of Infrastructure and Transport",
  "source_url": "https://electrokinisi.yme.gov.gr/public/HelpMyfah/PublicData/",
  "pipeline_version": "0.1.0",
- "last_run": "2026-09-12T04:30:51Z",
+ "last_run": "2026-09-12T04:48:12Z",
  "warnings": [],
  "licence": "Public data of the Hellenic Ministry of Infrastructure and Transport"
 }
