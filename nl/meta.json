@@ -1,27 +1,27 @@
 {
  "static": {
-  "sha256": "fd5e7b0d7bdd2eed5cb8e3feacb02b6f1ad2d7a76ffe19c2d4e50abf66f25b1a",
-  "etag": "\"116aaab-65b4a093668ea\"",
-  "last_modified": "Sat, 12 Sep 2026 14:30:00 GMT",
-  "body_bytes": 18262699,
-  "json_bytes": 197183592,
-  "structure": "590fa2eaa4b6b29c816f754a34b20e5375982acbc0c585decc9ea53f5c562d78",
-  "fetched": "2026-09-12T14:30:45Z",
-  "source_ts": "2026-09-12T14:30:00Z",
+  "sha256": "e4bc445268350922932365c11a5500b3c7159be32a47f51ac4c7b86d9330a0bd",
+  "etag": "\"1169dae-65b4a37b28514\"",
+  "last_modified": "Sat, 12 Sep 2026 14:43:00 GMT",
+  "body_bytes": 18259374,
+  "json_bytes": 197174022,
+  "structure": "e3583cc3c36da43a6d4dc00a3cdb65d30fa01ef4563597099cc30d9616c7f423",
+  "fetched": "2026-09-12T14:43:56Z",
+  "source_ts": "2026-09-12T14:43:00Z",
   "locations": 79706,
-  "evses": 200123,
+  "evses": 200108,
   "dropped": 195
  },
  "dynamic": {
-  "sha256": "fd5e7b0d7bdd2eed5cb8e3feacb02b6f1ad2d7a76ffe19c2d4e50abf66f25b1a",
-  "fetched": "2026-09-12T14:30:45Z",
-  "source_ts": "2026-09-12T14:30:00Z",
-  "evses": 200706,
+  "sha256": "e4bc445268350922932365c11a5500b3c7159be32a47f51ac4c7b86d9330a0bd",
+  "fetched": "2026-09-12T14:43:56Z",
+  "source_ts": "2026-09-12T14:43:00Z",
+  "evses": 200691,
   "orphan_evses": 583,
   "missing_evses": 0,
-  "changes": 4076,
+  "changes": 3673,
   "tariffs": 1326,
-  "tariffed_connectors": 170738
+  "tariffed_connectors": 170723
  },
  "country": "NL",
  "country_name": "Netherlands",
@@ -30,13 +30,13 @@
  "source_url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
  "licence": "NDW open data",
  "pipeline_version": "0.1.0",
- "last_run": "2026-09-12T14:30:45Z",
+ "last_run": "2026-09-12T14:43:56Z",
  "warnings": [],
  "tariffs": {
-  "fetched": "2026-09-12T14:30:45Z",
-  "last_modified": "Sat, 12 Sep 2026 10:02:00 GMT",
-  "body_bytes": 3853483,
-  "json_bytes": 70005900,
+  "fetched": "2026-09-12T14:43:56Z",
+  "last_modified": "Sat, 12 Sep 2026 14:32:00 GMT",
+  "body_bytes": 3853458,
+  "json_bytes": 70005855,
   "count": 96083
  }
 }
