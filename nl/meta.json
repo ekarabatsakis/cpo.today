@@ -1,25 +1,25 @@
 {
  "static": {
-  "sha256": "00f8c88ae2e9636b9425dad82955cc1e17a72450cd48c53d70734bd67435d515",
-  "etag": "W/\"116c079-65b51df7f9780\"",
-  "last_modified": "Sat, 12 Sep 2026 23:51:00 GMT",
-  "body_bytes": 18268281,
-  "json_bytes": 197201035,
+  "sha256": "67b703140feaeb56258c0e45d4792f42a6bbda903b708eb8a60efed0a9770065",
+  "etag": "\"116cdb0-65b523554424e\"",
+  "last_modified": "Sun, 13 Sep 2026 00:15:00 GMT",
+  "body_bytes": 18271664,
+  "json_bytes": 197200884,
   "structure": "969b6cdbc4f377a48800e49ad02e54dde2c347abbc5804a856fe18158614b609",
-  "fetched": "2026-09-12T23:51:00Z",
-  "source_ts": "2026-09-12T23:51:00Z",
+  "fetched": "2026-09-13T00:15:52Z",
+  "source_ts": "2026-09-13T00:15:00Z",
   "locations": 79723,
   "evses": 200159,
   "dropped": 195
  },
  "dynamic": {
-  "sha256": "00f8c88ae2e9636b9425dad82955cc1e17a72450cd48c53d70734bd67435d515",
-  "fetched": "2026-09-12T23:51:00Z",
-  "source_ts": "2026-09-12T23:51:00Z",
+  "sha256": "67b703140feaeb56258c0e45d4792f42a6bbda903b708eb8a60efed0a9770065",
+  "fetched": "2026-09-13T00:15:52Z",
+  "source_ts": "2026-09-13T00:15:00Z",
   "evses": 200717,
   "orphan_evses": 558,
   "missing_evses": 0,
-  "changes": 467,
+  "changes": 921,
   "tariffs": 1327,
   "tariffed_connectors": 170774
  },
@@ -30,12 +30,12 @@
  "source_url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
  "licence": "NDW open data",
  "pipeline_version": "0.1.0",
- "last_run": "2026-09-12T23:51:00Z",
+ "last_run": "2026-09-13T00:15:52Z",
  "warnings": [],
  "tariffs": {
-  "fetched": "2026-09-12T23:51:00Z",
-  "last_modified": "Sat, 12 Sep 2026 22:01:00 GMT",
-  "body_bytes": 3853551,
+  "fetched": "2026-09-13T00:15:52Z",
+  "last_modified": "Sun, 13 Sep 2026 00:16:00 GMT",
+  "body_bytes": 3853612,
   "json_bytes": 70008145,
   "count": 96098
  }
