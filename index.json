@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-13T20:24:00Z",
+ "generated": "2026-09-13T20:41:42Z",
  "countries": [
   {
    "code": "BE",
@@ -10,8 +10,8 @@
    "source_url": "https://transportdata.be/dataset/road-public-charging-network",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-13T20:22:27Z",
-   "dynamic_ts": "2026-09-13T20:22:27Z",
+   "static_ts": "2026-09-13T20:40:18Z",
+   "dynamic_ts": "2026-09-13T20:40:18Z",
    "locations": 3504,
    "evses": 10453
   },
@@ -24,7 +24,7 @@
    "source_url": "https://www.traffic4cyprus.org.cy/en_AU/dataset/electricvehiclecharges",
    "refresh_minutes": 1440,
    "live": false,
-   "static_ts": "2026-09-12T20:29:10Z",
+   "static_ts": "2026-09-13T20:41:42Z",
    "dynamic_ts": null,
    "locations": 171,
    "evses": 203
@@ -67,7 +67,7 @@
    "refresh_minutes": 10,
    "live": true,
    "static_ts": "2026-09-13T01:37:51Z",
-   "dynamic_ts": "2026-09-13T20:16:47Z",
+   "dynamic_ts": "2026-09-13T20:36:46Z",
    "locations": 4241,
    "evses": 9923
   },
@@ -80,8 +80,8 @@
    "source_url": "https://ev.vialietuva.lt/en/data-provision",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-13T20:21:46Z",
-   "dynamic_ts": "2026-09-13T20:21:46Z",
+   "static_ts": "2026-09-13T20:39:37Z",
+   "dynamic_ts": "2026-09-13T20:39:37Z",
    "locations": 2043,
    "evses": 5784
   },
@@ -94,8 +94,8 @@
    "source_url": "https://data.public.lu/en/pages/topics/transport-charging-points-points-de-charge/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-13T20:22:34Z",
-   "dynamic_ts": "2026-09-13T20:22:34Z",
+   "static_ts": "2026-09-13T20:40:24Z",
+   "dynamic_ts": "2026-09-13T20:40:24Z",
    "locations": 737,
    "evses": 2965
   },
@@ -108,8 +108,8 @@
    "source_url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-13T20:21:00Z",
-   "dynamic_ts": "2026-09-13T20:21:00Z",
+   "static_ts": "2026-09-13T20:39:00Z",
+   "dynamic_ts": "2026-09-13T20:39:00Z",
    "locations": 79739,
    "evses": 200220
   }
