@@ -1,27 +1,27 @@
 {
  "static": {
-  "sha256": "1b12f95a2f09daec30c5cdc7c9b6957bab108d7c775b5eff4be952cd6e3d82ca",
+  "sha256": "dbe47d0ca1b96ffa512e18c018c18d9d8fe14389195065b089cf756940d6aa6a",
   "etag": null,
-  "last_modified": "Mon, 14 Sep 2026 10:33:12 GMT",
-  "body_bytes": 5249898,
-  "json_bytes": 5249898,
-  "structure": "6bd387ec46e1407451ae77b8459dc1af4ddca46440e5829078266fe987ac5429",
-  "fetched": "2026-09-14T10:33:10Z",
-  "source_ts": "2026-09-14T10:33:12Z",
-  "locations": 3505,
-  "evses": 10454,
+  "last_modified": "Mon, 14 Sep 2026 10:51:19 GMT",
+  "body_bytes": 5250776,
+  "json_bytes": 5250776,
+  "structure": "b8fc59cf310e2885ec48eda321a6e3117ff162d1fd643e9fa520be8755aa6b40",
+  "fetched": "2026-09-14T10:51:16Z",
+  "source_ts": "2026-09-14T10:51:19Z",
+  "locations": 3506,
+  "evses": 10456,
   "dropped": 1
  },
  "dynamic": {
-  "sha256": "1b12f95a2f09daec30c5cdc7c9b6957bab108d7c775b5eff4be952cd6e3d82ca",
-  "fetched": "2026-09-14T10:33:10Z",
-  "source_ts": "2026-09-14T10:33:12Z",
-  "evses": 8116,
+  "sha256": "dbe47d0ca1b96ffa512e18c018c18d9d8fe14389195065b089cf756940d6aa6a",
+  "fetched": "2026-09-14T10:51:16Z",
+  "source_ts": "2026-09-14T10:51:19Z",
+  "evses": 8118,
   "orphan_evses": 2,
   "missing_evses": 0,
-  "changes": 497,
+  "changes": 1002,
   "tariffs": 355,
-  "tariffed_connectors": 7401
+  "tariffed_connectors": 7403
  },
  "country": "BE",
  "country_name": "Belgium",
@@ -30,14 +30,14 @@
  "source_url": "https://transportdata.be/dataset/road-public-charging-network",
  "licence": "Open data (transportdata.be)",
  "pipeline_version": "0.1.0",
- "last_run": "2026-09-14T10:33:10Z",
+ "last_run": "2026-09-14T10:51:16Z",
  "warnings": [],
  "part0": {},
  "tariffs": {
-  "fetched": "2026-09-14T10:33:10Z",
-  "last_modified": "Mon, 14 Sep 2026 10:33:19 GMT",
-  "body_bytes": 5077524,
-  "json_bytes": 5077524,
-  "count": 16975
+  "fetched": "2026-09-14T10:51:16Z",
+  "last_modified": "Mon, 14 Sep 2026 10:51:25 GMT",
+  "body_bytes": 5077822,
+  "json_bytes": 5077822,
+  "count": 16976
  }
 }
