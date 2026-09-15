@@ -479,6 +479,67 @@ class FranceTests(unittest.TestCase):
             self.assertFalse(index["countries"][0]["live"])
 
 
+class ResilienceTests(unittest.TestCase):
+    """Registry hiccups must not fail a run while the published data is fresh."""
+
+    def test_retries_transient_errors_then_succeeds(self):
+        from cpo_pipeline.runner import with_retries
+        calls, naps = [], []
+        def flaky():
+            calls.append(1)
+            if len(calls) < 3:
+                raise fetch.FetchError("https://x/page: HTTP 404")
+            return "ok"
+        self.assertEqual(with_retries(flaky, "t", sleep=naps.append), "ok")
+        self.assertEqual((len(calls), naps), (3, [3, 8]))
+
+    def test_does_not_retry_policy_refusals(self):
+        from cpo_pipeline.runner import with_retries
+        calls = []
+        def capped():
+            calls.append(1)
+            raise fetch.FetchError("https://x/file: body exceeds cap 100")
+        with self.assertRaises(fetch.FetchError):
+            with_retries(capped, "t", sleep=lambda s: None)
+        self.assertEqual(len(calls), 1)
+
+    def test_inventory_only_source_is_checked_on_its_own_cadence(self):
+        from cpo_pipeline.sources import de_bnetza as de
+        with TemporaryDirectory() as d:
+            now = dt.datetime(2026, 9, 15, 3, 0, tzinfo=dt.timezone.utc)
+            t = Tick(de.SPEC, Path(d), now=now)
+            self.assertTrue(t._static_due())                      # never checked: due
+            t._schedule_static(ok=True)
+            self.assertEqual(t.meta["static"]["next_check"], "2026-09-16T03:00:00Z")
+            self.assertFalse(t._static_due())                     # checked a moment ago: not due
+            t._schedule_static(ok=False)
+            self.assertEqual(t.meta["static"]["next_check"], "2026-09-15T04:00:00Z")   # failed: retry in an hour
+            t2 = Tick(de.SPEC, Path(d), now=now + dt.timedelta(hours=2))
+            t2.meta = t.meta
+            self.assertTrue(t2._static_due())
+            t3 = Tick(gr.SPEC, Path(d), now=now)
+            t3.meta["static"]["next_check"] = "2099-01-01T00:00:00Z"
+            self.assertTrue(t3._static_due())                     # live sources always run
+
+    def test_failure_is_soft_only_while_data_is_fresh(self):
+        from cpo_pipeline.runner import failure_is_soft
+        from cpo_pipeline.sources import de_bnetza as de
+        with TemporaryDirectory() as d:
+            now = dt.datetime(2026, 9, 15, 3, 0, tzinfo=dt.timezone.utc)
+            t = Tick(de.SPEC, Path(d), now=now)
+            self.assertFalse(failure_is_soft(t, "run_static"))                  # nothing published yet: hard
+            t.meta["static"]["fetched"] = "2026-09-14T03:00:00Z"                  # one day old, monthly registry
+            self.assertTrue(failure_is_soft(t, "run_static"))
+            t.meta["static"]["fetched"] = "2026-09-10T03:00:00Z"                  # five days: past 3 x refresh
+            self.assertFalse(failure_is_soft(t, "run_static"))
+            g = Tick(gr.SPEC, Path(d), now=now)
+            g.meta["dynamic"]["fetched"] = "2026-09-15T02:30:00Z"                 # 30 min: within the 45 min floor
+            self.assertTrue(failure_is_soft(g, "run_dynamic"))
+            g.meta["dynamic"]["fetched"] = "2026-09-15T02:00:00Z"                 # an hour: stale, hard
+            self.assertFalse(failure_is_soft(g, "run_dynamic"))
+            self.assertTrue(failure_is_soft(g, "run_tariffs"))                    # tariffs never fail a run
+
+
 DATEX_TABLE = """<?xml version="1.0" encoding="utf-8"?>
 <d2:payload xsi:type="egi:EnergyInfrastructureTablePublication" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:com="https://datex2.eu/schema/3/common" xmlns:egi="https://datex2.eu/schema/3/energyInfrastructure"

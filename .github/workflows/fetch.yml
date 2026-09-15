@@ -73,10 +73,16 @@ jobs:
         run: |
           set -uo pipefail
           python3 --version
+          # Exit codes: 0 ok, 2 transient fetch problem while the published data
+          # is still fresh (a notice, run stays green), 1 stale or broken (error).
           rc=0
           for c in $COUNTRIES; do
             echo "::group::$c"
-            if ! python3 -m cpo_pipeline "$c" --data-dir ../data $FORCE_STATIC; then
+            python3 -m cpo_pipeline "$c" --data-dir ../data $FORCE_STATIC
+            code=$?
+            if [ "$code" = "2" ]; then
+              echo "::notice::$c: registry not reachable this tick; last good data is still fresh and stays published"
+            elif [ "$code" != "0" ]; then
               echo "::warning::$c: pipeline reported a problem (see log); other countries continue"
               rc=1
             fi
@@ -130,6 +136,6 @@ jobs:
             } >> "$GITHUB_STEP_SUMMARY"
           done
           if [ "${{ steps.pipeline.outputs.rc }}" = "1" ]; then
-            echo "::error::at least one registry failed this tick; data for the others was published"
+            echo "::error::at least one registry has been failing long enough for its published data to go stale; see the log"
             exit 1
           fi

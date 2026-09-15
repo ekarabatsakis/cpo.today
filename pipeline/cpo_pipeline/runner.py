@@ -19,6 +19,7 @@ import hashlib
 import json
 import logging
 import re
+import time
 import urllib.parse
 from pathlib import Path
 
@@ -34,6 +35,36 @@ log = logging.getLogger("cpo.runner")
 # keep the old snapshot and flag it: a half-empty registry is far more likely
 # to be an upstream hiccup than a third of the network vanishing overnight.
 MAX_SHRINK = 0.30
+FETCH_ATTEMPTS = 3            # transient HTTP errors are retried within the tick
+RETRY_BACKOFF_S = (3, 8)      # sleep before attempt 2 and 3
+ERROR_RECHECK_MIN = 60        # a not-due source that failed is retried after this long
+EXIT_OK, EXIT_HARD, EXIT_SOFT = 0, 1, 2
+
+
+def parse_iso(s: str | None) -> dt.datetime | None:
+    if not s:
+        return None
+    try:
+        return dt.datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=dt.timezone.utc)
+    except ValueError:
+        return None
+
+
+def _transient(e: FetchError) -> bool:
+    """Retry network and server hiccups, never our own caps or policy refusals."""
+    msg = str(e)
+    return not ("exceeds cap" in msg or "refusing" in msg or "declared size" in msg)
+
+
+def with_retries(fn, what: str, attempts: int = FETCH_ATTEMPTS, sleep=time.sleep):
+    for i in range(attempts):
+        try:
+            return fn()
+        except FetchError as e:
+            if i + 1 >= attempts or not _transient(e):
+                raise
+            log.warning("%s: %s; retrying (%d/%d)", what, e, i + 2, attempts)
+            sleep(RETRY_BACKOFF_S[min(i, len(RETRY_BACKOFF_S) - 1)])
 
 
 def utcnow():
@@ -103,6 +134,7 @@ class Tick:
         self._part_statuses: dict = {}
         self._part_cache: dict = {}
         self._primary_ids: set | None = None
+        self._sleep = time.sleep
 
     # -- acquisition -------------------------------------------------------
 
@@ -131,19 +163,24 @@ class Tick:
             return docs, self.now, {"sha256": fp, **info}
         url = feed.url
         if feed.discover:
-            page = http_get(feed.url, max_bytes=8 << 20, headers=feed.headers)
-            html = page.body.decode("utf-8", errors="replace").replace("&amp;", "&")
-            mt = re.search(feed.discover, html)
-            if not mt:
-                raise FetchError(f"{feed.url}: no link matching {feed.discover!r}")
-            url = urllib.parse.urljoin(feed.url, mt.group(1) if mt.groups() else mt.group(0))
+            def discover():
+                page = http_get(feed.url, max_bytes=8 << 20, headers=feed.headers)
+                html = page.body.decode("utf-8", errors="replace").replace("&amp;", "&")
+                mt = re.search(feed.discover, html)
+                if not mt:
+                    # Registries occasionally serve a maintenance or error page
+                    # with a 200; treat it like any other transient failure.
+                    raise FetchError(f"{feed.url}: no link matching {feed.discover!r}")
+                return urllib.parse.urljoin(feed.url, mt.group(1) if mt.groups() else mt.group(0))
+            url = with_retries(discover, f"{kind}: discovery", sleep=self._sleep)
             if url != m.get("discovered_url"):
                 skip_unchanged = False       # a new file name is a new file
             m["discovered_url"] = url
             log.info("%s: discovered %s", kind, url)
-        res = http_get(url, etag=m.get("etag") if skip_unchanged else None,
-                       last_modified=m.get("last_modified") if skip_unchanged else None,
-                       max_bytes=feed.max_bytes, headers=feed.headers)
+        res = with_retries(lambda: http_get(url, etag=m.get("etag") if skip_unchanged else None,
+                                            last_modified=m.get("last_modified") if skip_unchanged else None,
+                                            max_bytes=feed.max_bytes, headers=feed.headers),
+                           f"{kind}: fetch", sleep=self._sleep)
         if res.status == 304:
             log.info("%s: not modified (etag %s)", kind, m.get("etag"))
             return None, None, None
@@ -166,6 +203,25 @@ class Tick:
 
     # -- static ------------------------------------------------------------
 
+    def _static_due(self) -> bool:
+        """Inventory-only registries are checked on their own cadence, not every
+        tick: a monthly CSV does not need 144 conditional requests a day, and a
+        page that is down for an hour should not fail 6 runs."""
+        spec = self.spec
+        if spec.has_status or self.force_static or self.static_file is not None:
+            return True
+        nxt = parse_iso(self.meta["static"].get("next_check"))
+        if nxt and self.now < nxt:
+            log.info("static: not due until %s; skipping", iso(nxt))
+            return False
+        return True
+
+    def _schedule_static(self, ok: bool):
+        if self.spec.has_status:
+            return
+        minutes = self.spec.refresh_minutes if ok else min(self.spec.refresh_minutes, ERROR_RECHECK_MIN)
+        self.meta["static"]["next_check"] = iso(self.now + dt.timedelta(minutes=minutes))
+
     def run_static(self) -> bool:
         spec = self.spec
         if not self.store.points.exists() or (spec.single_feed and spec.has_status and not self.store.status.exists()):
@@ -173,7 +229,14 @@ class Tick:
             # status tick was rejected: process the document even if upstream
             # reports it unchanged.
             self.force_static = True
-        doc, source_ts, info = self._acquire("static", spec.static, self.static_file)
+        if not self._static_due():
+            return False
+        try:
+            doc, source_ts, info = self._acquire("static", spec.static, self.static_file)
+        except (FetchError, SourceError, ValueError):
+            self._schedule_static(ok=False)
+            raise
+        self._schedule_static(ok=True)
         if doc is None:
             return False
         self._static_doc, self._static_ts, self._static_info = doc, source_ts, info
@@ -229,6 +292,7 @@ class Tick:
         self._inventory = norm
         self.meta["static"] = {
             **info,
+            "next_check": self.meta["static"].get("next_check"),
             "structure": fp,
             "fetched": iso(self.now),
             "source_ts": iso(source_ts),
@@ -441,16 +505,40 @@ class Tick:
         return self.changed
 
 
+def failure_is_soft(tick: Tick, step_name: str) -> bool:
+    """A failed fetch is only an error when the published data is getting stale.
+
+    Registries have hiccups; as long as the last good snapshot is younger than
+    three refresh intervals (with a floor so a single 10-minute miss never
+    counts), the tick is reported as a warning and the run stays green.
+    """
+    spec = tick.spec
+    if step_name == "run_static":
+        last = parse_iso(tick.meta["static"].get("fetched"))
+        grace = max(3 * spec.refresh_minutes, 12 * 60)
+    elif step_name == "run_dynamic":
+        last = parse_iso(tick.meta["dynamic"].get("fetched")) or parse_iso(tick.meta["dynamic"].get("source_ts"))
+        grace = max(3 * spec.refresh_minutes, 45)
+    else:
+        return True
+    return last is not None and tick.now - last < dt.timedelta(minutes=grace)
+
+
 def run(spec: SourceSpec, data_root: Path, **kw) -> int:
     tick = Tick(spec, data_root, **kw)
-    exit_code = 0
+    exit_code = EXIT_OK
     for step in (tick.run_static, tick.run_tariffs, tick.run_dynamic):
         try:
             step()
         except (FetchError, SourceError, ValueError) as e:
-            log.error("%s failed: %s", step.__name__, e)
-            tick.warnings.append(f"{step.__name__}: {e}")
-            exit_code = 1
+            if failure_is_soft(tick, step.__name__):
+                log.warning("%s failed: %s (published data still fresh; will retry)", step.__name__, e)
+                tick.warnings.append(f"{step.__name__}: {e} (transient)")
+                exit_code = max(exit_code, EXIT_SOFT)
+            else:
+                log.error("%s failed: %s", step.__name__, e)
+                tick.warnings.append(f"{step.__name__}: {e}")
+                exit_code = EXIT_HARD
     changed = tick.finish()
     log.info("changed=%s warnings=%d", changed, len(tick.warnings))
     return exit_code
