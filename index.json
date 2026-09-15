@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-15T03:36:01Z",
+ "generated": "2026-09-15T03:50:36Z",
  "countries": [
   {
    "code": "BE",
@@ -52,10 +52,10 @@
    "source_url": "https://transport.data.gouv.fr/datasets?locale=en&type=charging-stations",
    "refresh_minutes": 1440,
    "live": false,
-   "static_ts": "2026-09-14T03:41:36Z",
+   "static_ts": "2026-09-15T03:41:04Z",
    "dynamic_ts": null,
-   "locations": 57074,
-   "evses": 224469
+   "locations": 54045,
+   "evses": 222072
   },
   {
    "code": "GR",
