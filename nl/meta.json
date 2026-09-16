@@ -1,28 +1,28 @@
 {
  "static": {
-  "sha256": "774963d61c85339db6bc88beacde1618043278aed12158f74df742667ae02c3f",
-  "etag": "\"116e24e-65b8e4ae7ab67\"",
-  "last_modified": "Tue, 15 Sep 2026 23:56:00 GMT",
-  "body_bytes": 18276942,
-  "json_bytes": 197409375,
+  "sha256": "0e7c1fa736349f8ca4abb040381d1024c5b97bfd723a631b319f60f656b54ba6",
+  "etag": "\"116e87d-65b8e8edd814a\"",
+  "last_modified": "Wed, 16 Sep 2026 00:15:00 GMT",
+  "body_bytes": 18278525,
+  "json_bytes": 197411492,
   "next_check": null,
   "structure": "6d2a67165941a57901ee3ab318be15c82ee32644251695518388480a232332c5",
-  "fetched": "2026-09-15T23:56:19Z",
-  "source_ts": "2026-09-15T23:56:00Z",
+  "fetched": "2026-09-16T00:15:49Z",
+  "source_ts": "2026-09-16T00:15:00Z",
   "locations": 79822,
   "evses": 200352,
   "dropped": 193
  },
  "dynamic": {
-  "sha256": "774963d61c85339db6bc88beacde1618043278aed12158f74df742667ae02c3f",
-  "fetched": "2026-09-15T23:56:19Z",
-  "source_ts": "2026-09-15T23:56:00Z",
+  "sha256": "0e7c1fa736349f8ca4abb040381d1024c5b97bfd723a631b319f60f656b54ba6",
+  "fetched": "2026-09-16T00:15:49Z",
+  "source_ts": "2026-09-16T00:15:00Z",
   "evses": 200943,
   "orphan_evses": 591,
   "missing_evses": 0,
-  "changes": 306,
+  "changes": 342,
   "tariffs": 1338,
-  "tariffed_connectors": 170933
+  "tariffed_connectors": 171037
  },
  "country": "NL",
  "country_name": "Netherlands",
@@ -31,12 +31,12 @@
  "source_url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
  "licence": "NDW open data",
  "pipeline_version": "0.1.0",
- "last_run": "2026-09-15T23:56:19Z",
+ "last_run": "2026-09-16T00:15:49Z",
  "warnings": [],
  "tariffs": {
-  "fetched": "2026-09-15T23:56:19Z",
-  "last_modified": "Tue, 15 Sep 2026 22:04:00 GMT",
-  "body_bytes": 3854924,
+  "fetched": "2026-09-16T00:15:49Z",
+  "last_modified": "Wed, 16 Sep 2026 00:16:00 GMT",
+  "body_bytes": 3855146,
   "json_bytes": 70401173,
   "count": 96400
  }
