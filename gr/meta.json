@@ -14,17 +14,17 @@
   "dropped": 0
  },
  "dynamic": {
-  "sha256": "d6c9978d6266742666877b0c0b1d50e7f76e721eae7bb7e3a766fffb23d57c73",
-  "etag": "\"214eb8c2b446dd1:0\"",
-  "last_modified": "Thu, 17 Sep 2026 14:56:46 GMT",
-  "body_bytes": 707953,
-  "json_bytes": 26026312,
-  "fetched": "2026-09-17T14:58:06Z",
-  "source_ts": "2026-09-17T14:56:46Z",
+  "sha256": "bd28a6f9b232f0ce6253317c1e7de2a51dc372a9dc29e8fda39fc402c4b3eb49",
+  "etag": "\"d72981f3b846dd1:0\"",
+  "last_modified": "Thu, 17 Sep 2026 15:26:46 GMT",
+  "body_bytes": 708310,
+  "json_bytes": 26026318,
+  "fetched": "2026-09-17T15:32:01Z",
+  "source_ts": "2026-09-17T15:26:46Z",
   "evses": 9939,
   "orphan_evses": 9,
   "missing_evses": 2,
-  "changes": 130,
+  "changes": 167,
   "tariffs": 92,
   "tariffed_connectors": 4674
  },
@@ -34,9 +34,7 @@
  "source_name": "MYFAH - Hellenic Ministry of Infrastructure and Transport",
  "source_url": "https://electrokinisi.yme.gov.gr/public/HelpMyfah/PublicData/",
  "pipeline_version": "0.1.0",
- "last_run": "2026-09-17T15:16:44Z",
- "warnings": [
-  "run_dynamic: not a zip archive: File is not a zip file (transient)"
- ],
+ "last_run": "2026-09-17T15:32:01Z",
+ "warnings": [],
  "licence": "Public data of the Hellenic Ministry of Infrastructure and Transport"
 }
