@@ -17,7 +17,7 @@ on:
     inputs:
       countries:
         description: "Space-separated country codes to refresh (default: all)"
-        default: "gr lt nl be lu fr de cy"
+        default: "gr lt nl be lu fr cy"
         type: string
       force_static:
         description: "Re-process static inventories even if unchanged"
@@ -69,26 +69,28 @@ jobs:
         working-directory: pipeline
         env:
           FORCE_STATIC: ${{ inputs.force_static && '--force-static' || '' }}
-          COUNTRIES: ${{ inputs.countries || 'gr lt nl be lu fr de cy' }}
+          COUNTRIES: ${{ inputs.countries || 'gr lt nl be lu fr cy' }}
         run: |
           set -uo pipefail
           python3 --version
-          # Exit codes: 0 ok, 2 transient fetch problem while the published data
-          # is still fresh (a notice, run stays green), 1 stale or broken (error).
-          rc=0
+          # Pipeline exit codes: 0 ok, 2 transient fetch problem while the
+          # published data is still fresh, 1 the registry has been failing long
+          # enough for its data to go stale. Neither fails this run: the last
+          # good data stays published and the daily "Data health" workflow
+          # raises one alert while a registry stays down. The step shell runs
+          # with -e, so the exit code is captured with || and never aborts the loop.
           for c in $COUNTRIES; do
             echo "::group::$c"
-            python3 -m cpo_pipeline "$c" --data-dir ../data $FORCE_STATIC
-            code=$?
+            code=0
+            python3 -m cpo_pipeline "$c" --data-dir ../data $FORCE_STATIC || code=$?
             if [ "$code" = "2" ]; then
               echo "::notice::$c: registry not reachable this tick; last good data is still fresh and stays published"
             elif [ "$code" != "0" ]; then
-              echo "::warning::$c: pipeline reported a problem (see log); other countries continue"
-              rc=1
+              echo "::warning::$c: registry failing and its published data is going stale (see log); other countries continue"
             fi
             echo "::endgroup::"
           done
-          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          python3 -m cpo_pipeline.retire --data-dir ../data
 
       - name: Commit and push
         shell: bash
@@ -135,7 +137,3 @@ jobs:
               echo '```'
             } >> "$GITHUB_STEP_SUMMARY"
           done
-          if [ "${{ steps.pipeline.outputs.rc }}" = "1" ]; then
-            echo "::error::at least one registry has been failing long enough for its published data to go stale; see the log"
-            exit 1
-          fi

@@ -540,6 +540,23 @@ class ResilienceTests(unittest.TestCase):
             self.assertTrue(failure_is_soft(g, "run_tariffs"))                    # tariffs never fail a run
 
 
+    def test_retire_removes_countries_no_longer_in_specs(self):
+        from cpo_pipeline.retire import retire
+        with TemporaryDirectory() as d:
+            root = Path(d)
+            for code in ("gr", "de"):
+                (root / code).mkdir()
+                (root / code / "meta.json").write_text(json.dumps({"country": code.upper()}))
+                (root / code / "points.json").write_text("{}")
+            (root / "index.json").write_text(json.dumps({"generated": "t", "countries": [
+                {"code": "DE", "path": "de"}, {"code": "GR", "path": "gr"}]}))
+            self.assertEqual(retire(root), ["DE"])
+            self.assertFalse((root / "de").exists())
+            self.assertTrue((root / "gr" / "points.json").exists())
+            self.assertEqual([c["code"] for c in json.loads((root / "index.json").read_text())["countries"]], ["GR"])
+            self.assertEqual(retire(root), [])                    # idempotent
+
+
 DATEX_TABLE = """<?xml version="1.0" encoding="utf-8"?>
 <d2:payload xsi:type="egi:EnergyInfrastructureTablePublication" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:com="https://datex2.eu/schema/3/common" xmlns:egi="https://datex2.eu/schema/3/energyInfrastructure"

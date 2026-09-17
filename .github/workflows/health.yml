@@ -1,0 +1,54 @@
+# Daily data-health check. The 10-minute fetch never fails on a registry
+# problem (it would email on every tick); this workflow fails, once a day, while
+# any country's published data is stale, so an outage produces one email a day.
+name: Data health
+
+on:
+  schedule:
+    - cron: "15 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: published data is fresh
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out data branch
+        uses: actions/checkout@v5
+        with:
+          ref: data
+          persist-credentials: false
+
+      - name: Check freshness
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import datetime as dt, json, sys
+          now = dt.datetime.now(dt.timezone.utc)
+          def age_h(s):
+              if not s: return None
+              return (now - dt.datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=dt.timezone.utc)).total_seconds() / 3600
+          index = json.load(open("index.json"))
+          problems = []
+          gen = age_h(index.get("generated"))
+          if gen is None or gen > 1:
+              problems.append(f"index.json last generated {gen and round(gen, 1)} h ago: the fetch workflow is not publishing")
+          for c in index["countries"]:
+              meta = json.load(open(f"{c['path']}/meta.json"))
+              refresh = c.get("refresh_minutes") or 10
+              if c.get("live", True):
+                  a = age_h(c.get("dynamic_ts")); limit = 3
+              else:
+                  a = age_h(meta.get("static", {}).get("fetched")); limit = max(3 * refresh / 60, 24) + 6
+              if a is None or a > limit:
+                  problems.append(f"{c['code']}: last good data {a and round(a, 1)} h ago (limit {limit:.0f} h); warnings: {meta.get('warnings', [])[-2:]}")
+              else:
+                  print(f"ok  {c['code']}: {a:.1f} h old")
+          for p in problems:
+              print("::error::" + p)
+          sys.exit(1 if problems else 0)
+          PY

@@ -19,7 +19,6 @@ cpo.today exists so that charge point operators (CPOs), investors, fleets, plann
 | France | [Base nationale des IRVE](https://transport.data.gouv.fr/datasets?locale=en&type=charging-stations), transport.data.gouv.fr | CSV (IRVE schema) | daily | none published | 2026-09 |
 | Belgium | [transportdata.be](https://transportdata.be/dataset/road-public-charging-network): Road network OCPI + INDIGO DATEX II | OCPI JSON, DATEX II XML | every 10 min | every 10 min (Road network) | 2026-09 |
 | Luxembourg | [data.public.lu](https://data.public.lu/en/pages/topics/transport-charging-points-points-de-charge/): Chargy KML + Eco-Movement DATEX II | KML, DATEX II XML | every 10 min | every 10 min (Chargy) | 2026-09 |
-| Germany | [Bundesnetzagentur Ladesäulenregister](https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/E-Mobilitaet/Ladesaeulenkarte/start.html) | CSV | monthly | none published | 2026-09 |
 | Cyprus | [EMS via traffic4cyprus NAP](https://www.traffic4cyprus.org.cy/en_AU/dataset/electricvehiclecharges) | DATEX II-style XML | infrequent | none published | 2026-09 |
 
 All 28 EU/UK registries and their current status are listed in `site/coverage.json` and on the site's **Coverage** tab. Adding a country is one module under `pipeline/cpo_pipeline/sources/` (see [docs/ADDING_A_COUNTRY.md](docs/ADDING_A_COUNTRY.md)).
@@ -53,7 +52,7 @@ All 28 EU/UK registries and their current status are listed in `site/coverage.js
 
 ```bash
 # run the pipeline for one country against a data directory (downloads from the registry)
-cd pipeline && python3 -m cpo_pipeline gr --data-dir ../data-local     # or lt, nl
+cd pipeline && python3 -m cpo_pipeline gr --data-dir ../data-local     # or lt, nl, be, lu, fr, cy
 
 # or against files you already have
 python3 -m cpo_pipeline gr --data-dir ../data-local --static-file static.zip --dynamic-file dynamic.zip

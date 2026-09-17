@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-05",
+  "updated": "2026-09-17",
   "statuses": {
     "live": "Integrated: inventory and live status on cpo.today",
     "static": "Integrated: inventory only, no live status feed",
@@ -178,7 +178,7 @@
     {
       "code": "DE",
       "name": "Germany",
-      "status": "static",
+      "status": "public_static",
       "source": "Bundesnetzagentur Ladesäulenregister (CSV)",
       "url": "https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/E-Mobilitaet/start.html",
       "data": [
@@ -194,7 +194,7 @@
         "web service",
         "DATEX II (AFIR)"
       ],
-      "note": "Inventory only, refreshed about monthly by the Bundesnetzagentur; operators still in the notification procedure are missing."
+      "note": "Monthly inventory CSV without live status; not integrated on cpo.today because the register offers no availability data and its download page is unreliable."
     },
     {
       "code": "GR",

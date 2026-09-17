@@ -1,5 +1,9 @@
 """Germany: Ladesäulenregister of the Bundesnetzagentur (federal network agency).
 
+RETIRED (September 2026): not registered in ``sources.SPECS``. The register is a
+monthly inventory without live status and its download page proved unreliable;
+the module is kept so the country can be switched back on by re-adding it.
+
 https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/E-Mobilitaet/Ladesaeulenkarte/start.html
 
 A semicolon-separated CSV (~55 MB) with one row per charging device
