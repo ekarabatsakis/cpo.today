@@ -1,0 +1,35 @@
+// Hectocorn V — Prisma schema. SQLite by default (zero-config); swap DATABASE_URL
+// for Postgres and change `provider` to "postgresql".
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// One valuation run. JSON payloads are stored as serialised strings so the
+/// schema works unchanged on SQLite and Postgres.
+model Report {
+  id                String   @id
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  name              String
+  stage             String?
+  status            String   @default("pending") // pending | scoring | market | engine | memo | done | error
+  statusMessage     String?
+  inputRaw          String // StartupInput as submitted (reporting currency)
+  inputUsd          String // StartupInput normalised to USD
+  engineResult      String? // EngineResult (deterministic, pre-AI)
+  engineResultAi    String? // EngineResult re-run with AI scores (if any)
+  aiResult          String? // { scores, market, memo }
+  aiStatus          String   @default("pending") // pending | ok | partial | unavailable
+  finalPreMoneyUsd  Float?
+  adjustmentPct     Float?
+  model             String?
+  promptVersion     String?
+  benchmarksVersion String?
+  timings           String? // { validateMs, engineMs, scoreMs, marketMs, memoMs, totalMs }
+  error             String?
+}

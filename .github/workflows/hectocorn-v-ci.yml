@@ -1,0 +1,55 @@
+name: Hectocorn V CI
+
+on:
+  push:
+    branches: ["**"]
+    paths: ["hectocorn-v/**", ".github/workflows/hectocorn-v-ci.yml"]
+  pull_request:
+    paths: ["hectocorn-v/**", ".github/workflows/hectocorn-v-ci.yml"]
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: hectocorn-v
+
+jobs:
+  verify:
+    name: lint · typecheck · test · build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DATABASE_URL: "file:./dev.db"
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: hectocorn-v/package-lock.json
+      - name: Install
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit tests (engine)
+        run: npm test
+      - name: Database
+        run: npx prisma migrate deploy
+      - name: Build
+        run: npm run build
+      - name: End-to-end (Playwright)
+        run: |
+          npx playwright install --with-deps chromium
+          npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: hectocorn-v/playwright-report
+          retention-days: 7
