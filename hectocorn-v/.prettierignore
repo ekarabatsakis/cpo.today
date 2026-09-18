@@ -6,3 +6,4 @@ package-lock.json
 public
 prisma/migrations
 *.db
+CLAUDE.md

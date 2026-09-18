@@ -24,7 +24,6 @@ The number must be **deterministic first, AI second**: a transparent formula eng
 hectocorn.co is a Vite/React app on **shadcn/ui with the default "slate" theme and Tailwind**. Reproduce it exactly — do not invent a palette.
 
 ### 1.1 Logo
-
 - Mark: a **black square (#0f172a) with rounded corners (8px) containing a white bold "V"**, centered. Build it as an inline SVG component `<HectocornVMark />` (default 32×32, scalable).
 - Wordmark: `Hectocorn V` — "Hectocorn" in `font-bold`, then a space, then the mark rendered inline replacing the letter V. Text uses `text-foreground`.
 - Favicon: the mark, exported to `/public/favicon.svg` and `/public/favicon.ico`.
@@ -34,27 +33,18 @@ export function HectocornVMark({ size = 32 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" aria-label="Hectocorn V">
       <rect width="32" height="32" rx="8" fill="#0f172a" />
-      <path
-        d="M8 8 L16 25 L24 8"
-        stroke="#ffffff"
-        strokeWidth="4.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
-      />
+      <path d="M8 8 L16 25 L24 8" stroke="#ffffff" strokeWidth="4.5"
+            strokeLinecap="round" strokeLinejoin="round" fill="none" />
     </svg>
   );
 }
 ```
 
 ### 1.2 Typography
-
 The live site uses the Tailwind default sans stack (no web font is loaded). Use exactly:
-
 ```
 font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 ```
-
 - H1 hero: `text-5xl md:text-7xl font-bold leading-tight` with gradient text: `bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent`
 - H2 section: `text-4xl md:text-5xl font-bold` (48px), `text-foreground`
 - H3 card: `text-xl font-semibold tracking-[-0.5px]` (20px)
@@ -62,18 +52,17 @@ font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe U
 - Body: `text-base`; labels `text-sm font-medium`
 
 ### 1.3 Colour tokens (copy verbatim into `globals.css`)
-
 ```css
 :root {
   --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%; /* #020817 */
+  --foreground: 222.2 84% 4.9%;        /* #020817 */
   --card: 0 0% 100%;
   --card-foreground: 222.2 84% 4.9%;
   --popover: 0 0% 100%;
   --popover-foreground: 222.2 84% 4.9%;
-  --primary: 222.2 47.4% 11.2%; /* #0f172a  slate-900 */
-  --primary-foreground: 210 40% 98%; /* #f8fafc */
-  --secondary: 210 40% 96.1%; /* #f1f5f9 */
+  --primary: 222.2 47.4% 11.2%;        /* #0f172a  slate-900 */
+  --primary-foreground: 210 40% 98%;   /* #f8fafc */
+  --secondary: 210 40% 96.1%;          /* #f1f5f9 */
   --secondary-foreground: 222.2 47.4% 11.2%;
   --muted: 210 40% 96.1%;
   --muted-foreground: 215.4 16.3% 46.9%; /* #64748b */
@@ -81,17 +70,15 @@ font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe U
   --accent-foreground: 222.2 47.4% 11.2%;
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 210 40% 98%;
-  --border: 214.3 31.8% 91.4%; /* #e2e8f0 */
+  --border: 214.3 31.8% 91.4%;         /* #e2e8f0 */
   --input: 214.3 31.8% 91.4%;
   --ring: 222.2 84% 4.9%;
   --radius: 0.5rem;
 }
 ```
-
 Dark mode: use the shadcn default slate dark block (`--background: 222.2 84% 4.9%` etc.). Ship a theme toggle but default to light, as the live site is light-only.
 
 ### 1.4 Component recipes observed on hectocorn.co
-
 - **Primary button:** `bg-primary text-primary-foreground rounded-md h-11 px-8 text-sm font-medium hover:bg-primary/90`
 - **Ghost link (nav/footer):** `text-muted-foreground hover:text-foreground text-base`
 - **Card:** `rounded-lg border bg-card text-card-foreground shadow-sm` with `hover:shadow-lg transition-shadow`
@@ -105,22 +92,21 @@ Dark mode: use the shadcn default slate dark block (`--background: 222.2 84% 4.9
 
 ## 2. Tech stack (fixed — do not substitute)
 
-| Layer       | Choice                                                                                                                                                |
-| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Framework   | **Next.js 15** (App Router, TypeScript strict, `src/` dir)                                                                                            |
-| Styling     | Tailwind CSS 3 + **shadcn/ui** (init with `slate` base colour, CSS variables on)                                                                      |
-| Forms       | react-hook-form + zod                                                                                                                                 |
-| Charts      | recharts                                                                                                                                              |
-| DB          | Prisma + **SQLite** (zero-config for GitHub users; Postgres via `DATABASE_URL` swap)                                                                  |
-| AI          | `@anthropic-ai/sdk`, model `claude-sonnet-4-6` (config in one place), tool-use for structured JSON, optional server-side web search for market sizing |
-| PDF         | `@react-pdf/renderer`                                                                                                                                 |
-| Auth        | none in v1 (local tool). Reports are addressable by unguessable ID (`nanoid(16)`)                                                                     |
-| Tests       | Vitest for the engine, Playwright smoke for the form → report flow                                                                                    |
-| Lint/format | ESLint + Prettier, Husky pre-commit                                                                                                                   |
-| CI          | GitHub Actions: lint, typecheck, test, build                                                                                                          |
+| Layer | Choice |
+|---|---|
+| Framework | **Next.js 15** (App Router, TypeScript strict, `src/` dir) |
+| Styling | Tailwind CSS 3 + **shadcn/ui** (init with `slate` base colour, CSS variables on) |
+| Forms | react-hook-form + zod |
+| Charts | recharts |
+| DB | Prisma + **SQLite** (zero-config for GitHub users; Postgres via `DATABASE_URL` swap) |
+| AI | `@anthropic-ai/sdk`, model `claude-sonnet-4-6` (config in one place), tool-use for structured JSON, optional server-side web search for market sizing |
+| PDF | `@react-pdf/renderer` |
+| Auth | none in v1 (local tool). Reports are addressable by unguessable ID (`nanoid(16)`) |
+| Tests | Vitest for the engine, Playwright smoke for the form → report flow |
+| Lint/format | ESLint + Prettier, Husky pre-commit |
+| CI | GitHub Actions: lint, typecheck, test, build |
 
 `.env.example`:
-
 ```
 ANTHROPIC_API_KEY=
 ANTHROPIC_MODEL=claude-sonnet-4-6
@@ -192,54 +178,19 @@ This is the single source of truth. The form, the API, the engine and the AI pro
 import { z } from "zod";
 
 export const Sector = z.enum([
-  "cybersecurity",
-  "saas",
-  "fintech",
-  "healthtech",
-  "biotech",
-  "climate_energy",
-  "deeptech_hardware",
-  "ai_ml",
-  "marketplace",
-  "ecommerce",
-  "consumer",
-  "edtech",
-  "proptech",
-  "mobility",
-  "other",
+  "cybersecurity","saas","fintech","healthtech","biotech","climate_energy","deeptech_hardware",
+  "ai_ml","marketplace","ecommerce","consumer","edtech","proptech","mobility","other",
 ]);
-export const Region = z.enum(["EU", "UK", "US", "MENA", "APAC", "LATAM", "AFRICA", "OTHER"]);
-export const BusinessModel = z.enum([
-  "b2b_saas",
-  "b2b_services",
-  "b2b2c",
-  "b2c_subscription",
-  "b2c_transactional",
-  "marketplace",
-  "hardware",
-  "licensing",
-  "other",
-]);
-export const StageSelf = z.enum(["idea", "pre_seed", "seed", "series_a", "series_b_plus"]);
+export const Region = z.enum(["EU","UK","US","MENA","APAC","LATAM","AFRICA","OTHER"]);
+export const BusinessModel = z.enum(["b2b_saas","b2b_services","b2b2c","b2c_subscription","b2c_transactional","marketplace","hardware","licensing","other"]);
+export const StageSelf = z.enum(["idea","pre_seed","seed","series_a","series_b_plus"]);
 
 export const FundingRound = z.object({
-  type: z.enum([
-    "friends_family",
-    "angel",
-    "pre_seed",
-    "seed",
-    "series_a",
-    "series_b",
-    "grant",
-    "convertible_safe",
-    "other",
-  ]),
+  type: z.enum(["friends_family","angel","pre_seed","seed","series_a","series_b","grant","convertible_safe","other"]),
   date: z.string().describe("ISO date, e.g. 2025-04-01"),
   amountUsd: z.number().nonnegative(),
   postMoneyUsd: z.number().positive().optional().describe("Post-money valuation if priced"),
-  leadInvestorType: z
-    .enum(["vc", "angel", "corporate", "accelerator", "public_grant", "none"])
-    .optional(),
+  leadInvestorType: z.enum(["vc","angel","corporate","accelerator","public_grant","none"]).optional(),
 });
 
 export const StartupInput = z.object({
@@ -254,20 +205,14 @@ export const StartupInput = z.object({
   hqRegion: Region,
   hqCountry: z.string().length(2).describe("ISO-3166 alpha-2, e.g. GR"),
   otherBranches: z.array(z.string()).default([]).describe("Countries with an office/entity"),
-  operatingCountries: z
-    .array(z.string())
-    .default([])
-    .describe("Countries where you have customers"),
+  operatingCountries: z.array(z.string()).default([]).describe("Countries where you have customers"),
 
   // Team
   team: z.object({
     fullTimeEmployees: z.number().int().min(1),
     founders: z.number().int().min(1),
     foundersWithPriorExit: z.number().int().min(0),
-    foundersWithDomainYears: z
-      .number()
-      .min(0)
-      .describe("Avg years of domain experience across founders"),
+    foundersWithDomainYears: z.number().min(0).describe("Avg years of domain experience across founders"),
     technicalCofounder: z.boolean(),
     keyHiresPlanned12m: z.number().int().min(0).default(0),
     advisorsNotable: z.number().int().min(0).default(0),
@@ -278,16 +223,8 @@ export const StartupInput = z.object({
     payingCustomers: z.number().int().min(0),
     pilotsOrLOIs: z.number().int().min(0).default(0),
     arrUsd: z.number().min(0).default(0).describe("Annual recurring revenue"),
-    nonRecurringRevenueTtmUsd: z
-      .number()
-      .min(0)
-      .default(0)
-      .describe("Services/one-off revenue, trailing 12m"),
-    momGrowthPct: z
-      .number()
-      .min(-100)
-      .optional()
-      .describe("Avg month-over-month revenue growth, last 6m"),
+    nonRecurringRevenueTtmUsd: z.number().min(0).default(0).describe("Services/one-off revenue, trailing 12m"),
+    momGrowthPct: z.number().min(-100).optional().describe("Avg month-over-month revenue growth, last 6m"),
     grossMarginPct: z.number().min(-100).max(100).optional(),
     churnAnnualPct: z.number().min(0).max(100).optional(),
     netRevenueRetentionPct: z.number().min(0).optional(),
@@ -320,19 +257,11 @@ export const StartupInput = z.object({
     patentsGranted: z.number().int().min(0).default(0),
     patentsPending: z.number().int().min(0).default(0),
     trademarksRegistered: z.boolean().default(false),
-    proprietaryData: z
-      .boolean()
-      .default(false)
-      .describe("Unique dataset that compounds with usage"),
+    proprietaryData: z.boolean().default(false).describe("Unique dataset that compounds with usage"),
     certifications: z.array(z.string()).default([]).describe("e.g. ISO 27001, IEC 62443, SOC2, CE"),
-    regulatoryTailwind: z
-      .boolean()
-      .default(false)
-      .describe("Regulation forcing customers to buy, e.g. NIS2, CRA"),
-    productStage: z.enum(["concept", "prototype", "mvp", "launched", "scaling"]),
-    techDefensibility: z
-      .enum(["low", "medium", "high"])
-      .describe("How hard to replicate in 12 months"),
+    regulatoryTailwind: z.boolean().default(false).describe("Regulation forcing customers to buy, e.g. NIS2, CRA"),
+    productStage: z.enum(["concept","prototype","mvp","launched","scaling"]),
+    techDefensibility: z.enum(["low","medium","high"]).describe("How hard to replicate in 12 months"),
   }),
 
   // Market
@@ -342,7 +271,7 @@ export const StartupInput = z.object({
     somUsd: z.number().positive().optional(),
     marketCagrPct: z.number().optional(),
     competitorsNamed: z.array(z.string()).default([]),
-    competitiveIntensity: z.enum(["low", "medium", "high"]).optional(),
+    competitiveIntensity: z.enum(["low","medium","high"]).optional(),
     hasEstimateFromAi: z.boolean().default(false), // set server-side
   }),
 
@@ -357,7 +286,7 @@ export const StartupInput = z.object({
 
   // Meta
   selfDeclaredStage: StageSelf.optional(),
-  reportingCurrency: z.enum(["USD", "EUR", "GBP"]).default("USD"),
+  reportingCurrency: z.enum(["USD","EUR","GBP"]).default("USD"),
 });
 export type StartupInput = z.infer<typeof StartupInput>;
 ```
@@ -369,19 +298,17 @@ Currency: the form accepts EUR/GBP; the API converts to USD with a static rate t
 ## 5. Valuation engine (`src/lib/engine`) — deterministic, unit-tested
 
 ### 5.1 Stage detection (`stage.ts`)
-
 Infer stage from data (self-declared stage is only a tiebreaker):
 
-| Stage           | Rule (first match)                                                                      |
-| --------------- | --------------------------------------------------------------------------------------- |
-| `series_b_plus` | ARR ≥ $5M or last priced round ≥ Series B                                               |
-| `series_a`      | ARR ≥ $1M or last priced round = Series A                                               |
-| `seed`          | ARR ≥ $150k **or** paying customers ≥ 5 **or** last priced round = Seed with post ≥ $4M |
-| `pre_seed`      | product ≥ MVP and (paying ≥ 1 or raised ≥ $100k)                                        |
-| `idea`          | otherwise                                                                               |
+| Stage | Rule (first match) |
+|---|---|
+| `series_b_plus` | ARR ≥ $5M or last priced round ≥ Series B |
+| `series_a` | ARR ≥ $1M or last priced round = Series A |
+| `seed` | ARR ≥ $150k **or** paying customers ≥ 5 **or** last priced round = Seed with post ≥ $4M |
+| `pre_seed` | product ≥ MVP and (paying ≥ 1 or raised ≥ $100k) |
+| `idea` | otherwise |
 
 ### 5.2 Benchmarks (`benchmarks.ts`)
-
 Keep all numbers in one file, typed, with a `source`/`asOf` note so users can update them. Initial values (2025–2026 European/US early-stage medians, editable):
 
 ```ts
@@ -400,18 +327,17 @@ export const FX_TO_USD = { USD: 1, EUR: 1.08, GBP: 1.27 };
 ```
 
 ### 5.3 Qualitative scores
-
 Seven 0–100 scores feed several methods. They are computed **deterministically from the inputs** (`scoreFromInputs`) and then **optionally overridden by the AI scorer** (§6.1) which sees the narrative and names. The engine always keeps both versions and reports which was used.
 
-| Score       | Deterministic derivation (clamped 0–100)                                                                                                                      |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `team`      | 40 base + 10·technicalCofounder + 15·min(exits,2) + 2·min(domainYears,15) + 3·min(advisors,3) − 15·keyPersonDependency                                        |
-| `market`    | from TAM: <$500M→30, <$2B→50, <$10B→70, ≥$10B→85; +10 if CAGR ≥ 15%; +10 regulatoryTailwind; −10 competitiveIntensity=high                                    |
-| `product`   | concept 15 / prototype 35 / mvp 55 / launched 75 / scaling 90; +5 per certification (max 15)                                                                  |
-| `traction`  | 0 customers→10; else 30 + 8·min(customers,5) + 4·min(customers−5,10 if >5) + 15 if ARR>0 + 10 if momGrowth ≥ 10% + 5·min(marqueeCustomers,2) + 5 if NRR ≥ 100 |
-| `moat`      | techDefensibility low 25 / med 50 / high 75; +10 patentsGranted>0; +5 patentsPending>0; +10 proprietaryData; +5 trademarks; −10 hardwareSupplyRisk            |
-| `financial` | 50; +10 if runway ≥ 18m, −15 if < 6m; +10 grossMargin ≥ 70, −10 < 40; +10 profitable; −15 if churn > 15%                                                      |
-| `deal`      | 50; +15 if last round led by VC; +10 if raised ≥ $500k; +5 per named partnership (max 15); −10 if customerConcentration > 50%                                 |
+| Score | Deterministic derivation (clamped 0–100) |
+|---|---|
+| `team` | 40 base + 10·technicalCofounder + 15·min(exits,2) + 2·min(domainYears,15) + 3·min(advisors,3) − 15·keyPersonDependency |
+| `market` | from TAM: <$500M→30, <$2B→50, <$10B→70, ≥$10B→85; +10 if CAGR ≥ 15%; +10 regulatoryTailwind; −10 competitiveIntensity=high |
+| `product` | concept 15 / prototype 35 / mvp 55 / launched 75 / scaling 90; +5 per certification (max 15) |
+| `traction` | 0 customers→10; else 30 + 8·min(customers,5) + 4·min(customers−5,10 if >5) + 15 if ARR>0 + 10 if momGrowth ≥ 10% + 5·min(marqueeCustomers,2) + 5 if NRR ≥ 100 |
+| `moat` | techDefensibility low 25 / med 50 / high 75; +10 patentsGranted>0; +5 patentsPending>0; +10 proprietaryData; +5 trademarks; −10 hardwareSupplyRisk |
+| `financial` | 50; +10 if runway ≥ 18m, −15 if < 6m; +10 grossMargin ≥ 70, −10 < 40; +10 profitable; −15 if churn > 15% |
+| `deal` | 50; +15 if last round led by VC; +10 if raised ≥ $500k; +5 per named partnership (max 15); −10 if customerConcentration > 50% |
 
 `runwayMonths = cashOnHand / max(monthlyBurn, 1)`.
 
@@ -446,17 +372,16 @@ If a priced round exists: `anchor = postMoney × stepUp` where `stepUp = (1 + an
 Not a valuation method; a **sanity band**. `ceiling = SOM × 3` (a company is rarely worth more than 3× the revenue it could plausibly capture); `floor = 0`. If the blended number exceeds the ceiling, cap it and add a warning flag. If TAM/SAM/SOM missing, request AI estimate (§6.2) and mark `market.hasEstimateFromAi = true`.
 
 ### 5.5 Blend (`blend.ts`)
-
 1. Collect applicable methods and their `weightHint`.
 2. Apply stage weight presets (then multiply by `weightHint`, renormalise):
 
-| Stage         | Scorecard | Berkus | RFS | VC  | Multiples | Anchor |
-| ------------- | --------- | ------ | --- | --- | --------- | ------ |
-| idea          | 35        | 30     | 25  | 10  | 0         | 0      |
-| pre_seed      | 30        | 20     | 20  | 15  | 5         | 10     |
-| seed          | 20        | 5      | 15  | 25  | 20        | 15     |
-| series_a      | 5         | 0      | 5   | 35  | 45        | 10     |
-| series_b_plus | 0         | 0      | 0   | 35  | 55        | 10     |
+| Stage | Scorecard | Berkus | RFS | VC | Multiples | Anchor |
+|---|---|---|---|---|---|---|
+| idea | 35 | 30 | 25 | 10 | 0 | 0 |
+| pre_seed | 30 | 20 | 20 | 15 | 5 | 10 |
+| seed | 20 | 5 | 15 | 25 | 20 | 15 |
+| series_a | 5 | 0 | 5 | 35 | 45 | 10 |
+| series_b_plus | 0 | 0 | 0 | 35 | 55 | 10 |
 
 3. `base = weighted geometric mean` (geometric, not arithmetic — it resists one outlier method).
 4. Apply market ceiling (G).
@@ -464,29 +389,18 @@ Not a valuation method; a **sanity band**. `ceiling = SOM × 3` (a company is ra
 6. Output `pre-money` as the headline and also `impliedPostMoney = pre + targetRaise` when raising.
 
 ### 5.6 Sensitivity (`sensitivity.ts`)
-
 Re-run the engine with one variable perturbed; return deltas for: ARR ±50%, +1 paying customer, +1 patent granted, +1 operating country, momGrowth +5pp, region → US, runway +12m. Also expose `POST /api/sensitivity` for custom what-ifs from the UI.
 
 ### 5.7 Engine contract
-
 ```ts
 export interface EngineResult {
-  stage: Stage;
-  scores: Scores;
-  scoresSource: "deterministic" | "ai";
-  methods: MethodResult[];
-  weights: Record<string, number>;
-  preMoneyUsd: number;
-  lowUsd: number;
-  highUsd: number;
-  impliedPostMoneyUsd?: number;
-  confidence: number;
-  flags: string[];
-  marketCeilingUsd?: number;
+  stage: Stage; scores: Scores; scoresSource: "deterministic" | "ai";
+  methods: MethodResult[]; weights: Record<string, number>;
+  preMoneyUsd: number; lowUsd: number; highUsd: number; impliedPostMoneyUsd?: number;
+  confidence: number; flags: string[]; marketCeilingUsd?: number;
   benchmarksVersion: string;
 }
 ```
-
 Tests must cover: every method in isolation with hand-computed expected values; stage detection edge cases; the PlugSecure fixture (§7) producing a pre-money **between $3.0M and $6.5M** with no exceptions; ceiling capping; geometric blend; currency conversion.
 
 ---
@@ -496,17 +410,13 @@ Tests must cover: every method in isolation with hand-computed expected values; 
 All calls: `claude-sonnet-4-6`, temperature 0.2, **tool-use with a strict JSON schema** for structured outputs (never regex-parse prose). Every prompt receives the zod schema descriptions plus the full normalised input. Log prompt version + model in the DB row.
 
 ### 6.1 Qualitative scorer (`score.ts`)
-
 Input: startup JSON + deterministic scores. Task: return the seven scores (0–100), each with a one-sentence rationale, **staying within ±20 of the deterministic score unless the narrative/named customers/partners justify more**, and a `notableSignals[]` list. System prompt establishes it as a European seed-stage investor who is sceptical, benchmark-aware and explicitly rewards regulatory tailwinds, hard-to-replicate OT/deep-tech, and paying B2B logos.
 
 ### 6.2 Market estimator (`market.ts`)
-
 Only runs if TAM/SAM/SOM missing. With `ENABLE_WEB_SEARCH=true`, enable the Anthropic web-search tool so Claude can cite public market reports; otherwise estimate from knowledge with wide bands. Returns `{ tamUsd, samUsd, somUsd, cagrPct, method, sources[], confidence }`. SOM must be derived bottom-up (customers × ACV reachable in 5 years), not as a % of TAM.
 
 ### 6.3 Memo + bounded adjustment (`memo.ts`)
-
 Input: startup JSON, `EngineResult`, AI scores, market estimate. Returns:
-
 ```ts
 {
   adjustmentPct: number;          // must be within [-25, 25]; server clamps and flags
@@ -518,11 +428,9 @@ Input: startup JSON, `EngineResult`, AI scores, market estimate. Returns:
   disclaimer: string;
 }
 ```
-
 The report page shows engine number → AI adjustment → final, with the rationale, so nothing is a black box.
 
 ### 6.4 Failure mode
-
 If `ANTHROPIC_API_KEY` is missing or a call fails: still return the deterministic result, mark `aiStatus: "unavailable"`, and render the report without the memo. The tool must never fail to give a number.
 
 ---
@@ -534,70 +442,20 @@ If `ANTHROPIC_API_KEY` is missing or a call fails: still return the deterministi
   "name": "PlugSecure",
   "website": "https://plugsecure.io",
   "oneLiner": "Cybersecurity for critical energy infrastructure — securing EV charging (OCPP/CSMS), solar inverters, BESS and smart-grid assets for CPOs, utilities and OEMs.",
-  "sector": "cybersecurity",
-  "subSector": "OT/ICS security for EV charging & distributed energy",
-  "businessModel": "b2b_saas",
-  "foundedDate": "2025-01-01",
-  "hqRegion": "EU",
-  "hqCountry": "GR",
-  "otherBranches": [],
-  "operatingCountries": ["GR", "UK", "RO"],
-  "team": {
-    "fullTimeEmployees": 3,
-    "founders": 2,
-    "foundersWithPriorExit": 1,
-    "foundersWithDomainYears": 10,
-    "technicalCofounder": true,
-    "keyHiresPlanned12m": 2,
-    "advisorsNotable": 1
-  },
-  "traction": {
-    "payingCustomers": 3,
-    "pilotsOrLOIs": 2,
-    "arrUsd": 0,
-    "nonRecurringRevenueTtmUsd": 0,
-    "marqueeCustomers": [],
-    "partnerships": [],
-    "pipelineWeightedUsd": 0
-  },
+  "sector": "cybersecurity", "subSector": "OT/ICS security for EV charging & distributed energy",
+  "businessModel": "b2b_saas", "foundedDate": "2025-01-01",
+  "hqRegion": "EU", "hqCountry": "GR", "otherBranches": [], "operatingCountries": ["GR","UK","RO"],
+  "team": { "fullTimeEmployees": 3, "founders": 2, "foundersWithPriorExit": 1, "foundersWithDomainYears": 10, "technicalCofounder": true, "keyHiresPlanned12m": 2, "advisorsNotable": 1 },
+  "traction": { "payingCustomers": 3, "pilotsOrLOIs": 2, "arrUsd": 0, "nonRecurringRevenueTtmUsd": 0, "marqueeCustomers": [], "partnerships": [], "pipelineWeightedUsd": 0 },
   "financials": { "monthlyBurnUsd": 0, "cashOnHandUsd": 0, "isProfitable": false },
-  "funding": {
-    "rounds": [
-      {
-        "type": "pre_seed",
-        "date": "2025-04-01",
-        "amountUsd": 720000,
-        "postMoneyUsd": 2620000,
-        "leadInvestorType": "vc"
-      }
-    ],
-    "totalRaisedUsd": 720000,
-    "currentlyRaising": true,
-    "targetRaiseUsd": 1500000,
-    "grantsNonDilutiveUsd": 0
-  },
-  "ip": {
-    "patentsGranted": 1,
-    "patentsPending": 0,
-    "trademarksRegistered": true,
-    "proprietaryData": true,
-    "certifications": [],
-    "regulatoryTailwind": true,
-    "productStage": "launched",
-    "techDefensibility": "high"
-  },
+  "funding": { "rounds": [{ "type": "pre_seed", "date": "2025-04-01", "amountUsd": 720000, "postMoneyUsd": 2620000, "leadInvestorType": "vc" }], "totalRaisedUsd": 720000, "currentlyRaising": true, "targetRaiseUsd": 1500000, "grantsNonDilutiveUsd": 0 },
+  "ip": { "patentsGranted": 1, "patentsPending": 0, "trademarksRegistered": true, "proprietaryData": true, "certifications": [], "regulatoryTailwind": true, "productStage": "launched", "techDefensibility": "high" },
   "market": { "competitorsNamed": [], "competitiveIntensity": "medium" },
-  "risks": {
-    "keyPersonDependency": true,
-    "hardwareSupplyRisk": false,
-    "litigationOrRegulatoryRisk": false
-  },
+  "risks": { "keyPersonDependency": true, "hardwareSupplyRisk": false, "litigationOrRegulatoryRisk": false },
   "narrative": "NIS2 and the Cyber Resilience Act force CPOs and energy-asset operators to secure OCPP/Modbus/DNP3 endpoints. Founders previously built and sold a company to PPC Group, Greece's largest utility. Product is live with paying customers in three countries.",
-  "selfDeclaredStage": "pre_seed",
-  "reportingCurrency": "USD"
+  "selfDeclaredStage": "pre_seed", "reportingCurrency": "USD"
 }
 ```
-
 Fields marked `0` above (ARR, burn, cash, revenue numbers) are placeholders — the wizard must make it obvious these matter and let the user fill them. The example's amounts were entered in EUR originally; the seed stores USD-converted values already.
 
 ---
