@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-21T01:03:32Z",
+ "generated": "2026-09-21T06:17:13Z",
  "countries": [
   {
    "code": "BE",
@@ -10,10 +10,10 @@
    "source_url": "https://transportdata.be/dataset/road-public-charging-network",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-21T01:03:16Z",
-   "dynamic_ts": "2026-09-21T01:03:16Z",
-   "locations": 3518,
-   "evses": 10473
+   "static_ts": "2026-09-21T06:16:56Z",
+   "dynamic_ts": "2026-09-21T06:16:56Z",
+   "locations": 3519,
+   "evses": 10474
   },
   {
    "code": "CY",
@@ -52,8 +52,8 @@
    "source_url": "https://electrokinisi.yme.gov.gr/public/HelpMyfah/PublicData/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-20T01:37:55Z",
-   "dynamic_ts": "2026-09-21T00:56:46Z",
+   "static_ts": "2026-09-21T01:38:02Z",
+   "dynamic_ts": "2026-09-21T06:06:49Z",
    "locations": 4252,
    "evses": 9940
   },
@@ -66,8 +66,8 @@
    "source_url": "https://ev.vialietuva.lt/en/data-provision",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-21T01:02:31Z",
-   "dynamic_ts": "2026-09-21T01:02:31Z",
+   "static_ts": "2026-09-21T06:16:12Z",
+   "dynamic_ts": "2026-09-21T06:16:12Z",
    "locations": 1964,
    "evses": 5706
   },
@@ -80,8 +80,8 @@
    "source_url": "https://data.public.lu/en/pages/topics/transport-charging-points-points-de-charge/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-21T01:03:28Z",
-   "dynamic_ts": "2026-09-21T01:03:28Z",
+   "static_ts": "2026-09-21T06:17:09Z",
+   "dynamic_ts": "2026-09-21T06:17:09Z",
    "locations": 737,
    "evses": 2963
   },
@@ -94,10 +94,10 @@
    "source_url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-21T01:02:00Z",
-   "dynamic_ts": "2026-09-21T01:02:00Z",
-   "locations": 79835,
-   "evses": 200450
+   "static_ts": "2026-09-21T06:16:00Z",
+   "dynamic_ts": "2026-09-21T06:16:00Z",
+   "locations": 79828,
+   "evses": 200453
   }
  ]
 }
