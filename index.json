@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-22T19:05:27Z",
+ "generated": "2026-09-22T22:04:49Z",
  "countries": [
   {
    "code": "BE",
@@ -53,7 +53,7 @@
    "refresh_minutes": 10,
    "live": true,
    "static_ts": "2026-09-22T01:38:02Z",
-   "dynamic_ts": "2026-09-22T18:56:45Z",
+   "dynamic_ts": "2026-09-22T21:56:52Z",
    "locations": 4251,
    "evses": 9933
   },
@@ -66,10 +66,10 @@
    "source_url": "https://ev.vialietuva.lt/en/data-provision",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-22T19:03:57Z",
-   "dynamic_ts": "2026-09-22T19:03:57Z",
+   "static_ts": "2026-09-22T22:03:15Z",
+   "dynamic_ts": "2026-09-22T22:03:15Z",
    "locations": 1984,
-   "evses": 5813
+   "evses": 5782
   },
   {
    "code": "LU",
@@ -80,8 +80,8 @@
    "source_url": "https://data.public.lu/en/pages/topics/transport-charging-points-points-de-charge/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-22T19:05:23Z",
-   "dynamic_ts": "2026-09-22T19:05:23Z",
+   "static_ts": "2026-09-22T22:04:46Z",
+   "dynamic_ts": "2026-09-22T22:04:46Z",
    "locations": 736,
    "evses": 2962
   },
@@ -94,10 +94,10 @@
    "source_url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-22T19:04:00Z",
-   "dynamic_ts": "2026-09-22T19:04:00Z",
-   "locations": 79835,
-   "evses": 200448
+   "static_ts": "2026-09-22T22:03:00Z",
+   "dynamic_ts": "2026-09-22T22:03:00Z",
+   "locations": 79869,
+   "evses": 200516
   }
  ]
 }
