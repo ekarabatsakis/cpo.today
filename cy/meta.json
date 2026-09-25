@@ -1,14 +1,14 @@
 {
  "static": {
-  "sha256": "5176ef3f4c2dea4af3eff3f33151c3a6974204f581c2af0847cc2ade7e7bd764",
+  "sha256": "87f99ed121490b988c94d57ec6e810407a658492fe7f7e73f6eb7c7150acd884",
   "etag": null,
   "last_modified": null,
   "body_bytes": 386467,
   "json_bytes": 386467,
-  "next_check": "2026-09-25T21:47:44Z",
+  "next_check": "2026-09-26T22:29:39Z",
   "structure": "c79b2c377d6c74f3fe2b12971143ccf38960036535794bb38fd399e5bffb2b31",
-  "fetched": "2026-09-24T21:47:44Z",
-  "source_ts": "2026-09-24T21:47:44Z",
+  "fetched": "2026-09-25T22:29:39Z",
+  "source_ts": "2026-09-25T22:29:39Z",
   "locations": 171,
   "evses": 203,
   "dropped": 0
@@ -24,6 +24,6 @@
  "source_url": "https://www.traffic4cyprus.org.cy/en_AU/dataset/electricvehiclecharges",
  "licence": "CC-BY 4.0",
  "pipeline_version": "0.1.0",
- "last_run": "2026-09-25T19:15:02Z",
+ "last_run": "2026-09-25T22:29:39Z",
  "warnings": []
 }
