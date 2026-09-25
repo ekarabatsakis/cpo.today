@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-25T00:04:57Z",
+ "generated": "2026-09-25T04:52:07Z",
  "countries": [
   {
    "code": "BE",
@@ -10,8 +10,8 @@
    "source_url": "https://transportdata.be/dataset/road-public-charging-network",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-25T00:04:40Z",
-   "dynamic_ts": "2026-09-25T00:04:40Z",
+   "static_ts": "2026-09-25T04:51:52Z",
+   "dynamic_ts": "2026-09-25T04:51:52Z",
    "locations": 3526,
    "evses": 10448
   },
@@ -52,10 +52,10 @@
    "source_url": "https://electrokinisi.yme.gov.gr/public/HelpMyfah/PublicData/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-24T01:37:59Z",
-   "dynamic_ts": "2026-09-24T23:56:45Z",
-   "locations": 4255,
-   "evses": 9936
+   "static_ts": "2026-09-25T01:38:03Z",
+   "dynamic_ts": "2026-09-25T04:46:48Z",
+   "locations": 4259,
+   "evses": 9954
   },
   {
    "code": "LT",
@@ -66,8 +66,8 @@
    "source_url": "https://ev.vialietuva.lt/en/data-provision",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-25T00:03:54Z",
-   "dynamic_ts": "2026-09-25T00:03:54Z",
+   "static_ts": "2026-09-25T04:51:09Z",
+   "dynamic_ts": "2026-09-25T04:51:09Z",
    "locations": 1984,
    "evses": 5770
   },
@@ -80,8 +80,8 @@
    "source_url": "https://data.public.lu/en/pages/topics/transport-charging-points-points-de-charge/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-25T00:04:52Z",
-   "dynamic_ts": "2026-09-25T00:04:52Z",
+   "static_ts": "2026-09-25T04:52:04Z",
+   "dynamic_ts": "2026-09-25T04:52:04Z",
    "locations": 735,
    "evses": 2957
   },
@@ -94,10 +94,10 @@
    "source_url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-25T00:04:00Z",
-   "dynamic_ts": "2026-09-25T00:04:00Z",
-   "locations": 79982,
-   "evses": 200768
+   "static_ts": "2026-09-25T04:51:00Z",
+   "dynamic_ts": "2026-09-25T04:51:00Z",
+   "locations": 79927,
+   "evses": 200732
   }
  ]
 }
