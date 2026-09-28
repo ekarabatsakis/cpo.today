@@ -1,28 +1,28 @@
 {
  "static": {
-  "sha256": "13c66a8fa02260c0ef218b5f77ec1fcc051cd466bcea064bb795ccd1075d62f7",
-  "etag": "\"117be72-65c7f2cada359\"",
-  "last_modified": "Sun, 27 Sep 2026 23:19:00 GMT",
-  "body_bytes": 18333298,
-  "json_bytes": 197809911,
+  "sha256": "cbbf0831a2aab65db7863ae3d72da4cdd42031ac2eaabbb4f17bb04022b10a7b",
+  "etag": "\"117e96b-65c813df6ad3b\"",
+  "last_modified": "Mon, 28 Sep 2026 01:47:00 GMT",
+  "body_bytes": 18344299,
+  "json_bytes": 197813214,
   "next_check": null,
-  "structure": "6bb9b57ee6d342b113d0cad4c8bce76fc6e8cb368b0ac2a32e904bb3b1f86bdd",
-  "fetched": "2026-09-27T23:19:21Z",
-  "source_ts": "2026-09-27T23:19:00Z",
+  "structure": "95d6d606286a3d61a4a22507729d395c0c6331b1169daa7c8751e5f8694d2134",
+  "fetched": "2026-09-28T01:47:07Z",
+  "source_ts": "2026-09-28T01:47:00Z",
   "locations": 80020,
   "evses": 200715,
   "dropped": 192
  },
  "dynamic": {
-  "sha256": "13c66a8fa02260c0ef218b5f77ec1fcc051cd466bcea064bb795ccd1075d62f7",
-  "fetched": "2026-09-27T23:19:21Z",
-  "source_ts": "2026-09-27T23:19:00Z",
+  "sha256": "cbbf0831a2aab65db7863ae3d72da4cdd42031ac2eaabbb4f17bb04022b10a7b",
+  "fetched": "2026-09-28T01:47:07Z",
+  "source_ts": "2026-09-28T01:47:00Z",
   "evses": 201297,
   "orphan_evses": 582,
   "missing_evses": 0,
-  "changes": 10564,
+  "changes": 1619,
   "tariffs": 1342,
-  "tariffed_connectors": 173283
+  "tariffed_connectors": 173285
  },
  "country": "NL",
  "country_name": "Netherlands",
@@ -31,12 +31,12 @@
  "source_url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
  "licence": "NDW open data",
  "pipeline_version": "0.1.0",
- "last_run": "2026-09-27T23:19:21Z",
+ "last_run": "2026-09-28T01:47:07Z",
  "warnings": [],
  "tariffs": {
-  "fetched": "2026-09-27T23:19:21Z",
-  "last_modified": "Sun, 27 Sep 2026 22:34:00 GMT",
-  "body_bytes": 3988756,
+  "fetched": "2026-09-28T01:47:07Z",
+  "last_modified": "Mon, 28 Sep 2026 00:14:00 GMT",
+  "body_bytes": 3988841,
   "json_bytes": 72673022,
   "count": 98476
  }
