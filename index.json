@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-30T23:46:21Z",
+ "generated": "2026-10-01T02:30:47Z",
  "countries": [
   {
    "code": "BE",
@@ -10,8 +10,8 @@
    "source_url": "https://transportdata.be/dataset/road-public-charging-network",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-30T23:46:12Z",
-   "dynamic_ts": "2026-09-30T23:46:12Z",
+   "static_ts": "2026-10-01T02:30:32Z",
+   "dynamic_ts": "2026-10-01T02:30:32Z",
    "locations": 3555,
    "evses": 10554
   },
@@ -52,10 +52,10 @@
    "source_url": "https://electrokinisi.yme.gov.gr/public/HelpMyfah/PublicData/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-30T01:37:58Z",
-   "dynamic_ts": "2026-09-30T23:36:45Z",
-   "locations": 4269,
-   "evses": 9971
+   "static_ts": "2026-10-01T01:37:58Z",
+   "dynamic_ts": "2026-10-01T02:26:55Z",
+   "locations": 4288,
+   "evses": 10006
   },
   {
    "code": "LT",
@@ -66,8 +66,8 @@
    "source_url": "https://ev.vialietuva.lt/en/data-provision",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-30T23:45:34Z",
-   "dynamic_ts": "2026-09-30T23:45:34Z",
+   "static_ts": "2026-10-01T02:29:53Z",
+   "dynamic_ts": "2026-10-01T02:29:53Z",
    "locations": 1984,
    "evses": 5803
   },
@@ -80,8 +80,8 @@
    "source_url": "https://data.public.lu/en/pages/topics/transport-charging-points-points-de-charge/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-30T23:46:17Z",
-   "dynamic_ts": "2026-09-30T23:46:17Z",
+   "static_ts": "2026-10-01T02:30:39Z",
+   "dynamic_ts": "2026-10-01T02:30:39Z",
    "locations": 736,
    "evses": 2999
   },
@@ -94,10 +94,10 @@
    "source_url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-09-30T23:45:00Z",
-   "dynamic_ts": "2026-09-30T23:45:00Z",
-   "locations": 74854,
-   "evses": 187490
+   "static_ts": "2026-10-01T02:30:00Z",
+   "dynamic_ts": "2026-10-01T02:30:00Z",
+   "locations": 74856,
+   "evses": 187500
   }
  ]
 }
