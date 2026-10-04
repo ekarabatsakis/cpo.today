@@ -1,26 +1,26 @@
 {
  "static": {
-  "sha256": "fe41676d804956dfc45a6071e8785909ffbe71311e694713fda9a616a8c7591d",
+  "sha256": "e05be203de4db52b6b1daf349fbf28f521c2966bf514065230c5d0b3604f4606",
   "etag": null,
-  "last_modified": "Sun, 04 Oct 2026 17:40:13 GMT",
-  "body_bytes": 5342076,
-  "json_bytes": 5342076,
+  "last_modified": "Sun, 04 Oct 2026 20:28:34 GMT",
+  "body_bytes": 5342092,
+  "json_bytes": 5342092,
   "next_check": null,
   "structure": "0f06c978cb00817d97439d0e4a3ed988ee2bd2828f35136e3e2cecb8b026bb5d",
-  "fetched": "2026-10-04T17:40:12Z",
-  "source_ts": "2026-10-04T17:40:13Z",
+  "fetched": "2026-10-04T20:28:33Z",
+  "source_ts": "2026-10-04T20:28:34Z",
   "locations": 3563,
   "evses": 10597,
   "dropped": 1
  },
  "dynamic": {
-  "sha256": "fe41676d804956dfc45a6071e8785909ffbe71311e694713fda9a616a8c7591d",
-  "fetched": "2026-10-04T17:40:12Z",
-  "source_ts": "2026-10-04T17:40:13Z",
+  "sha256": "e05be203de4db52b6b1daf349fbf28f521c2966bf514065230c5d0b3604f4606",
+  "fetched": "2026-10-04T20:28:33Z",
+  "source_ts": "2026-10-04T20:28:34Z",
   "evses": 8257,
   "orphan_evses": 2,
   "missing_evses": 0,
-  "changes": 598,
+  "changes": 320,
   "tariffs": 355,
   "tariffed_connectors": 7568
  },
@@ -31,14 +31,14 @@
  "source_url": "https://transportdata.be/dataset/road-public-charging-network",
  "licence": "Open data (transportdata.be)",
  "pipeline_version": "0.1.0",
- "last_run": "2026-10-04T17:40:12Z",
+ "last_run": "2026-10-04T20:28:33Z",
  "warnings": [],
  "part0": {},
  "tariffs": {
-  "fetched": "2026-10-04T17:40:12Z",
-  "last_modified": "Sun, 04 Oct 2026 17:40:26 GMT",
-  "body_bytes": 5167359,
-  "json_bytes": 5167359,
-  "count": 17282
+  "fetched": "2026-10-04T20:28:33Z",
+  "last_modified": "Sun, 04 Oct 2026 20:28:39 GMT",
+  "body_bytes": 5167655,
+  "json_bytes": 5167655,
+  "count": 17283
  }
 }
