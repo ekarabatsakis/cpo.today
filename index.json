@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-06T06:43:02Z",
+ "generated": "2026-10-06T13:41:07Z",
  "countries": [
   {
    "code": "BE",
@@ -10,10 +10,10 @@
    "source_url": "https://transportdata.be/dataset/road-public-charging-network",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-10-06T06:42:50Z",
-   "dynamic_ts": "2026-10-06T06:42:50Z",
-   "locations": 3564,
-   "evses": 10598
+   "static_ts": "2026-10-06T13:40:59Z",
+   "dynamic_ts": "2026-10-06T13:40:59Z",
+   "locations": 3565,
+   "evses": 10600
   },
   {
    "code": "CY",
@@ -53,7 +53,7 @@
    "refresh_minutes": 10,
    "live": true,
    "static_ts": "2026-10-06T01:38:09Z",
-   "dynamic_ts": "2026-10-06T06:36:46Z",
+   "dynamic_ts": "2026-10-06T13:36:46Z",
    "locations": 4301,
    "evses": 10039
   },
@@ -66,10 +66,10 @@
    "source_url": "https://ev.vialietuva.lt/en/data-provision",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-10-06T06:42:13Z",
-   "dynamic_ts": "2026-10-06T06:42:13Z",
+   "static_ts": "2026-10-06T13:40:26Z",
+   "dynamic_ts": "2026-10-06T13:40:26Z",
    "locations": 1984,
-   "evses": 5822
+   "evses": 5820
   },
   {
    "code": "LU",
@@ -80,10 +80,10 @@
    "source_url": "https://data.public.lu/en/pages/topics/transport-charging-points-points-de-charge/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-10-06T06:42:58Z",
-   "dynamic_ts": "2026-10-06T06:42:58Z",
-   "locations": 737,
-   "evses": 3000
+   "static_ts": "2026-10-06T13:41:04Z",
+   "dynamic_ts": "2026-10-06T13:41:04Z",
+   "locations": 738,
+   "evses": 3004
   },
   {
    "code": "NL",
@@ -94,10 +94,10 @@
    "source_url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-10-06T06:42:00Z",
-   "dynamic_ts": "2026-10-06T06:42:00Z",
-   "locations": 75012,
-   "evses": 187962
+   "static_ts": "2026-10-06T13:40:00Z",
+   "dynamic_ts": "2026-10-06T13:40:00Z",
+   "locations": 74789,
+   "evses": 186848
   }
  ]
 }
