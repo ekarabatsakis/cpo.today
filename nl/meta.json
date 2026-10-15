@@ -1,28 +1,28 @@
 {
  "static": {
-  "sha256": "270b61c51bb80e4d22df6450e7bba2239ce38caa0abcb7e0ffdd29755a9b6a70",
-  "etag": "\"115f913-65de132bb448f\"",
-  "last_modified": "Thu, 15 Oct 2026 13:41:00 GMT",
-  "body_bytes": 18217235,
-  "json_bytes": 198065330,
+  "sha256": "6c27c032f0c4eb0bca5aff40a743f0baa42250b394a0bb147ea16d6942e35a02",
+  "etag": "\"1160959-65de4bb87fed5\"",
+  "last_modified": "Thu, 15 Oct 2026 17:54:00 GMT",
+  "body_bytes": 18221401,
+  "json_bytes": 198776494,
   "next_check": null,
-  "structure": "c5d8681c512a0050eed5ebe93f36cb50195a494020c139f76965ae70b88e87b9",
-  "fetched": "2026-10-15T13:41:15Z",
-  "source_ts": "2026-10-15T13:41:00Z",
-  "locations": 80068,
-  "evses": 200647,
+  "structure": "58ac92916f136a6ea48f275916f98cc09b386cd0caa8709ded4fbfd071d9be8d",
+  "fetched": "2026-10-15T17:54:20Z",
+  "source_ts": "2026-10-15T17:54:00Z",
+  "locations": 80226,
+  "evses": 201558,
   "dropped": 206
  },
  "dynamic": {
-  "sha256": "270b61c51bb80e4d22df6450e7bba2239ce38caa0abcb7e0ffdd29755a9b6a70",
-  "fetched": "2026-10-15T13:41:15Z",
-  "source_ts": "2026-10-15T13:41:00Z",
-  "evses": 201258,
-  "orphan_evses": 611,
+  "sha256": "6c27c032f0c4eb0bca5aff40a743f0baa42250b394a0bb147ea16d6942e35a02",
+  "fetched": "2026-10-15T17:54:20Z",
+  "source_ts": "2026-10-15T17:54:00Z",
+  "evses": 202167,
+  "orphan_evses": 609,
   "missing_evses": 0,
-  "changes": 47516,
-  "tariffs": 1370,
-  "tariffed_connectors": 172295
+  "changes": 59287,
+  "tariffs": 1381,
+  "tariffed_connectors": 173200
  },
  "country": "NL",
  "country_name": "Netherlands",
@@ -31,13 +31,13 @@
  "source_url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
  "licence": "NDW open data",
  "pipeline_version": "0.1.0",
- "last_run": "2026-10-15T13:41:15Z",
+ "last_run": "2026-10-15T17:54:20Z",
  "warnings": [],
  "tariffs": {
-  "fetched": "2026-10-15T13:41:15Z",
-  "last_modified": "Thu, 15 Oct 2026 10:02:00 GMT",
-  "body_bytes": 4096402,
-  "json_bytes": 74593304,
-  "count": 100466
+  "fetched": "2026-10-15T17:54:20Z",
+  "last_modified": "Thu, 15 Oct 2026 16:02:00 GMT",
+  "body_bytes": 3973013,
+  "json_bytes": 71103717,
+  "count": 100555
  }
 }
