@@ -1,28 +1,28 @@
 {
  "static": {
-  "sha256": "407c88d2f73d40c8079574cb2122d67c3e7daffaf07d8cb12ace722de043bbe3",
-  "etag": "\"114f949-65de989c4e251\"",
-  "last_modified": "Thu, 15 Oct 2026 23:38:00 GMT",
-  "body_bytes": 18151753,
-  "json_bytes": 198132823,
+  "sha256": "60f931bf6bbbffcd1bbbdd1243bec95d7fad563c5ccf592a7203680c33e71e09",
+  "etag": "\"11510ac-65deb3a8053ee\"",
+  "last_modified": "Fri, 16 Oct 2026 01:39:00 GMT",
+  "body_bytes": 18157740,
+  "json_bytes": 198137619,
   "next_check": null,
-  "structure": "a6ec62532eb7096066326e334ee3dd2de64db0e8aed9a0e6955dfdd76a903ae0",
-  "fetched": "2026-10-15T23:38:05Z",
-  "source_ts": "2026-10-15T23:38:00Z",
+  "structure": "73cb9a92749fa81874491af246cdcd14d59f71acdb7572de377a05edc6a69afc",
+  "fetched": "2026-10-16T01:39:17Z",
+  "source_ts": "2026-10-16T01:39:00Z",
   "locations": 80106,
   "evses": 200745,
   "dropped": 206
  },
  "dynamic": {
-  "sha256": "407c88d2f73d40c8079574cb2122d67c3e7daffaf07d8cb12ace722de043bbe3",
-  "fetched": "2026-10-15T23:38:05Z",
-  "source_ts": "2026-10-15T23:38:00Z",
+  "sha256": "60f931bf6bbbffcd1bbbdd1243bec95d7fad563c5ccf592a7203680c33e71e09",
+  "fetched": "2026-10-16T01:39:17Z",
+  "source_ts": "2026-10-16T01:39:00Z",
   "evses": 201348,
   "orphan_evses": 603,
   "missing_evses": 0,
-  "changes": 14155,
+  "changes": 1603,
   "tariffs": 1369,
-  "tariffed_connectors": 172361
+  "tariffed_connectors": 172433
  },
  "country": "NL",
  "country_name": "Netherlands",
@@ -31,12 +31,12 @@
  "source_url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
  "licence": "NDW open data",
  "pipeline_version": "0.1.0",
- "last_run": "2026-10-15T23:38:05Z",
+ "last_run": "2026-10-16T01:39:17Z",
  "warnings": [],
  "tariffs": {
-  "fetched": "2026-10-15T23:38:05Z",
-  "last_modified": "Thu, 15 Oct 2026 22:03:00 GMT",
-  "body_bytes": 3972500,
+  "fetched": "2026-10-16T01:39:17Z",
+  "last_modified": "Fri, 16 Oct 2026 00:20:00 GMT",
+  "body_bytes": 3972845,
   "json_bytes": 71093734,
   "count": 100572
  }
