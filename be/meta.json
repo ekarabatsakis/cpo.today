@@ -1,28 +1,28 @@
 {
  "static": {
-  "sha256": "8c7b22cddeb8d4672b2b5d6df19765655b6e591d397aa535de0a9f96c5cae67e",
+  "sha256": "d3c9fdcfcbbae33bf7293f94466f08b45be19c1af2cbf9e607fe4a5de1fc81bd",
   "etag": null,
-  "last_modified": "Sun, 18 Oct 2026 21:25:24 GMT",
-  "body_bytes": 5363609,
-  "json_bytes": 5363609,
+  "last_modified": "Sun, 18 Oct 2026 23:31:12 GMT",
+  "body_bytes": 5364570,
+  "json_bytes": 5364570,
   "next_check": null,
-  "structure": "a6b8735745821f63a9549243d2e3317b2bd4ac22a082036e72f959e3d43d4e40",
-  "fetched": "2026-10-18T21:25:23Z",
-  "source_ts": "2026-10-18T21:25:24Z",
-  "locations": 3579,
-  "evses": 10677,
+  "structure": "fce3857b6c8840a548b665f2bf40906bcf9677f1874df08d19f10c7e7dfdee1c",
+  "fetched": "2026-10-18T23:31:11Z",
+  "source_ts": "2026-10-18T23:31:12Z",
+  "locations": 3580,
+  "evses": 10678,
   "dropped": 1
  },
  "dynamic": {
-  "sha256": "8c7b22cddeb8d4672b2b5d6df19765655b6e591d397aa535de0a9f96c5cae67e",
-  "fetched": "2026-10-18T21:25:23Z",
-  "source_ts": "2026-10-18T21:25:24Z",
-  "evses": 8289,
+  "sha256": "d3c9fdcfcbbae33bf7293f94466f08b45be19c1af2cbf9e607fe4a5de1fc81bd",
+  "fetched": "2026-10-18T23:31:11Z",
+  "source_ts": "2026-10-18T23:31:12Z",
+  "evses": 8290,
   "orphan_evses": 2,
   "missing_evses": 0,
-  "changes": 178,
+  "changes": 49,
   "tariffs": 361,
-  "tariffed_connectors": 7602
+  "tariffed_connectors": 7603
  },
  "country": "BE",
  "country_name": "Belgium",
@@ -31,14 +31,14 @@
  "source_url": "https://transportdata.be/dataset/road-public-charging-network",
  "licence": "Open data (transportdata.be)",
  "pipeline_version": "0.1.0",
- "last_run": "2026-10-18T21:25:23Z",
+ "last_run": "2026-10-18T23:31:11Z",
  "warnings": [],
  "part0": {},
  "tariffs": {
-  "fetched": "2026-10-18T21:25:23Z",
-  "last_modified": "Sun, 18 Oct 2026 21:25:28 GMT",
-  "body_bytes": 5206024,
-  "json_bytes": 5206024,
+  "fetched": "2026-10-18T23:31:11Z",
+  "last_modified": "Sun, 18 Oct 2026 23:31:17 GMT",
+  "body_bytes": 5206027,
+  "json_bytes": 5206027,
   "count": 17411
  }
 }
