@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-18T00:27:43Z",
+ "generated": "2026-10-18T04:59:43Z",
  "countries": [
   {
    "code": "BE",
@@ -10,8 +10,8 @@
    "source_url": "https://transportdata.be/dataset/road-public-charging-network",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-10-18T00:27:33Z",
-   "dynamic_ts": "2026-10-18T00:27:33Z",
+   "static_ts": "2026-10-18T04:59:35Z",
+   "dynamic_ts": "2026-10-18T04:59:35Z",
    "locations": 3577,
    "evses": 10674
   },
@@ -52,10 +52,10 @@
    "source_url": "https://electrokinisi.yme.gov.gr/public/HelpMyfah/PublicData/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-10-17T01:38:02Z",
-   "dynamic_ts": "2026-10-18T00:26:46Z",
+   "static_ts": "2026-10-18T01:38:00Z",
+   "dynamic_ts": "2026-10-18T04:56:45Z",
    "locations": 4319,
-   "evses": 10085
+   "evses": 10092
   },
   {
    "code": "LT",
@@ -66,8 +66,8 @@
    "source_url": "https://ev.vialietuva.lt/en/data-provision",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-10-18T00:26:55Z",
-   "dynamic_ts": "2026-10-18T00:26:55Z",
+   "static_ts": "2026-10-18T04:58:58Z",
+   "dynamic_ts": "2026-10-18T04:58:58Z",
    "locations": 1977,
    "evses": 5823
   },
@@ -80,8 +80,8 @@
    "source_url": "https://data.public.lu/en/pages/topics/transport-charging-points-points-de-charge/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-10-18T00:27:39Z",
-   "dynamic_ts": "2026-10-18T00:27:39Z",
+   "static_ts": "2026-10-18T04:59:40Z",
+   "dynamic_ts": "2026-10-18T04:59:40Z",
    "locations": 737,
    "evses": 2998
   },
@@ -94,10 +94,10 @@
    "source_url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-10-18T00:27:00Z",
-   "dynamic_ts": "2026-10-18T00:27:00Z",
-   "locations": 80199,
-   "evses": 201050
+   "static_ts": "2026-10-18T04:59:00Z",
+   "dynamic_ts": "2026-10-18T04:59:00Z",
+   "locations": 80410,
+   "evses": 202031
   }
  ]
 }
