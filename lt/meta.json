@@ -24,10 +24,10 @@
   "tariffed_connectors": 5829
  },
  "tariffs": {
-  "fetched": "2026-10-18T23:30:27Z",
+  "fetched": "2026-10-19T01:36:09Z",
   "last_modified": null,
-  "body_bytes": 1750311,
-  "json_bytes": 1750311,
+  "body_bytes": 1673931,
+  "json_bytes": 1673931,
   "count": 1721
  },
  "country": "LT",
@@ -37,6 +37,8 @@
  "source_url": "https://ev.vialietuva.lt/en/data-provision",
  "licence": "Open data of Via Lietuva (Lithuanian Road Administration)",
  "pipeline_version": "0.1.0",
- "last_run": "2026-10-18T23:30:27Z",
- "warnings": []
+ "last_run": "2026-10-19T01:36:09Z",
+ "warnings": [
+  "run_static: https://ev.vialietuva.lt/ocpi/2.3.0/locations?offset=0&limit=5000: HTTP 403 (transient)"
+ ]
 }
