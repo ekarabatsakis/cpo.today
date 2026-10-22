@@ -1,28 +1,28 @@
 {
  "static": {
-  "sha256": "e5b15f6ea8e8bc9b47024cd0090b9610ef0669b8b146429ba58128f7950aa7cf",
+  "sha256": "fd8164a5f3fe1cacd88329eb5c4f1e3215494fc7cc559bb29c14c1f9d11d9a72",
   "etag": null,
-  "last_modified": "Thu, 22 Oct 2026 05:01:35 GMT",
-  "body_bytes": 5381003,
-  "json_bytes": 5381003,
+  "last_modified": "Thu, 22 Oct 2026 10:02:23 GMT",
+  "body_bytes": 5380707,
+  "json_bytes": 5380707,
   "next_check": null,
-  "structure": "24b237258f6a6a2ec4d13fd89883032366f62c57f264a776c30bfae4bf1eb973",
-  "fetched": "2026-10-22T05:01:33Z",
-  "source_ts": "2026-10-22T05:01:35Z",
+  "structure": "3dc0da8675237165fcfd7c6984954123b1ccf81277403889fbca8efb9865df08",
+  "fetched": "2026-10-22T10:02:22Z",
+  "source_ts": "2026-10-22T10:02:23Z",
   "locations": 3589,
-  "evses": 10709,
+  "evses": 10711,
   "dropped": 0
  },
  "dynamic": {
-  "sha256": "e5b15f6ea8e8bc9b47024cd0090b9610ef0669b8b146429ba58128f7950aa7cf",
-  "fetched": "2026-10-22T05:01:33Z",
-  "source_ts": "2026-10-22T05:01:35Z",
-  "evses": 8319,
+  "sha256": "fd8164a5f3fe1cacd88329eb5c4f1e3215494fc7cc559bb29c14c1f9d11d9a72",
+  "fetched": "2026-10-22T10:02:22Z",
+  "source_ts": "2026-10-22T10:02:23Z",
+  "evses": 8321,
   "orphan_evses": 0,
   "missing_evses": 0,
-  "changes": 299,
+  "changes": 1889,
   "tariffs": 360,
-  "tariffed_connectors": 7631
+  "tariffed_connectors": 7633
  },
  "country": "BE",
  "country_name": "Belgium",
@@ -31,14 +31,14 @@
  "source_url": "https://transportdata.be/dataset/road-public-charging-network",
  "licence": "Open data (transportdata.be)",
  "pipeline_version": "0.1.0",
- "last_run": "2026-10-22T05:01:33Z",
+ "last_run": "2026-10-22T10:02:22Z",
  "warnings": [],
  "part0": {},
  "tariffs": {
-  "fetched": "2026-10-22T05:01:33Z",
-  "last_modified": "Thu, 22 Oct 2026 05:01:39 GMT",
-  "body_bytes": 5215961,
-  "json_bytes": 5215961,
-  "count": 17441
+  "fetched": "2026-10-22T10:02:22Z",
+  "last_modified": "Thu, 22 Oct 2026 10:02:27 GMT",
+  "body_bytes": 5217442,
+  "json_bytes": 5217442,
+  "count": 17446
  }
 }
