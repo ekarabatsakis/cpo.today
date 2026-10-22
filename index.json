@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-22T00:13:15Z",
+ "generated": "2026-10-22T05:01:43Z",
  "countries": [
   {
    "code": "BE",
@@ -10,10 +10,10 @@
    "source_url": "https://transportdata.be/dataset/road-public-charging-network",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-10-22T00:13:03Z",
-   "dynamic_ts": "2026-10-22T00:13:03Z",
+   "static_ts": "2026-10-22T05:01:35Z",
+   "dynamic_ts": "2026-10-22T05:01:35Z",
    "locations": 3589,
-   "evses": 10708
+   "evses": 10709
   },
   {
    "code": "CY",
@@ -52,10 +52,10 @@
    "source_url": "https://electrokinisi.yme.gov.gr/public/HelpMyfah/PublicData/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-10-21T01:38:13Z",
-   "dynamic_ts": "2026-10-22T00:06:48Z",
-   "locations": 4316,
-   "evses": 10088
+   "static_ts": "2026-10-22T01:38:08Z",
+   "dynamic_ts": "2026-10-22T04:56:46Z",
+   "locations": 4322,
+   "evses": 10115
   },
   {
    "code": "LT",
@@ -66,8 +66,8 @@
    "source_url": "https://ev.vialietuva.lt/en/data-provision",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-10-22T00:12:24Z",
-   "dynamic_ts": "2026-10-22T00:12:24Z",
+   "static_ts": "2026-10-22T05:00:30Z",
+   "dynamic_ts": "2026-10-22T05:00:30Z",
    "locations": 1979,
    "evses": 5822
   },
@@ -80,8 +80,8 @@
    "source_url": "https://data.public.lu/en/pages/topics/transport-charging-points-points-de-charge/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-10-22T00:13:10Z",
-   "dynamic_ts": "2026-10-22T00:13:10Z",
+   "static_ts": "2026-10-22T05:01:40Z",
+   "dynamic_ts": "2026-10-22T05:01:40Z",
    "locations": 738,
    "evses": 3000
   },
@@ -94,10 +94,10 @@
    "source_url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-10-22T00:12:00Z",
-   "dynamic_ts": "2026-10-22T00:12:00Z",
-   "locations": 80578,
-   "evses": 202525
+   "static_ts": "2026-10-22T05:01:00Z",
+   "dynamic_ts": "2026-10-22T05:01:00Z",
+   "locations": 80573,
+   "evses": 202538
   }
  ]
 }
