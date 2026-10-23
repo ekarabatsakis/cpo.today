@@ -1,28 +1,28 @@
 {
  "static": {
-  "sha256": "421436ab57a71fac29101f4c9fb68d9c71d57d69b2653fea38585a37d9bdb445",
+  "sha256": "29a927b7dd9e703f2c2b784f7f2d14f86ec61dea03bcfa0817da7a773f368294",
   "etag": null,
-  "last_modified": "Fri, 23 Oct 2026 10:34:20 GMT",
-  "body_bytes": 5390868,
-  "json_bytes": 5390868,
+  "last_modified": "Fri, 23 Oct 2026 15:27:36 GMT",
+  "body_bytes": 5393865,
+  "json_bytes": 5393865,
   "next_check": null,
-  "structure": "91cdf2959afa24a377ade647ae26a76dbcfbba6800e41fc40c854cd552f40e15",
-  "fetched": "2026-10-23T10:34:19Z",
-  "source_ts": "2026-10-23T10:34:20Z",
-  "locations": 3596,
-  "evses": 10738,
+  "structure": "308e2967143fdc6b4adb5a02392accf5497b87029c21017b2759726cbdd39112",
+  "fetched": "2026-10-23T15:27:35Z",
+  "source_ts": "2026-10-23T15:27:36Z",
+  "locations": 3598,
+  "evses": 10740,
   "dropped": 0
  },
  "dynamic": {
-  "sha256": "421436ab57a71fac29101f4c9fb68d9c71d57d69b2653fea38585a37d9bdb445",
-  "fetched": "2026-10-23T10:34:19Z",
-  "source_ts": "2026-10-23T10:34:20Z",
-  "evses": 8334,
+  "sha256": "29a927b7dd9e703f2c2b784f7f2d14f86ec61dea03bcfa0817da7a773f368294",
+  "fetched": "2026-10-23T15:27:35Z",
+  "source_ts": "2026-10-23T15:27:36Z",
+  "evses": 8336,
   "orphan_evses": 0,
   "missing_evses": 0,
-  "changes": 1555,
-  "tariffs": 361,
-  "tariffed_connectors": 7647
+  "changes": 1508,
+  "tariffs": 362,
+  "tariffed_connectors": 7649
  },
  "country": "BE",
  "country_name": "Belgium",
@@ -31,14 +31,14 @@
  "source_url": "https://transportdata.be/dataset/road-public-charging-network",
  "licence": "Open data (transportdata.be)",
  "pipeline_version": "0.1.0",
- "last_run": "2026-10-23T10:34:19Z",
+ "last_run": "2026-10-23T15:27:35Z",
  "warnings": [],
  "part0": {},
  "tariffs": {
-  "fetched": "2026-10-23T10:34:19Z",
-  "last_modified": "Fri, 23 Oct 2026 10:34:25 GMT",
-  "body_bytes": 5223963,
-  "json_bytes": 5223963,
-  "count": 17468
+  "fetched": "2026-10-23T15:27:35Z",
+  "last_modified": "Fri, 23 Oct 2026 15:27:41 GMT",
+  "body_bytes": 5225445,
+  "json_bytes": 5225445,
+  "count": 17473
  }
 }
