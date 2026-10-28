@@ -1,28 +1,28 @@
 {
  "static": {
-  "sha256": "edf5391553702e862fb6edfefb4517cda0a8ee1c2afd5c95a09973b5975ae244",
+  "sha256": "65bd543aa5c2a42d724b65fcb8038d24330d26b1c557cc81db0c2c69bdf2483d",
   "etag": null,
-  "last_modified": "Wed, 28 Oct 2026 13:36:23 GMT",
-  "body_bytes": 5406414,
-  "json_bytes": 5406414,
+  "last_modified": "Wed, 28 Oct 2026 19:06:09 GMT",
+  "body_bytes": 5408200,
+  "json_bytes": 5408200,
   "next_check": null,
-  "structure": "f1abac9f3bf9dcccb34ed69f892eb3857018f55337396f1ec446cee18f8c90c8",
-  "fetched": "2026-10-28T13:36:22Z",
-  "source_ts": "2026-10-28T13:36:23Z",
+  "structure": "d9e1454955cbbaa332515e9f747e02ab3e913f802b44babcdcb6ece3fd6562f9",
+  "fetched": "2026-10-28T19:06:08Z",
+  "source_ts": "2026-10-28T19:06:09Z",
   "locations": 3606,
-  "evses": 10761,
+  "evses": 10763,
   "dropped": 0
  },
  "dynamic": {
-  "sha256": "edf5391553702e862fb6edfefb4517cda0a8ee1c2afd5c95a09973b5975ae244",
-  "fetched": "2026-10-28T13:36:22Z",
-  "source_ts": "2026-10-28T13:36:23Z",
-  "evses": 8357,
+  "sha256": "65bd543aa5c2a42d724b65fcb8038d24330d26b1c557cc81db0c2c69bdf2483d",
+  "fetched": "2026-10-28T19:06:08Z",
+  "source_ts": "2026-10-28T19:06:09Z",
+  "evses": 8359,
   "orphan_evses": 0,
   "missing_evses": 0,
-  "changes": 1497,
-  "tariffs": 368,
-  "tariffed_connectors": 7669
+  "changes": 1609,
+  "tariffs": 369,
+  "tariffed_connectors": 7671
  },
  "country": "BE",
  "country_name": "Belgium",
@@ -31,14 +31,14 @@
  "source_url": "https://transportdata.be/dataset/road-public-charging-network",
  "licence": "Open data (transportdata.be)",
  "pipeline_version": "0.1.0",
- "last_run": "2026-10-28T13:36:22Z",
+ "last_run": "2026-10-28T19:06:08Z",
  "warnings": [],
  "part0": {},
  "tariffs": {
-  "fetched": "2026-10-28T13:36:22Z",
-  "last_modified": "Wed, 28 Oct 2026 13:36:27 GMT",
-  "body_bytes": 5377566,
-  "json_bytes": 5377566,
-  "count": 17525
+  "fetched": "2026-10-28T19:06:08Z",
+  "last_modified": "Wed, 28 Oct 2026 19:06:13 GMT",
+  "body_bytes": 5379335,
+  "json_bytes": 5379335,
+  "count": 17531
  }
 }
