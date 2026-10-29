@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-28T23:10:01Z",
+ "generated": "2026-10-29T02:26:50Z",
  "countries": [
   {
    "code": "BE",
@@ -10,8 +10,8 @@
    "source_url": "https://transportdata.be/dataset/road-public-charging-network",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-10-28T23:09:50Z",
-   "dynamic_ts": "2026-10-28T23:09:50Z",
+   "static_ts": "2026-10-29T02:26:23Z",
+   "dynamic_ts": "2026-10-29T02:26:23Z",
    "locations": 3606,
    "evses": 10763
   },
@@ -24,7 +24,7 @@
    "source_url": "https://www.traffic4cyprus.org.cy/en_AU/dataset/electricvehiclecharges",
    "refresh_minutes": 1440,
    "live": false,
-   "static_ts": "2026-10-28T01:00:38Z",
+   "static_ts": "2026-10-29T02:26:50Z",
    "dynamic_ts": null,
    "locations": 171,
    "evses": 203
@@ -38,10 +38,10 @@
    "source_url": "https://transport.data.gouv.fr/datasets?locale=en&type=charging-stations",
    "refresh_minutes": 1440,
    "live": false,
-   "static_ts": "2026-10-27T06:04:00Z",
+   "static_ts": "2026-10-28T04:49:56Z",
    "dynamic_ts": null,
-   "locations": 54050,
-   "evses": 160456
+   "locations": 54002,
+   "evses": 160860
   },
   {
    "code": "GR",
@@ -53,7 +53,7 @@
    "refresh_minutes": 10,
    "live": true,
    "static_ts": "2026-10-28T02:38:11Z",
-   "dynamic_ts": "2026-10-28T23:06:48Z",
+   "dynamic_ts": "2026-10-29T02:16:46Z",
    "locations": 4326,
    "evses": 10133
   },
@@ -66,8 +66,8 @@
    "source_url": "https://ev.vialietuva.lt/en/data-provision",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-10-28T23:09:22Z",
-   "dynamic_ts": "2026-10-28T23:09:22Z",
+   "static_ts": "2026-10-29T02:25:57Z",
+   "dynamic_ts": "2026-10-29T02:25:57Z",
    "locations": 1975,
    "evses": 5803
   },
@@ -80,8 +80,8 @@
    "source_url": "https://data.public.lu/en/pages/topics/transport-charging-points-points-de-charge/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-10-28T23:09:57Z",
-   "dynamic_ts": "2026-10-28T23:09:57Z",
+   "static_ts": "2026-10-29T02:26:28Z",
+   "dynamic_ts": "2026-10-29T02:26:28Z",
    "locations": 740,
    "evses": 3006
   },
@@ -94,8 +94,8 @@
    "source_url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-10-28T23:09:00Z",
-   "dynamic_ts": "2026-10-28T23:09:00Z",
+   "static_ts": "2026-10-29T02:26:00Z",
+   "dynamic_ts": "2026-10-29T02:26:00Z",
    "locations": 80689,
    "evses": 202851
   }
