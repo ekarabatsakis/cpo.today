@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-03T01:19:12Z",
+ "generated": "2026-11-03T08:01:13Z",
  "countries": [
   {
    "code": "BE",
@@ -10,9 +10,9 @@
    "source_url": "https://transportdata.be/dataset/road-public-charging-network",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-03T01:19:02Z",
-   "dynamic_ts": "2026-11-03T01:19:02Z",
-   "locations": 3615,
+   "static_ts": "2026-11-03T08:01:05Z",
+   "dynamic_ts": "2026-11-03T08:01:05Z",
+   "locations": 3617,
    "evses": 10775
   },
   {
@@ -52,10 +52,10 @@
    "source_url": "https://electrokinisi.yme.gov.gr/public/HelpMyfah/PublicData/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-02T02:38:00Z",
-   "dynamic_ts": "2026-11-03T01:16:46Z",
-   "locations": 4336,
-   "evses": 10155
+   "static_ts": "2026-11-03T02:38:00Z",
+   "dynamic_ts": "2026-11-03T07:56:46Z",
+   "locations": 4335,
+   "evses": 10149
   },
   {
    "code": "LT",
@@ -66,8 +66,8 @@
    "source_url": "https://ev.vialietuva.lt/en/data-provision",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-03T01:18:32Z",
-   "dynamic_ts": "2026-11-03T01:18:32Z",
+   "static_ts": "2026-11-03T08:00:13Z",
+   "dynamic_ts": "2026-11-03T08:00:13Z",
    "locations": 1973,
    "evses": 5727
   },
@@ -80,8 +80,8 @@
    "source_url": "https://data.public.lu/en/pages/topics/transport-charging-points-points-de-charge/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-03T01:19:08Z",
-   "dynamic_ts": "2026-11-03T01:19:08Z",
+   "static_ts": "2026-11-03T08:01:10Z",
+   "dynamic_ts": "2026-11-03T08:01:10Z",
    "locations": 743,
    "evses": 3040
   },
@@ -94,10 +94,10 @@
    "source_url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-03T01:18:00Z",
-   "dynamic_ts": "2026-11-03T01:18:00Z",
-   "locations": 81689,
-   "evses": 205670
+   "static_ts": "2026-11-03T08:00:00Z",
+   "dynamic_ts": "2026-11-03T08:00:00Z",
+   "locations": 80794,
+   "evses": 203243
   }
  ]
 }
