@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-07T02:11:58Z",
+ "generated": "2026-11-07T08:55:32Z",
  "countries": [
   {
    "code": "BE",
@@ -10,8 +10,8 @@
    "source_url": "https://transportdata.be/dataset/road-public-charging-network",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-07T02:11:35Z",
-   "dynamic_ts": "2026-11-07T02:11:35Z",
+   "static_ts": "2026-11-07T08:55:21Z",
+   "dynamic_ts": "2026-11-07T08:55:21Z",
    "locations": 3624,
    "evses": 10891
   },
@@ -52,10 +52,10 @@
    "source_url": "https://electrokinisi.yme.gov.gr/public/HelpMyfah/PublicData/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-06T02:37:58Z",
-   "dynamic_ts": "2026-11-07T02:06:48Z",
-   "locations": 4336,
-   "evses": 10151
+   "static_ts": "2026-11-07T02:37:58Z",
+   "dynamic_ts": "2026-11-07T08:46:48Z",
+   "locations": 4331,
+   "evses": 10144
   },
   {
    "code": "LT",
@@ -66,8 +66,8 @@
    "source_url": "https://ev.vialietuva.lt/en/data-provision",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-07T02:11:09Z",
-   "dynamic_ts": "2026-11-07T02:11:09Z",
+   "static_ts": "2026-11-07T08:54:52Z",
+   "dynamic_ts": "2026-11-07T08:54:52Z",
    "locations": 1973,
    "evses": 5737
   },
@@ -80,8 +80,8 @@
    "source_url": "https://data.public.lu/en/pages/topics/transport-charging-points-points-de-charge/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-07T02:11:40Z",
-   "dynamic_ts": "2026-11-07T02:11:40Z",
+   "static_ts": "2026-11-07T08:55:27Z",
+   "dynamic_ts": "2026-11-07T08:55:27Z",
    "locations": 740,
    "evses": 3034
   },
@@ -94,10 +94,10 @@
    "source_url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-07T02:11:00Z",
-   "dynamic_ts": "2026-11-07T02:11:00Z",
-   "locations": 81349,
-   "evses": 204747
+   "static_ts": "2026-11-07T08:55:00Z",
+   "dynamic_ts": "2026-11-07T08:55:00Z",
+   "locations": 72447,
+   "evses": 185944
   }
  ]
 }
