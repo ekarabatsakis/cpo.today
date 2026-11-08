@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-08T20:18:23Z",
+ "generated": "2026-11-08T23:49:45Z",
  "countries": [
   {
    "code": "BE",
@@ -10,10 +10,10 @@
    "source_url": "https://transportdata.be/dataset/road-public-charging-network",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-08T20:18:14Z",
-   "dynamic_ts": "2026-11-08T20:18:14Z",
-   "locations": 3625,
-   "evses": 10892
+   "static_ts": "2026-11-08T23:49:37Z",
+   "dynamic_ts": "2026-11-08T23:49:37Z",
+   "locations": 3624,
+   "evses": 10891
   },
   {
    "code": "CY",
@@ -53,7 +53,7 @@
    "refresh_minutes": 10,
    "live": true,
    "static_ts": "2026-11-08T02:37:58Z",
-   "dynamic_ts": "2026-11-08T20:16:46Z",
+   "dynamic_ts": "2026-11-08T23:46:48Z",
    "locations": 4331,
    "evses": 10144
   },
@@ -66,10 +66,10 @@
    "source_url": "https://ev.vialietuva.lt/en/data-provision",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-08T20:17:48Z",
-   "dynamic_ts": "2026-11-08T20:17:48Z",
-   "locations": 1973,
-   "evses": 5740
+   "static_ts": "2026-11-08T23:49:12Z",
+   "dynamic_ts": "2026-11-08T23:49:12Z",
+   "locations": 1972,
+   "evses": 5737
   },
   {
    "code": "LU",
@@ -80,8 +80,8 @@
    "source_url": "https://data.public.lu/en/pages/topics/transport-charging-points-points-de-charge/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-08T20:18:19Z",
-   "dynamic_ts": "2026-11-08T20:18:19Z",
+   "static_ts": "2026-11-08T23:49:42Z",
+   "dynamic_ts": "2026-11-08T23:49:42Z",
    "locations": 740,
    "evses": 3034
   },
@@ -94,10 +94,10 @@
    "source_url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-08T20:17:00Z",
-   "dynamic_ts": "2026-11-08T20:17:00Z",
-   "locations": 72449,
-   "evses": 186012
+   "static_ts": "2026-11-08T23:49:00Z",
+   "dynamic_ts": "2026-11-08T23:49:00Z",
+   "locations": 72482,
+   "evses": 186082
   }
  ]
 }
