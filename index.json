@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-12T02:31:34Z",
+ "generated": "2026-11-12T10:16:44Z",
  "countries": [
   {
    "code": "BE",
@@ -10,8 +10,8 @@
    "source_url": "https://transportdata.be/dataset/road-public-charging-network",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-12T02:31:23Z",
-   "dynamic_ts": "2026-11-12T02:31:23Z",
+   "static_ts": "2026-11-12T10:16:18Z",
+   "dynamic_ts": "2026-11-12T10:16:18Z",
    "locations": 3629,
    "evses": 10899
   },
@@ -24,7 +24,7 @@
    "source_url": "https://www.traffic4cyprus.org.cy/en_AU/dataset/electricvehiclecharges",
    "refresh_minutes": 1440,
    "live": false,
-   "static_ts": "2026-11-11T06:43:12Z",
+   "static_ts": "2026-11-12T10:16:44Z",
    "dynamic_ts": null,
    "locations": 171,
    "evses": 203
@@ -38,10 +38,10 @@
    "source_url": "https://transport.data.gouv.fr/datasets?locale=en&type=charging-stations",
    "refresh_minutes": 1440,
    "live": false,
-   "static_ts": "2026-11-10T05:13:38Z",
+   "static_ts": "2026-11-12T05:32:15Z",
    "dynamic_ts": null,
-   "locations": 56817,
-   "evses": 167436
+   "locations": 57378,
+   "evses": 168445
   },
   {
    "code": "GR",
@@ -52,10 +52,10 @@
    "source_url": "https://electrokinisi.yme.gov.gr/public/HelpMyfah/PublicData/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-11T02:38:00Z",
-   "dynamic_ts": "2026-11-12T02:26:46Z",
-   "locations": 4341,
-   "evses": 10147
+   "static_ts": "2026-11-12T02:38:07Z",
+   "dynamic_ts": "2026-11-12T10:06:49Z",
+   "locations": 4342,
+   "evses": 10149
   },
   {
    "code": "LT",
@@ -66,8 +66,8 @@
    "source_url": "https://ev.vialietuva.lt/en/data-provision",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-12T02:30:40Z",
-   "dynamic_ts": "2026-11-12T02:30:40Z",
+   "static_ts": "2026-11-12T10:15:47Z",
+   "dynamic_ts": "2026-11-12T10:15:47Z",
    "locations": 1972,
    "evses": 5704
   },
@@ -80,8 +80,8 @@
    "source_url": "https://data.public.lu/en/pages/topics/transport-charging-points-points-de-charge/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-12T02:31:30Z",
-   "dynamic_ts": "2026-11-12T02:31:30Z",
+   "static_ts": "2026-11-12T10:16:25Z",
+   "dynamic_ts": "2026-11-12T10:16:25Z",
    "locations": 739,
    "evses": 3034
   },
@@ -94,10 +94,10 @@
    "source_url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-12T02:31:00Z",
-   "dynamic_ts": "2026-11-12T02:31:00Z",
-   "locations": 73530,
-   "evses": 188909
+   "static_ts": "2026-11-12T10:16:00Z",
+   "dynamic_ts": "2026-11-12T10:16:00Z",
+   "locations": 72662,
+   "evses": 186606
   }
  ]
 }
