@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-14T05:29:09Z",
+ "generated": "2026-11-14T12:27:37Z",
  "countries": [
   {
    "code": "BE",
@@ -10,8 +10,8 @@
    "source_url": "https://transportdata.be/dataset/road-public-charging-network",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-14T05:28:57Z",
-   "dynamic_ts": "2026-11-14T05:28:57Z",
+   "static_ts": "2026-11-14T12:27:24Z",
+   "dynamic_ts": "2026-11-14T12:27:24Z",
    "locations": 3631,
    "evses": 10904
   },
@@ -24,7 +24,7 @@
    "source_url": "https://www.traffic4cyprus.org.cy/en_AU/dataset/electricvehiclecharges",
    "refresh_minutes": 1440,
    "live": false,
-   "static_ts": "2026-11-13T11:35:52Z",
+   "static_ts": "2026-11-14T12:27:37Z",
    "dynamic_ts": null,
    "locations": 171,
    "evses": 203
@@ -53,7 +53,7 @@
    "refresh_minutes": 10,
    "live": true,
    "static_ts": "2026-11-14T02:38:07Z",
-   "dynamic_ts": "2026-11-14T05:26:46Z",
+   "dynamic_ts": "2026-11-14T12:26:46Z",
    "locations": 4347,
    "evses": 10162
   },
@@ -66,8 +66,8 @@
    "source_url": "https://ev.vialietuva.lt/en/data-provision",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-14T05:28:26Z",
-   "dynamic_ts": "2026-11-14T05:28:26Z",
+   "static_ts": "2026-11-14T12:26:54Z",
+   "dynamic_ts": "2026-11-14T12:26:54Z",
    "locations": 1974,
    "evses": 5711
   },
@@ -80,8 +80,8 @@
    "source_url": "https://data.public.lu/en/pages/topics/transport-charging-points-points-de-charge/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-14T05:29:04Z",
-   "dynamic_ts": "2026-11-14T05:29:04Z",
+   "static_ts": "2026-11-14T12:27:30Z",
+   "dynamic_ts": "2026-11-14T12:27:30Z",
    "locations": 739,
    "evses": 3034
   },
@@ -94,10 +94,10 @@
    "source_url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-14T05:28:00Z",
-   "dynamic_ts": "2026-11-14T05:28:00Z",
-   "locations": 83132,
-   "evses": 208627
+   "static_ts": "2026-11-14T12:27:00Z",
+   "dynamic_ts": "2026-11-14T12:27:00Z",
+   "locations": 83065,
+   "evses": 208510
   }
  ]
 }
