@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-16T01:02:32Z",
+ "generated": "2026-11-16T07:56:29Z",
  "countries": [
   {
    "code": "BE",
@@ -10,8 +10,8 @@
    "source_url": "https://transportdata.be/dataset/road-public-charging-network",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-16T01:02:24Z",
-   "dynamic_ts": "2026-11-16T01:02:24Z",
+   "static_ts": "2026-11-16T07:56:18Z",
+   "dynamic_ts": "2026-11-16T07:56:18Z",
    "locations": 3632,
    "evses": 10905
   },
@@ -52,10 +52,10 @@
    "source_url": "https://electrokinisi.yme.gov.gr/public/HelpMyfah/PublicData/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-15T02:38:04Z",
-   "dynamic_ts": "2026-11-16T00:56:47Z",
-   "locations": 4348,
-   "evses": 10163
+   "static_ts": "2026-11-16T02:38:06Z",
+   "dynamic_ts": "2026-11-16T07:46:49Z",
+   "locations": 4349,
+   "evses": 10164
   },
   {
    "code": "LT",
@@ -66,8 +66,8 @@
    "source_url": "https://ev.vialietuva.lt/en/data-provision",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-16T01:01:42Z",
-   "dynamic_ts": "2026-11-16T01:01:42Z",
+   "static_ts": "2026-11-16T07:55:46Z",
+   "dynamic_ts": "2026-11-16T07:55:46Z",
    "locations": 1974,
    "evses": 5715
   },
@@ -80,8 +80,8 @@
    "source_url": "https://data.public.lu/en/pages/topics/transport-charging-points-points-de-charge/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-16T01:02:29Z",
-   "dynamic_ts": "2026-11-16T01:02:29Z",
+   "static_ts": "2026-11-16T07:56:25Z",
+   "dynamic_ts": "2026-11-16T07:56:25Z",
    "locations": 739,
    "evses": 3034
   },
@@ -94,10 +94,10 @@
    "source_url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-16T01:02:00Z",
-   "dynamic_ts": "2026-11-16T01:02:00Z",
-   "locations": 83147,
-   "evses": 208746
+   "static_ts": "2026-11-16T07:55:00Z",
+   "dynamic_ts": "2026-11-16T07:55:00Z",
+   "locations": 84002,
+   "evses": 211119
   }
  ]
 }
