@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-17T01:50:51Z",
+ "generated": "2026-11-17T09:47:18Z",
  "countries": [
   {
    "code": "BE",
@@ -10,8 +10,8 @@
    "source_url": "https://transportdata.be/dataset/road-public-charging-network",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-17T01:50:41Z",
-   "dynamic_ts": "2026-11-17T01:50:41Z",
+   "static_ts": "2026-11-17T09:47:06Z",
+   "dynamic_ts": "2026-11-17T09:47:06Z",
    "locations": 3635,
    "evses": 10921
   },
@@ -52,10 +52,10 @@
    "source_url": "https://electrokinisi.yme.gov.gr/public/HelpMyfah/PublicData/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-16T02:38:06Z",
-   "dynamic_ts": "2026-11-17T01:46:49Z",
-   "locations": 4349,
-   "evses": 10164
+   "static_ts": "2026-11-17T02:38:01Z",
+   "dynamic_ts": "2026-11-17T09:36:46Z",
+   "locations": 4360,
+   "evses": 10207
   },
   {
    "code": "LT",
@@ -66,8 +66,8 @@
    "source_url": "https://ev.vialietuva.lt/en/data-provision",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-17T01:50:06Z",
-   "dynamic_ts": "2026-11-17T01:50:06Z",
+   "static_ts": "2026-11-17T09:45:58Z",
+   "dynamic_ts": "2026-11-17T09:45:58Z",
    "locations": 1978,
    "evses": 5727
   },
@@ -80,8 +80,8 @@
    "source_url": "https://data.public.lu/en/pages/topics/transport-charging-points-points-de-charge/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-17T01:50:47Z",
-   "dynamic_ts": "2026-11-17T01:50:47Z",
+   "static_ts": "2026-11-17T09:47:13Z",
+   "dynamic_ts": "2026-11-17T09:47:13Z",
    "locations": 741,
    "evses": 3040
   },
@@ -94,10 +94,10 @@
    "source_url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-17T01:50:00Z",
-   "dynamic_ts": "2026-11-17T01:50:00Z",
-   "locations": 83184,
-   "evses": 208838
+   "static_ts": "2026-11-17T09:46:00Z",
+   "dynamic_ts": "2026-11-17T09:46:00Z",
+   "locations": 84020,
+   "evses": 211021
   }
  ]
 }
