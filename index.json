@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-23T02:20:28Z",
+ "generated": "2026-11-23T10:56:50Z",
  "countries": [
   {
    "code": "BE",
@@ -10,10 +10,10 @@
    "source_url": "https://transportdata.be/dataset/road-public-charging-network",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-23T02:20:17Z",
-   "dynamic_ts": "2026-11-23T02:20:17Z",
-   "locations": 3645,
-   "evses": 10945
+   "static_ts": "2026-11-23T10:56:39Z",
+   "dynamic_ts": "2026-11-23T10:56:39Z",
+   "locations": 3647,
+   "evses": 10947
   },
   {
    "code": "CY",
@@ -24,7 +24,7 @@
    "source_url": "https://www.traffic4cyprus.org.cy/en_AU/dataset/electricvehiclecharges",
    "refresh_minutes": 1440,
    "live": false,
-   "static_ts": "2026-11-22T08:13:12Z",
+   "static_ts": "2026-11-23T10:56:50Z",
    "dynamic_ts": null,
    "locations": 171,
    "evses": 203
@@ -52,8 +52,8 @@
    "source_url": "https://electrokinisi.yme.gov.gr/public/HelpMyfah/PublicData/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-22T02:38:00Z",
-   "dynamic_ts": "2026-11-23T02:16:47Z",
+   "static_ts": "2026-11-23T02:38:03Z",
+   "dynamic_ts": "2026-11-23T10:46:49Z",
    "locations": 4359,
    "evses": 10208
   },
@@ -66,8 +66,8 @@
    "source_url": "https://ev.vialietuva.lt/en/data-provision",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-23T02:19:51Z",
-   "dynamic_ts": "2026-11-23T02:19:51Z",
+   "static_ts": "2026-11-23T10:56:10Z",
+   "dynamic_ts": "2026-11-23T10:56:10Z",
    "locations": 1978,
    "evses": 5750
   },
@@ -80,8 +80,8 @@
    "source_url": "https://data.public.lu/en/pages/topics/transport-charging-points-points-de-charge/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-23T02:20:23Z",
-   "dynamic_ts": "2026-11-23T02:20:23Z",
+   "static_ts": "2026-11-23T10:56:44Z",
+   "dynamic_ts": "2026-11-23T10:56:44Z",
    "locations": 742,
    "evses": 3065
   },
@@ -94,10 +94,10 @@
    "source_url": "https://docs.ndw.nu/en/data-uitwisseling/interface-beschrijvingen/dafne-api/",
    "refresh_minutes": 10,
    "live": true,
-   "static_ts": "2026-11-23T02:19:00Z",
-   "dynamic_ts": "2026-11-23T02:19:00Z",
-   "locations": 83497,
-   "evses": 209651
+   "static_ts": "2026-11-23T10:56:00Z",
+   "dynamic_ts": "2026-11-23T10:56:00Z",
+   "locations": 83523,
+   "evses": 209652
   }
  ]
 }
