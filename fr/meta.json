@@ -1,17 +1,17 @@
 {
  "static": {
-  "sha256": "9eb6b26c74ecf212b98032c3e95fc438288a9801e3787f762f471e9edab88968",
-  "etag": "\"0dab77f633fb78092181517d109a3c06-15\"",
-  "last_modified": "Thu, 12 Nov 2026 05:32:15 GMT",
-  "body_bytes": 118041158,
-  "json_bytes": 118041158,
-  "next_check": "2026-11-24T10:56:48Z",
-  "structure": "6416aa9fb3db08ad4cd31a0c06a36ef11fafc2b47fed4c75b7a846c7b6859e22",
-  "fetched": "2026-11-12T10:16:29Z",
-  "source_ts": "2026-11-12T05:32:15Z",
-  "locations": 57378,
-  "evses": 168445,
-  "dropped": 834
+  "sha256": "6a640de5d5a9b843384ced8c776f547ca41df072a2788dfc9247ba571a67251b",
+  "etag": "\"3531312016d613c52dbe5cdf71c31852-15\"",
+  "last_modified": "Tue, 24 Nov 2026 01:00:50 GMT",
+  "body_bytes": 118738301,
+  "json_bytes": 118738301,
+  "next_check": "2026-11-25T17:58:35Z",
+  "structure": "2802602edca6c52aa8308e42adaa073118672c4f36bf732147c124bb387c9f15",
+  "fetched": "2026-11-24T17:58:35Z",
+  "source_ts": "2026-11-24T01:00:50Z",
+  "locations": 56888,
+  "evses": 169113,
+  "dropped": 784
  },
  "dynamic": {
   "source_ts": null,
@@ -24,6 +24,6 @@
  "source_url": "https://transport.data.gouv.fr/datasets?locale=en&type=charging-stations",
  "licence": "Licence Ouverte / Open Licence 2.0 (Etalab)",
  "pipeline_version": "0.1.0",
- "last_run": "2026-11-24T06:19:22Z",
+ "last_run": "2026-11-24T17:58:35Z",
  "warnings": []
 }
